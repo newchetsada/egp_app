@@ -1,4 +1,7 @@
+import 'package:egp_app/clean/cleansolar.dart';
 import 'package:egp_app/home.dart';
+import 'package:egp_app/login.dart';
+import 'package:egp_app/pages/homepage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,7 +37,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
   messaging.getToken().then((value) {
-    print(value);
+    print('key is $value');
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage event) {
@@ -57,9 +60,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EGP',
       theme: ThemeData(
+        fontFamily: 'BaiJamjuree',
         primarySwatch: Colors.blue,
       ),
-      home: Home(),
+      home: homePage(),
     );
   }
 }

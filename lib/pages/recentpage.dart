@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class recentPage extends StatefulWidget {
   @override
@@ -10,9 +11,9 @@ class _recentPageState extends State<recentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.pink,
+      // backgroundColor: Colors.pink,
       body: Center(
-        child: IconButton(onPressed: () {}, icon: Icon(Icons.abc)),
+        child: Lottie.asset('assets/logoloading.json'),
       ),
     );
   }
