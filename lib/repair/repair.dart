@@ -1,18 +1,22 @@
-import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/repair/uploadpic.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dotted_line/dotted_line.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
-class cleansolar extends StatefulWidget {
-  _cleansolarState createState() => _cleansolarState();
+import 'hero_dialog_route.dart';
+
+class repair extends StatefulWidget {
+  @override
+  _repairState createState() => _repairState();
 }
 
-class _cleansolarState extends State<cleansolar> {
+class _repairState extends State<repair> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
 
@@ -35,7 +39,6 @@ class _cleansolarState extends State<cleansolar> {
   void confirmpop() {
     showDialog<void>(
       context: context,
-      // barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding:
@@ -166,6 +169,9 @@ class _cleansolarState extends State<cleansolar> {
               height: 130,
               decoration: BoxDecoration(
                 color: Color(0xff149C32),
+                // borderRadius: BorderRadius.only(
+                //     bottomLeft: Radius.circular(25),
+                //     bottomRight: Radius.circular(25))
               ),
               child: Column(
                 children: [
@@ -342,12 +348,12 @@ class _cleansolarState extends State<cleansolar> {
                       children: [
                         Container(
                           height: 30,
-                          width: 100,
+                          width: 120,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20)),
                           child: Center(
-                              child: Text('ล้างแผง',
+                              child: Text('ซ่อมบำรุง',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 15,
@@ -364,7 +370,7 @@ class _cleansolarState extends State<cleansolar> {
                             (_curpage == 0)
                                 ? 'นัดหมาย 25/1/2023 08:30'
                                 : (_curpage == 1)
-                                    ? 'ผู้ใช้งานสุ่มถ่ายรูป แผลโซล่าเซลล์ก่อนล้าง หลังล้าง'
+                                    ? 'ถ่ายรูปตามจุดที่กำหมด พร้อมเขียนรายละเอียดให้ครบถ้วน'
                                     : 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน',
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -703,11 +709,348 @@ class _cleansolarState extends State<cleansolar> {
               ],
             ),
             SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: Color(0xff003175),
+                      size: 20,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('คุณ ตู่',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff464646))),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('ตำแหน่ง : ประสานงาน',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff464646))),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('000-000-0000',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: Color(0xff464646)))
+                      ],
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 30),
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      // border: Border.all(width: 3),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(200),
+                      ),
+                      color: Color(0xff003175),
+                    ),
+                    child: Center(
+                      child: IconButton(
+                          splashRadius: 20,
+                          iconSize: 20,
+                          color: Colors.white,
+                          onPressed: () {
+                            _makePhoneCall('0000000000');
+                          },
+                          icon: Icon(Icons.phone)),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: Color(0xff003175),
+                      size: 20,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('คุณ ตู่',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff464646))),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('ตำแหน่ง : ประสานงาน',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff464646))),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('000-000-0000',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                                color: Color(0xff464646)))
+                      ],
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 30),
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      // border: Border.all(width: 3),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(200),
+                      ),
+                      color: Color(0xff003175),
+                    ),
+                    child: Center(
+                      child: IconButton(
+                          splashRadius: 20,
+                          iconSize: 20,
+                          color: Colors.white,
+                          onPressed: () {
+                            _makePhoneCall('0000000000');
+                          },
+                          icon: Icon(Icons.phone)),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
               height: 30,
             )
           ],
         ),
       ),
+    );
+  }
+
+  _buildPopUp(BuildContext context) {
+    return Center(
+      child: Hero(
+          tag: "bg",
+          child: Material(
+            // shape: RoundedRectangleBorder(
+            //     borderRadius: BorderRadius.all(Radius.circular(20))),
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color(0xff149C32),
+                // borderRadius: BorderRadius.circular(20),
+                // border: Border.all(color: Color(0xffE0ECDE)),
+                // boxShadow: [
+                //   BoxShadow(
+                //     color: Color(0xff149C32).withOpacity(0.1),
+                //     blurRadius: 10,
+                //     spreadRadius: 0,
+                //     offset: Offset(0, 0), // Shadow position
+                //   ),
+                // ],
+              ),
+              child: SafeArea(
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: 100,
+                    ),
+                    Text('เลือกอุปกรณ์ซ่อมบำรุง',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24,
+                            color: Colors.white)),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    // Divider(
+                    //   thickness: 0.5,
+                    //   color: Colors.white,
+                    // ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('PV (แผงโซลาเซลล์)',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Mounting',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Inverter',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('ตู้ DC, AC',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Fuse',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Breaker',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Switch',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('Optimizer',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('อื่นๆ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Colors.white)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    IconButton(
+                        iconSize: 30,
+                        color: Colors.white,
+                        splashRadius: 20,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.cancel_outlined)),
+                  ],
+                ),
+              ),
+            ),
+          )),
     );
   }
 
@@ -717,326 +1060,486 @@ class _cleansolarState extends State<cleansolar> {
       bottomNavigationBar: Container(
         // height: 30,
         color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 20, left: 30, right: 30),
-                      child: SizedBox(
-                        height: 50,
-                        // width: 160,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => photopage(
-                                        type: 0,
-                                      )),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff003175),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            'แจ้งซ่อม',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
-                          ),
-                        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 20, bottom: 30, left: 30, right: 30),
+                child: SizedBox(
+                  height: 50,
+                  // width: 160,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      controller.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xff149C32),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, bottom: 30, left: 30, right: 30),
-                      child: SizedBox(
-                        height: 50,
-                        // width: 160,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            controller.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff149C32),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            'ถัดไป',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
+                    child: Text(
+                      'ถัดไป',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                   ),
-                ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: ListView(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
-                child: GridView.count(
-                    shrinkWrap: true,
-                    childAspectRatio: 1,
-                    primary: false,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 2,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => photopage(
-                                      type: 1,
-                                    )),
-                          );
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Color(0xff149C32),
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
+          Padding(
+            padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    HeroDialogRoute(
+                        builder: (BuildContext context) =>
+                            _buildPopUp(context)));
+              },
+              child: Material(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Container(
+                  height: 70,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Color(0xffE0ECDE)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xff149C32).withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: Offset(0, 0), // Shadow position
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('เพิ่มเรื่องซ่อมบำรุง',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Color(0xff464646))),
+                        Hero(
+                          tag: "bg",
+                          child: Container(
+                            height: 30,
+                            width: 30,
+                            decoration: BoxDecoration(
+                              // border: Border.all(width: 3),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(200),
                               ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: Colors.white)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 45,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                            child: Center(
-                                              child: Text('12/12',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Colors.white)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              color: Color(0xff149C32),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => photopage(
-                                      type: 2,
-                                    )),
-                          );
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: Color(0xff003175))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 45,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                            child: Center(
-                                              child: Text('0/12',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Color(0xff003175))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ]),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ],
+            ),
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
+          //   child: PullDownButton(
+          //     itemBuilder: (context) => [
+          //       PullDownMenuItem(
+          //         title: 'Menu item',
+          //         onTap: () {},
+          //       ),
+          //       const PullDownMenuDivider(),
+          //       PullDownMenuItem(
+          //         title: 'Menu item 2',
+          //         onTap: () {},
+          //       ),
+          //     ],
+          //     position: PullDownMenuPosition.under,
+          //     buttonBuilder: (context, showMenu) => GestureDetector(
+          //       onTap: showMenu,
+          //       // padding: EdgeInsets.zero,
+          //       child: Container(
+          //         height: 70,
+          //         width: double.infinity,
+          //         decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           borderRadius: BorderRadius.circular(15),
+          //           border: Border.all(color: Color(0xffE0ECDE)),
+          //           boxShadow: [
+          //             BoxShadow(
+          //               color: Color(0xff149C32).withOpacity(0.1),
+          //               blurRadius: 10,
+          //               spreadRadius: 0,
+          //               offset: Offset(0, 0), // Shadow position
+          //             ),
+          //           ],
+          //         ),
+          //         child: Padding(
+          //           padding: const EdgeInsets.symmetric(horizontal: 30),
+          //           child: Row(
+          //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //             children: [
+          //               Text('เพิ่มเรื่องซ่อมบำรุง',
+          //                   style: TextStyle(
+          //                       fontWeight: FontWeight.w600,
+          //                       fontSize: 14,
+          //                       color: Color(0xff464646))),
+          //               Container(
+          //                 height: 30,
+          //                 width: 30,
+          //                 decoration: BoxDecoration(
+          //                   // border: Border.all(width: 3),
+          //                   borderRadius: BorderRadius.all(
+          //                     Radius.circular(200),
+          //                   ),
+          //                   color: Color(0xff149C32),
+          //                 ),
+          //                 child: Center(
+          //                   child: Icon(
+          //                     Icons.add,
+          //                     color: Colors.white,
+          //                     size: 30,
+          //                   ),
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10, left: 45, right: 40),
+            child: Row(
+              children: [
+                Text('ซ่อมบำรุง',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xff464646))),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
+            child: GridView.count(
+                shrinkWrap: true,
+                childAspectRatio: 1.2,
+                primary: false,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 10,
+                crossAxisCount: 2,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => uploadPic()));
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xff149C32),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xff003175).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text('PV (แผงโซล่าเซลล์)',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                            color: Colors.white)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      height: 30,
+                                      width: 45,
+                                      decoration: BoxDecoration(
+                                        // border: Border.all(width: 3),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(13),
+                                        ),
+                                        color: Color(0xff003175),
+                                      ),
+                                      child: Center(
+                                        child: Text('5/5',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: Colors.white)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text('งานทั้งหมด',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12,
+                                            color: Colors.white)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => uploadPic()));
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xff149C32),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xff003175).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text('Inverter',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 12,
+                                            color: Colors.white)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      height: 30,
+                                      width: 45,
+                                      decoration: BoxDecoration(
+                                        // border: Border.all(width: 3),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(13),
+                                        ),
+                                        color: Color(0xff003175),
+                                      ),
+                                      child: Center(
+                                        child: Text('5/5',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: Colors.white)),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text('งานทั้งหมด',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 12,
+                                            color: Colors.white)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigator.push(context,
+                  //         MaterialPageRoute(builder: (context) => uploadPic()));
+                  //   },
+                  //   child: Container(
+                  //     height: 80,
+                  //     width: double.infinity,
+                  //     decoration: BoxDecoration(
+                  //       color: Color(0xffF9FAF8),
+                  //       borderRadius: BorderRadius.circular(15),
+                  //       border: Border.all(color: Color(0xffE0ECDE)),
+                  //       boxShadow: [
+                  //         BoxShadow(
+                  //           color: Color(0xff149C32).withOpacity(0.1),
+                  //           blurRadius: 10,
+                  //           spreadRadius: 0,
+                  //           offset: Offset(0, 0), // Shadow position
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     child: Column(
+                  //       children: [
+                  //         Container(
+                  //           height: 40,
+                  //           width: double.infinity,
+                  //           decoration: BoxDecoration(
+                  //               color: Colors.white,
+                  //               borderRadius: BorderRadius.only(
+                  //                   topLeft: Radius.circular(15),
+                  //                   topRight: Radius.circular(15))),
+                  //           child: Center(
+                  //             child: Text('PV (แผงโซล่าเซลล์)',
+                  //                 style: TextStyle(
+                  //                     fontWeight: FontWeight.w600,
+                  //                     fontSize: 13,
+                  //                     color: Color(0xff2DAC34))),
+                  //           ),
+                  //         ),
+                  //         Expanded(
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //             children: [
+                  //               Row(
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 children: [
+                  //                   Container(
+                  //                     height: 22,
+                  //                     width: 22,
+                  //                     decoration: BoxDecoration(
+                  //                       // border: Border.all(width: 3),
+                  //                       borderRadius: BorderRadius.all(
+                  //                         Radius.circular(200),
+                  //                       ),
+                  //                       color: Color(0xffB3E8A8),
+                  //                     ),
+                  //                     child: Center(
+                  //                       child: Text('1',
+                  //                           style: TextStyle(
+                  //                               fontWeight: FontWeight.w600,
+                  //                               fontSize: 12,
+                  //                               color: Color(0xff149C32))),
+                  //                     ),
+                  //                   ),
+                  //                   SizedBox(
+                  //                     width: 10,
+                  //                   ),
+                  //                   Text('รูปถ่ายก่อนซ่อม',
+                  //                       style: TextStyle(
+                  //                           fontWeight: FontWeight.w600,
+                  //                           fontSize: 12,
+                  //                           color: Color(0xff2DAC34)))
+                  //                 ],
+                  //               ),
+                  //               Row(
+                  //                 mainAxisAlignment: MainAxisAlignment.center,
+                  //                 children: [
+                  //                   Container(
+                  //                     height: 22,
+                  //                     width: 22,
+                  //                     decoration: BoxDecoration(
+                  //                       // border: Border.all(width: 3),
+                  //                       borderRadius: BorderRadius.all(
+                  //                         Radius.circular(200),
+                  //                       ),
+                  //                       color: Color(0xffB3E8A8),
+                  //                     ),
+                  //                     child: Center(
+                  //                       child: Text('1',
+                  //                           style: TextStyle(
+                  //                               fontWeight: FontWeight.w600,
+                  //                               fontSize: 12,
+                  //                               color: Color(0xff149C32))),
+                  //                     ),
+                  //                   ),
+                  //                   SizedBox(
+                  //                     width: 10,
+                  //                   ),
+                  //                   Text('รูปถ่ายหลังซ่อม',
+                  //                       style: TextStyle(
+                  //                           fontWeight: FontWeight.w600,
+                  //                           fontSize: 12,
+                  //                           color: Color(0xff2DAC34)))
+                  //                 ],
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                ]),
           ),
         ],
       ),

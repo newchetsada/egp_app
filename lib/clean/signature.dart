@@ -27,7 +27,7 @@ class _signatureState extends State<signature> {
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
           leading: IconButton(
-              color: Color(0xff57A946),
+              color: Color(0xff149C32),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -37,12 +37,12 @@ class _signatureState extends State<signature> {
             style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 19,
-                color: Color(0xff57A946)),
+                color: Color(0xff149C32)),
           ),
         ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
                 Expanded(
@@ -52,7 +52,7 @@ class _signatureState extends State<signature> {
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xff57A946).withOpacity(0.1),
+                        color: Color(0xff149C32).withOpacity(0.1),
                         blurRadius: 10,
                         spreadRadius: 3,
                         offset: Offset(0, 0), // Shadow position
@@ -87,11 +87,11 @@ class _signatureState extends State<signature> {
                             'ล้าง',
                             style: TextStyle(
                                 color: Color(0xff464646),
-                                fontSize: 14,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600),
                           )),
                       SizedBox(
-                        height: 40,
+                        height: 45,
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () async {
@@ -109,15 +109,15 @@ class _signatureState extends State<signature> {
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff57A946),
+                            backgroundColor: Color(0xff149C32),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32.0),
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           child: Text(
                             'บันทึก',
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w600),
+                                fontSize: 15, fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),

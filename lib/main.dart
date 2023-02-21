@@ -20,7 +20,6 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   //create noti chanel
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -34,6 +33,18 @@ void main() async {
   );
 
   var messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  print('User granted permission: ${settings.authorizationStatus}');
   FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
   messaging.getToken().then((value) {
@@ -57,13 +68,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EGP',
-      theme: ThemeData(
-        fontFamily: 'BaiJamjuree',
-        primarySwatch: Colors.blue,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if (!currentFocus.hasPrimaryFocus &&
+            currentFocus.focusedChild != null) {
+          FocusManager.instance.primaryFocus?.unfocus();
+        }
+      },
+      child: MaterialApp(
+        title: 'EGP',
+        theme: ThemeData(
+          fontFamily: 'BaiJamjuree',
+          primarySwatch: Colors.blue,
+        ),
+        home: login(),
+        // homePage(),
       ),
-      home: homePage(),
     );
   }
 }

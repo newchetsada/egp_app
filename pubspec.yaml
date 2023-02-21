@@ -44,6 +44,9 @@ dependencies:
   dotted_line: ^3.1.0
   flutter_launcher_icons: ^0.11.0
   flutter_signature_pad: ^3.0.1
+  image_picker: ^0.8.6+1
+  adaptive_action_sheet: ^2.0.2
+  pull_down_button: ^0.5.1
 
 
 

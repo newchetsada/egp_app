@@ -1,18 +1,23 @@
-import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:dotted_line/dotted_line.dart';
 import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/research/ctfull.dart';
+import 'package:egp_app/research/powersystem.dart';
+import 'package:egp_app/research/roof.dart';
+import 'package:egp_app/research/stair.dart';
+import 'package:egp_app/research/water.dart';
+import 'package:egp_app/research/wire.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:dotted_line/dotted_line.dart';
 
-class cleansolar extends StatefulWidget {
-  _cleansolarState createState() => _cleansolarState();
+class research extends StatefulWidget {
+  @override
+  _researchState createState() => _researchState();
 }
 
-class _cleansolarState extends State<cleansolar> {
+class _researchState extends State<research> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
 
@@ -342,12 +347,12 @@ class _cleansolarState extends State<cleansolar> {
                       children: [
                         Container(
                           height: 30,
-                          width: 100,
+                          width: 120,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20)),
                           child: Center(
-                              child: Text('ล้างแผง',
+                              child: Text('สำรวจสถานที่',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 15,
@@ -364,7 +369,7 @@ class _cleansolarState extends State<cleansolar> {
                             (_curpage == 0)
                                 ? 'นัดหมาย 25/1/2023 08:30'
                                 : (_curpage == 1)
-                                    ? 'ผู้ใช้งานสุ่มถ่ายรูป แผลโซล่าเซลล์ก่อนล้าง หลังล้าง'
+                                    ? 'ถ่ายรูปตามจุดที่กำหนด พร้อมเขียนรายละเอียดให้ครบถ้วน'
                                     : 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน',
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
@@ -713,334 +718,647 @@ class _cleansolarState extends State<cleansolar> {
 
   Widget photoPage() {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      bottomNavigationBar: Container(
-        // height: 30,
-        color: Colors.white,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 20, left: 30, right: 30),
-                      child: SizedBox(
-                        height: 50,
-                        // width: 160,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => photopage(
-                                        type: 0,
-                                      )),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff003175),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+        backgroundColor: Colors.transparent,
+        bottomNavigationBar: Container(
+          // height: 30,
+          color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.only(top: 10, left: 30, right: 30),
+                        child: SizedBox(
+                          height: 50,
+                          // width: 160,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => photopage(
+                                          type: 0,
+                                        )),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Color(0xff003175),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'แจ้งซ่อม',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
+                            child: Text(
+                              'แจ้งซ่อม',
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, bottom: 30, left: 30, right: 30),
-                      child: SizedBox(
-                        height: 50,
-                        // width: 160,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            controller.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff149C32),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 15, bottom: 30, left: 30, right: 30),
+                        child: SizedBox(
+                          height: 50,
+                          // width: 160,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              controller.nextPage(
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.ease);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Color(0xff149C32),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'ถัดไป',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
+                            child: Text(
+                              'ถัดไป',
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
-                child: GridView.count(
-                    shrinkWrap: true,
-                    childAspectRatio: 1,
-                    primary: false,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 2,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => photopage(
-                                      type: 1,
-                                    )),
-                          );
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Color(0xff149C32),
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
+        body: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
+              child: GridView.count(
+                  shrinkWrap: true,
+                  childAspectRatio: 1.2,
+                  primary: false,
+                  crossAxisSpacing: 30,
+                  mainAxisSpacing: 20,
+                  crossAxisCount: 2,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => powerSystem()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color(0xff149C32),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('ระบบไฟ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
                                           ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('5/5',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
                                                   color: Colors.white)),
-                                        ],
+                                        ),
                                       ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Colors.white)),
                                     ],
                                   ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 45,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                            child: Center(
-                                              child: Text('12/12',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Colors.white)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => photopage(
-                                      type: 2,
-                                    )),
-                          );
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
+                                ],
                               ),
                             ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => wire()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color(0xff149C32),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('สายไฟ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
                                           ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('5/5',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
-                                                  color: Color(0xff003175))),
-                                        ],
+                                                  color: Colors.white)),
+                                        ),
                                       ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Colors.white)),
                                     ],
                                   ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 45,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
-                                            child: Center(
-                                              child: Text('0/12',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Color(0xff003175))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ]),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => water()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color(0xff149C32),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('ระบบน้ำ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
+                                          ),
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('5/5',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ctfull()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text('การคล้อง CT Full Load',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: Color(0xff003175))),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
+                                          ),
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('0/1',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Color(0xff003175))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => roof()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color(0xff149C32),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('หลังคา',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
+                                          ),
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('5/5',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => stair()),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xff003175).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text('บันได',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Color(0xff003175))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 45,
+                                        decoration: BoxDecoration(
+                                          // border: Border.all(width: 3),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(13),
+                                          ),
+                                          color: Color(0xff003175),
+                                        ),
+                                        child: Center(
+                                          child: Text('1/2',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12,
+                                                  color: Colors.white)),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text('งานทั้งหมด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: Color(0xff003175))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]),
+            ),
+            SizedBox(
+              height: 20,
+            )
+          ],
+        ));
   }
 
   Widget sign() {
