@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
@@ -60,11 +61,17 @@ void main() async {
     print('Message clicked!');
   });
 
-  runApp(const MyApp());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var isLogin = prefs.getString('user');
+
+  runApp(MyApp(
+    isLogin: isLogin,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final isLogin;
+  MyApp({super.key, required this.isLogin});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +91,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'BaiJamjuree',
           primarySwatch: Colors.blue,
         ),
-        home: login(),
+        home: (isLogin != null) ? homePage() : login(),
         // homePage(),
       ),
     );

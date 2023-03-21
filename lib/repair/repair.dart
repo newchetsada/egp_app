@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
@@ -8,17 +10,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+import 'package:http/http.dart' as http;
+import 'package:shimmer/shimmer.dart';
 
 import 'hero_dialog_route.dart';
 
 class repair extends StatefulWidget {
   @override
   _repairState createState() => _repairState();
+  final int jid;
+  //detail
+  final String j_start_date;
+  final String j_send_date;
+  final String cus_name;
+  final String site_name;
+  final String cus_address;
+  final String install_date;
+  final String warranty_expire;
+  final String power_peak;
+  final String j_detail;
+  final String remark_tech;
+  final double lat;
+  final double lon;
+
+  //
+
+  repair({
+    required this.jid,
+    required this.j_start_date,
+    required this.j_send_date,
+    required this.cus_name,
+    required this.site_name,
+    required this.cus_address,
+    required this.install_date,
+    required this.warranty_expire,
+    required this.power_peak,
+    required this.j_detail,
+    required this.remark_tech,
+    required this.lat,
+    required this.lon,
+  });
 }
 
 class _repairState extends State<repair> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
+  var contact = <Album>[];
+  bool contactloading = true;
 
   @override
   void initState() {
@@ -26,6 +64,9 @@ class _repairState extends State<repair> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    // Future.delayed(const Duration(milliseconds: 500), () {
+    _getAPI(widget.jid);
+    // });
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -34,6 +75,26 @@ class _repairState extends State<repair> {
       path: phoneNumber,
     );
     await launchUrl(launchUri);
+  }
+
+  void openMap(double lat, double lon) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+    // if (await canLaunch(url)) {
+    await launch(url);
+    // } else {
+    //   throw 'Could not launch $url';
+    // }
+  }
+
+  _getAPI(id) {
+    var idd = id;
+    API.getContactLs(idd).then((response) {
+      setState(() {
+        List list = json.decode(response.body);
+        contact = list.map((m) => Album.fromJson(m)).toList();
+        contactloading = false;
+      });
+    });
   }
 
   void confirmpop() {
@@ -123,10 +184,6 @@ class _repairState extends State<repair> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        // if (Navigator.of(context).userGestureInProgress) {
-        //   return false;
-        // } else
-
         if (_curpage == 0) {
           Navigator.pop(context);
         } else {
@@ -166,7 +223,7 @@ class _repairState extends State<repair> {
         body: Column(
           children: [
             Container(
-              height: 130,
+              height: 140,
               decoration: BoxDecoration(
                 color: Color(0xff149C32),
                 // borderRadius: BorderRadius.only(
@@ -368,12 +425,13 @@ class _repairState extends State<repair> {
                       children: [
                         Text(
                             (_curpage == 0)
-                                ? 'นัดหมาย 25/1/2023 08:30'
+                                ? 'นัดหมายเข้างาน ${widget.j_start_date}\nนัดหมายส่งงาน ${widget.j_send_date}'
                                 : (_curpage == 1)
                                     ? 'ถ่ายรูปตามจุดที่กำหมด พร้อมเขียนรายละเอียดให้ครบถ้วน'
                                     : 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน',
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
+                                height: 1.4,
                                 fontSize: 13,
                                 color: Colors.white))
                       ],
@@ -451,19 +509,19 @@ class _repairState extends State<repair> {
       body: Padding(
         padding: const EdgeInsets.only(left: 30, right: 30),
         child: ListView(
-          physics: BouncingScrollPhysics(),
+          // physics: BouncingScrollPhysics(),
 
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 20,
+              height: 30,
             ),
-            Text('บริษัท : นำโชคเรื่องการเงิน ',
+            Text('บริษัท : ${widget.cus_name} ',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                     color: Color(0xff003175))),
-            Text('สาขา : นนทบุรี',
+            Text('สาขา : ${widget.site_name}',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
@@ -471,29 +529,33 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on_rounded,
-                  color: Color(0xff003175),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Flexible(
-                  child: Text(
-                      '455/37-38 ถ.พระราม6 เขตราชเทวี แขวงถนนเพชรบุรี กทม 10400',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Color(0xff646464))),
-                )
-              ],
+            GestureDetector(
+              onTap: () {
+                openMap(0, 0);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on_rounded,
+                    color: Color(0xff003175),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Flexible(
+                    child: Text(widget.cus_address,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Color(0xff646464))),
+                  )
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Text('วันเดือนปี ติดตั้งแผง : 00 / 00 / 0000',
+            Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -501,7 +563,7 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Text('วันเดือนปี หมดระยะเวลาประกัน : 00 / 00 / 0000',
+            Text('วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -509,7 +571,7 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Text('ปริมาณการติดตั้ง :',
+            Text('ปริมาณการติดตั้ง : ${widget.power_peak}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -529,7 +591,7 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Text('รายละเอียดงาน :',
+            Text('รายละเอียดงาน : ${widget.j_detail}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -537,7 +599,7 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Text('หมายเหตุ :',
+            Text('หมายเหตุ : ${widget.remark_tech}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -557,74 +619,161 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Color(0xff003175),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
+            (contactloading == true)
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('คุณ ใจรัก ในงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
+                        Icon(
+                          Icons.circle,
+                          size: 20,
                         ),
-                        Text('ตำแหน่ง :ประสานงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
                         SizedBox(
-                          height: 5,
+                          width: 10,
                         ),
-                        Text('000-000-0000',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xff464646)))
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: Container(
+                            height: 35,
+                            width: 35,
+                            decoration: BoxDecoration(
+                              // border: Border.all(width: 3),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(200),
+                              ),
+                              color: Color(0xff003175),
+                            ),
+                            child: Center(
+                                child: Icon(
+                              Icons.phone,
+                              size: 20,
+                            )),
+                          ),
+                        )
                       ],
                     ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: contact.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  color: Color(0xff003175),
+                                  size: 20,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(contact[index].j_cont_name,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Color(0xff464646))),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                        'ตำแหน่ง : ${contact[index].j_cont_position}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 13,
+                                            color: Color(0xff464646))),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(contact[index].j_cont_tel,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            color: Color(0xff464646)))
+                                  ],
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 30),
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  // border: Border.all(width: 3),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(200),
+                                  ),
+                                  color: Color(0xff003175),
+                                ),
+                                child: Center(
+                                  child: IconButton(
+                                      splashRadius: 20,
+                                      iconSize: 20,
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        _makePhoneCall(
+                                            contact[index].j_cont_tel);
+                                      },
+                                      icon: Icon(Icons.phone)),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                )
-              ],
-            ),
             SizedBox(
               height: 10,
             ),
@@ -711,148 +860,6 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Color(0xff003175),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('คุณ ตู่',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('ตำแหน่ง : ประสานงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('000-000-0000',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xff464646)))
-                      ],
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Color(0xff003175),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('คุณ ตู่',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('ตำแหน่ง : ประสานงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('000-000-0000',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xff464646)))
-                      ],
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 30,
-            )
           ],
         ),
       ),
@@ -2068,5 +2075,43 @@ class _repairState extends State<repair> {
             ),
           );
         });
+  }
+}
+
+//api
+class API {
+  static Future getContactLs(idd) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobContactMobileLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+      }),
+    );
+    return response;
+  }
+}
+
+class Album {
+  final String j_cont_name;
+  final String j_cont_position;
+  final String j_cont_tel;
+
+  const Album({
+    required this.j_cont_name,
+    required this.j_cont_position,
+    required this.j_cont_tel,
+  });
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      j_cont_name: json['j_cont_name'],
+      j_cont_position: json['j_cont_position'],
+      j_cont_tel: json['j_cont_tel'],
+    );
   }
 }

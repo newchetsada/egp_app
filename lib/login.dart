@@ -1,6 +1,13 @@
+import 'dart:convert';
+
 import 'package:egp_app/pages/homepage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class login extends StatefulWidget {
   _loginState createState() => _loginState();
@@ -8,6 +15,18 @@ class login extends StatefulWidget {
 
 class _loginState extends State<login> {
   final _formKey = GlobalKey<FormState>();
+  var messaging = FirebaseMessaging.instance;
+
+  var user = TextEditingController();
+  var pass = TextEditingController();
+
+  bool _obscureText = true;
+
+  addSession(use, id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('user', use);
+    prefs.setInt('id', id);
+  }
 
   @override
   void initState() {
@@ -48,24 +67,43 @@ class _loginState extends State<login> {
                   height: 20,
                 ),
                 TextFormField(
+                    controller: user,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter Email';
+                        return 'Please enter Username';
                       }
                       return null;
                     },
-                    decoration: InputDecoration(labelText: 'Email address')),
+                    decoration: InputDecoration(labelText: 'Username')),
                 SizedBox(
                   height: 10,
                 ),
                 TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter Password';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(labelText: 'Password')),
+                  controller: pass,
+                  obscureText: _obscureText,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter Password';
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: IconButton(
+                            splashRadius: 15,
+                            iconSize: 20,
+                            icon: Icon(_obscureText
+                                ? Icons.visibility
+                                : Icons.visibility_off),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            }),
+                      )),
+                ),
                 SizedBox(
                   height: 30,
                 ),
@@ -84,18 +122,28 @@ class _loginState extends State<login> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   const SnackBar(content: Text('Processing Data')),
-                          // );
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => homePage()),
-                              (route) => false);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(builder: (context) => homePage()),
-                          // );
+                          messaging.getToken().then((value) {
+                            showDialog(
+                                barrierDismissible: true,
+                                context: context,
+                                builder: (_) {
+                                  return Center(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.8),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      height: 100,
+                                      width: 100,
+                                      child: Center(
+                                          child: Lottie.asset(
+                                              'assets/logoloading.json',
+                                              height: 80)),
+                                    ),
+                                  );
+                                });
+                            signIn(user.text, pass.text, value);
+                          });
                         }
                       },
                       child: const Text('Login'),
@@ -108,5 +156,44 @@ class _loginState extends State<login> {
         ),
       ),
     );
+  }
+
+  signIn(user, pass, token) async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/mobileLogin'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'userLogin': user,
+        'pass': pass,
+        'token': token,
+        'tokenFlag': (defaultTargetPlatform == TargetPlatform.android) ? 0 : 1
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      if (jsonResponse['status'] == true) {
+        Navigator.pop(context);
+        addSession(user, jsonResponse['id']).then((value) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => homePage()),
+              (route) => false);
+        });
+      } else {
+        Navigator.pop(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(jsonResponse['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

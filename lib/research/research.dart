@@ -742,7 +742,9 @@ class _researchState extends State<research> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => photopage(
-                                          type: 0,
+                                          type: 2,
+                                          limit: 0,
+                                          jidx: 0,
                                         )),
                               );
                             },

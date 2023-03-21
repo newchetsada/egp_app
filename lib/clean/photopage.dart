@@ -1,26 +1,32 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:http/http.dart' as http;
 
 class photopage extends StatefulWidget {
   @override
   _photopageState createState() => _photopageState();
   final int type;
-  const photopage({
-    super.key,
-    required this.type,
-  });
+  final int limit;
+  final int jidx;
+  const photopage(
+      {super.key, required this.type, required this.limit, required this.jidx});
 }
 
 class _photopageState extends State<photopage> {
   //img
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
-  int limitFile = 10;
+  int limitFile = 0;
+  List deleteLs = [];
+  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+  var pic = <Album>[];
 
   void limitpop(total) {
     showDialog<void>(
@@ -86,15 +92,19 @@ class _photopageState extends State<photopage> {
       var pickedfiles = await imgpicker.pickMultiImage();
       //you can use ImageCourse.camera for Camera capture
       if (pickedfiles != null) {
-        if (pickedfiles.length > limitFile - imagefiles.length) {
-          limitpop(limitFile - imagefiles.length);
+        if (pickedfiles.length > limitFile - pic.length) {
+          limitpop(limitFile - pic.length);
         } else {
-          imagefiles.addAll(pickedfiles);
+          // imagefiles.addAll(pickedfiles);
+          for (var i = 0; i < pickedfiles.length; i++) {
+            pic.add(
+                Album(j_img_id: 0, j_img_name: pickedfiles[i].path, onApi: 0));
+          }
         }
 
         setState(() {});
 
-        print("Image List Length:" + imagefiles!.length.toString());
+        print("Image List Length:" + pickedfiles.length.toString());
       } else {
         print("No image is selected.");
       }
@@ -108,7 +118,8 @@ class _photopageState extends State<photopage> {
       var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
       //you can use ImageCourse.camera for Camera capture
       if (pickedfile != null) {
-        imagefiles.add(pickedfile);
+        // imagefiles.add(pickedfile);
+        pic.add(Album(j_img_id: 0, j_img_name: pickedfile.path, onApi: 0));
 
         setState(() {});
 
@@ -127,6 +138,18 @@ class _photopageState extends State<photopage> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    setState(() {
+      limitFile = widget.limit;
+    });
+    API.getPicLs(widget.jidx, widget.type).then((response) {
+      print(response.body);
+      setState(() {
+        List list = json.decode(response.body);
+        pic = list.map((m) => Album.fromJson(m)).toList();
+
+        // isLoading = false;
+      });
+    });
   }
 
   @override
@@ -148,7 +171,10 @@ class _photopageState extends State<photopage> {
                     // width: 160,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        // Navigator.pop(context);
+                        print(deleteLs);
+
+                        // print(pic.length);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -180,9 +206,9 @@ class _photopageState extends State<photopage> {
               },
               icon: Icon(Icons.arrow_back)),
           title: Text(
-            (widget.type == 0)
+            (widget.type == 2)
                 ? 'แจ้งซ่อม'
-                : (widget.type == 1)
+                : (widget.type == 0)
                     ? 'ถ่ายรูป ก่อนล้างแผง'
                     : 'ถ่ายรูป หลังล้างแผง',
             style: TextStyle(
@@ -212,9 +238,9 @@ class _photopageState extends State<photopage> {
                       width: 10,
                     ),
                     Text(
-                      (imagefiles == null)
+                      (pic == null)
                           ? '0/$limitFile'
-                          : '${imagefiles!.length}/$limitFile',
+                          : '${pic.length}/$limitFile',
                       style: TextStyle(
                           color: Color(0xff149C32),
                           fontSize: 18,
@@ -222,150 +248,205 @@ class _photopageState extends State<photopage> {
                     ),
                   ],
                 ),
+                //new test
                 Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20),
-                    child:
-                        // GridView.builder(
-                        //     itemCount: imagefiles?.length,
-                        //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        //         crossAxisCount: 3),
-                        //     itemBuilder: (BuildContext context, int index) {
-                        //       return Image.file(
-                        //         File(imagefiles![index].path),
-                        //         fit: BoxFit.cover,
-                        //       );
-                        //     }),
-                        GridView.count(
+                    child: GridView.count(
                       shrinkWrap: true,
                       childAspectRatio: 1.3,
                       primary: false,
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       crossAxisCount: 2,
-                      children: (imagefiles.length != null)
-                          ? (imagefiles.length == limitFile)
-                              ? List.generate(imagefiles.length, (index) {
+                      children: (pic.length != null)
+                          ? (pic.length == limitFile)
+                              ? List.generate(pic.length, (index) {
                                   return Container(
                                     decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: FileImage(
-                                          File(imagefiles[index].path),
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
                                       color: Color(0xffffffff),
                                       borderRadius: BorderRadius.circular(10),
-                                      border:
-                                          Border.all(color: Color(0xffF1FAEF)),
+                                      border: Border.all(
+                                          color: Colors.grey.withOpacity(0.3)),
                                     ),
-                                    child: Column(
+                                    child: Stack(
                                       children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  imagefiles.removeAt(index);
-                                                });
-                                              },
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10),
-                                                child: Container(
-                                                  height: 25,
-                                                  width: 25,
-                                                  decoration: BoxDecoration(
-                                                    // border: Border.all(
-                                                    //     width: 1,
-                                                    //     color: Colors.grey),
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(200),
-                                                    ),
-                                                    color: Colors.white
-                                                        .withOpacity(0.7),
-                                                  ),
-                                                  child: Center(
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: (pic[index].onApi == 1)
+                                              ? Image.network(
+                                                  '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                  fit: BoxFit.cover,
+                                                  height: double.infinity,
+                                                  width: double.infinity,
+
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Center(
                                                       child: Icon(
-                                                    Icons.close_rounded,
-                                                    size: 20,
-                                                    color: Colors.grey,
-                                                  )),
+                                                        Icons
+                                                            .error_outline_rounded,
+                                                        size: 40,
+                                                        color: Colors.grey
+                                                            .withOpacity(0.3),
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : Image.file(
+                                                  File(pic[index].j_img_name),
+                                                  fit: BoxFit.cover,
+                                                  height: double.infinity,
+                                                  width: double.infinity,
                                                 ),
-                                              ),
+                                        ),
+                                        Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (pic[index].onApi ==
+                                                          1) {
+                                                        deleteLs.add(pic[index]
+                                                            .j_img_id);
+                                                        pic.removeAt(index);
+                                                      } else {
+                                                        pic.removeAt(index);
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    child: Container(
+                                                      height: 25,
+                                                      width: 25,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(200),
+                                                        ),
+                                                        color: Colors.white
+                                                            .withOpacity(0.7),
+                                                      ),
+                                                      child: Center(
+                                                          child: Icon(
+                                                        Icons.close_rounded,
+                                                        size: 20,
+                                                        color: Colors.grey,
+                                                      )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            // IconButton(
-                                            //     color: Colors.red[300],
-                                            //     onPressed: () {},
-                                            //     icon: Icon(Icons.remove_circle_rounded))
+                                            // Text(index.toString()),
+                                            // Text('${pic[index].j_img_id}')
                                           ],
                                         ),
                                       ],
                                     ),
                                   );
                                 })
-                              : List.generate(imagefiles.length + 1, (index) {
-                                  if (index > imagefiles.length - 1) {
-                                    //  (imagefiles!.length == limitFile)
+                              : List.generate(pic.length + 1, (index) {
+                                  if (index > pic.length - 1) {
                                     return add();
                                   } else {
                                     return Container(
                                       decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: FileImage(
-                                            File(imagefiles[index].path),
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
                                         color: Color(0xffffffff),
                                         borderRadius: BorderRadius.circular(10),
                                         border: Border.all(
-                                            color: Color(0xffF1FAEF)),
+                                            color:
+                                                Colors.grey.withOpacity(0.3)),
                                       ),
-                                      child: Column(
+                                      child: Stack(
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    imagefiles.removeAt(index);
-                                                  });
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: Container(
-                                                    height: 25,
-                                                    width: 25,
-                                                    decoration: BoxDecoration(
-                                                      // border: Border.all(
-                                                      //     width: 1,
-                                                      //     color: Colors.grey),
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(200),
-                                                      ),
-                                                      color: Colors.white
-                                                          .withOpacity(0.7),
-                                                    ),
-                                                    child: Center(
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: (pic[index].onApi == 1)
+                                                ? Image.network(
+                                                    '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                    fit: BoxFit.cover,
+                                                    height: double.infinity,
+                                                    width: double.infinity,
+
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      return Center(
                                                         child: Icon(
-                                                      Icons.close_rounded,
-                                                      size: 20,
-                                                      color: Colors.grey,
-                                                    )),
+                                                          Icons
+                                                              .error_outline_rounded,
+                                                          size: 40,
+                                                          color: Colors.grey
+                                                              .withOpacity(0.3),
+                                                        ),
+                                                      );
+                                                    },
+                                                  )
+                                                : Image.file(
+                                                    File(pic[index].j_img_name),
+                                                    fit: BoxFit.cover,
+                                                    height: double.infinity,
+                                                    width: double.infinity,
                                                   ),
-                                                ),
+                                          ),
+                                          Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (pic[index].onApi ==
+                                                            1) {
+                                                          deleteLs.add(
+                                                              pic[index]
+                                                                  .j_img_id);
+                                                          pic.removeAt(index);
+                                                        } else {
+                                                          pic.removeAt(index);
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      child: Container(
+                                                        height: 25,
+                                                        width: 25,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                            Radius.circular(
+                                                                200),
+                                                          ),
+                                                          color: Colors.white
+                                                              .withOpacity(0.7),
+                                                        ),
+                                                        child: Center(
+                                                            child: Icon(
+                                                          Icons.close_rounded,
+                                                          size: 20,
+                                                          color: Colors.grey,
+                                                        )),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              // IconButton(
-                                              //     color: Colors.red[300],
-                                              //     onPressed: () {},
-                                              //     icon: Icon(Icons.remove_circle_rounded))
+                                              // Text(index.toString()),
+                                              // Text('${pic[index].j_img_id}')
                                             ],
                                           ),
                                         ],
@@ -375,31 +456,146 @@ class _photopageState extends State<photopage> {
                                 })
                           : <Widget>[
                               add(),
-                              // (imagefiles?.length != null)
-                              //     ? Image.file(
-                              //         File(imagefiles![0].path),
-                              //         fit: BoxFit.cover,
-                              //       )
-                              //     : Container()
-                              // add(),
-                              // add(),
-                              // add(),
-                              // add(),
-                              // add(),
-                              // add(),
-                              // add(),
                             ],
                     )),
+                // Padding(
+                //     padding: const EdgeInsets.only(top: 20, bottom: 20),
+                //     child: GridView.count(
+                //       shrinkWrap: true,
+                //       childAspectRatio: 1.3,
+                //       primary: false,
+                //       crossAxisSpacing: 10,
+                //       mainAxisSpacing: 10,
+                //       crossAxisCount: 2,
+                //       children: (imagefiles.length != null)
+                //           ? (imagefiles.length == limitFile)
+                //               ? List.generate(imagefiles.length, (index) {
+                //                   return Container(
+                //                     decoration: BoxDecoration(
+                //                       image: DecorationImage(
+                //                         image: FileImage(
+                //                           File(imagefiles[index].path),
+                //                         ),
+                //                         fit: BoxFit.cover,
+                //                       ),
+                //                       color: Color(0xffffffff),
+                //                       borderRadius: BorderRadius.circular(10),
+                //                       border:
+                //                           Border.all(color: Color(0xffF1FAEF)),
+                //                     ),
+                //                     child: Column(
+                //                       children: [
+                //                         Row(
+                //                           mainAxisAlignment:
+                //                               MainAxisAlignment.end,
+                //                           children: [
+                //                             GestureDetector(
+                //                               onTap: () {
+                //                                 setState(() {
+                //                                   imagefiles.removeAt(index);
+                //                                 });
+                //                               },
+                //                               child: Padding(
+                //                                 padding:
+                //                                     const EdgeInsets.all(10),
+                //                                 child: Container(
+                //                                   height: 25,
+                //                                   width: 25,
+                //                                   decoration: BoxDecoration(
+                //                                     // border: Border.all(
+                //                                     //     width: 1,
+                //                                     //     color: Colors.grey),
+                //                                     borderRadius:
+                //                                         BorderRadius.all(
+                //                                       Radius.circular(200),
+                //                                     ),
+                //                                     color: Colors.white
+                //                                         .withOpacity(0.7),
+                //                                   ),
+                //                                   child: Center(
+                //                                       child: Icon(
+                //                                     Icons.close_rounded,
+                //                                     size: 20,
+                //                                     color: Colors.grey,
+                //                                   )),
+                //                                 ),
+                //                               ),
+                //                             ),
+                //                           ],
+                //                         ),
+                //                       ],
+                //                     ),
+                //                   );
+                //                 })
+                //               : List.generate(imagefiles.length + 1, (index) {
+                //                   if (index > imagefiles.length - 1) {
+                //                     return add();
+                //                   } else {
+                //                     return Container(
+                //                       decoration: BoxDecoration(
+                //                         image: DecorationImage(
+                //                           image: FileImage(
+                //                             File(imagefiles[index].path),
+                //                           ),
+                //                           fit: BoxFit.cover,
+                //                         ),
+                //                         color: Color(0xffffffff),
+                //                         borderRadius: BorderRadius.circular(10),
+                //                         border: Border.all(
+                //                             color: Color(0xffF1FAEF)),
+                //                       ),
+                //                       child: Column(
+                //                         children: [
+                //                           Row(
+                //                             mainAxisAlignment:
+                //                                 MainAxisAlignment.end,
+                //                             children: [
+                //                               GestureDetector(
+                //                                 onTap: () {
+                //                                   setState(() {
+                //                                     imagefiles.removeAt(index);
+                //                                   });
+                //                                 },
+                //                                 child: Padding(
+                //                                   padding:
+                //                                       const EdgeInsets.all(10),
+                //                                   child: Container(
+                //                                     height: 25,
+                //                                     width: 25,
+                //                                     decoration: BoxDecoration(
+                //                                       // border: Border.all(
+                //                                       //     width: 1,
+                //                                       //     color: Colors.grey),
+                //                                       borderRadius:
+                //                                           BorderRadius.all(
+                //                                         Radius.circular(200),
+                //                                       ),
+                //                                       color: Colors.white
+                //                                           .withOpacity(0.7),
+                //                                     ),
+                //                                     child: Center(
+                //                                         child: Icon(
+                //                                       Icons.close_rounded,
+                //                                       size: 20,
+                //                                       color: Colors.grey,
+                //                                     )),
+                //                                   ),
+                //                                 ),
+                //                               ),
+                //                             ],
+                //                           ),
+                //                         ],
+                //                       ),
+                //                     );
+                //                   }
+                //                 })
+                //           : <Widget>[
+                //               add(),
+                //             ],
+                //     )),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Text(
-                    //   'หมายเหตุ',
-                    //   style: TextStyle(
-                    //       color: Color(0xff003175),
-                    //       fontSize: 15,
-                    //       fontWeight: FontWeight.w600),
-                    // ),
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: Container(
@@ -428,35 +624,6 @@ class _photopageState extends State<photopage> {
                         ),
                       ),
                     ),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 20, bottom: 20),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       SizedBox(
-                    //         height: 40,
-                    //         width: 150,
-                    //         child: ElevatedButton(
-                    //           onPressed: () {
-                    //             Navigator.pop(context);
-                    //           },
-                    //           style: ElevatedButton.styleFrom(
-                    //             foregroundColor: Colors.white,
-                    //             backgroundColor: Color(0xff149C32),
-                    //             shape: RoundedRectangleBorder(
-                    //               borderRadius: BorderRadius.circular(32.0),
-                    //             ),
-                    //           ),
-                    //           child: Text(
-                    //             'บันทึก',
-                    //             style: TextStyle(
-                    //                 fontSize: 15, fontWeight: FontWeight.w600),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                   ],
                 )
               ],
@@ -506,5 +673,43 @@ class _photopageState extends State<photopage> {
         ),
       ),
     );
+  }
+}
+
+//api
+class API {
+  static Future getPicLs(idd, type) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+        'groupNo': 1,
+        'imgType': type,
+        'typeId': null
+      }),
+    );
+    return response;
+  }
+}
+
+class Album {
+  final int j_img_id;
+  final String j_img_name;
+  final int onApi;
+
+  const Album(
+      {required this.j_img_id, required this.j_img_name, required this.onApi});
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+        j_img_id: json['j_img_id'],
+        j_img_name:
+            (json['j_img_name'].toString() == 'null') ? "" : json['j_img_name'],
+        onApi: 1);
   }
 }

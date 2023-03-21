@@ -1,20 +1,195 @@
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/report/report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:http/http.dart' as http;
 
 class cleansolar extends StatefulWidget {
   _cleansolarState createState() => _cleansolarState();
+
+  final int jid;
+  //detail
+  final String j_start_date;
+  final String j_send_date;
+  final String cus_name;
+  final String site_name;
+  final String cus_address;
+  final String install_date;
+  final String warranty_expire;
+  final String power_peak;
+  final String j_detail;
+  final String remark_tech;
+  final double lat;
+  final double lon;
+  final String fullname;
+  final String position;
+  final String tel;
+  final int j_status;
+
+  //
+
+  cleansolar(
+      {required this.jid,
+      required this.j_start_date,
+      required this.j_send_date,
+      required this.cus_name,
+      required this.site_name,
+      required this.cus_address,
+      required this.install_date,
+      required this.warranty_expire,
+      required this.power_peak,
+      required this.j_detail,
+      required this.remark_tech,
+      required this.lat,
+      required this.lon,
+      required this.fullname,
+      required this.position,
+      required this.tel,
+      required this.j_status});
 }
 
 class _cleansolarState extends State<cleansolar> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
+  String userName = "Loading...";
+  var contact = <Album>[];
+  bool contactloading = true;
+
+  int? iduser;
+  bool isLoading = true;
+  int before_taken = 0;
+  int after_taken = 0;
+  int total_taken = 0;
+
+  getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return String
+    if (prefs.getString('user') != null) {
+      setState(() {
+        userName = prefs.getString('user')!;
+        iduser = prefs.getInt('id')!;
+      });
+    }
+  }
+
+  void openMap(double lat, double lon) async {
+    final url = 'https://www.google.com/maps/search/?api=1&query=$lat,$lon';
+    // if (await canLaunch(url)) {
+    await launch(url);
+    // } else {
+    //   throw 'Could not launch $url';
+    // }
+  }
+
+  _getAPI(id) {
+    var idd = id;
+    API.getContactLs(idd).then((response) {
+      setState(() {
+        List list = json.decode(response.body);
+        contact = list.map((m) => Album.fromJson(m)).toList();
+        contactloading = false;
+      });
+    });
+  }
+
+  Future getcountphoto(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForClean'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'jidx': jidx,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        setState(() {
+          before_taken = jsonResponse[0]['before_taken'];
+          after_taken = jsonResponse[0]['after_taken'];
+          total_taken = jsonResponse[0]['total_taken'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  StartWork() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': widget.jid,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return jsonResponse;
+    }
+  }
+
+  endWork() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/endWorking'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': widget.jid,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return jsonResponse;
+    }
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
+  }
 
   @override
   void initState() {
@@ -22,6 +197,11 @@ class _cleansolarState extends State<cleansolar> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    // getUser().then((value) {
+    //   getWorkdetail(iduser, widget.jid).then((value) {});
+    // });
+    _getAPI(widget.jid);
+    getcountphoto(widget.jid);
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -163,7 +343,7 @@ class _cleansolarState extends State<cleansolar> {
         body: Column(
           children: [
             Container(
-              height: 130,
+              height: 140,
               decoration: BoxDecoration(
                 color: Color(0xff149C32),
               ),
@@ -362,12 +542,13 @@ class _cleansolarState extends State<cleansolar> {
                       children: [
                         Text(
                             (_curpage == 0)
-                                ? 'นัดหมาย 25/1/2023 08:30'
+                                ? 'นัดหมายเข้างาน ${widget.j_start_date}\nนัดหมายส่งงาน ${widget.j_send_date}'
                                 : (_curpage == 1)
                                     ? 'ผู้ใช้งานสุ่มถ่ายรูป แผลโซล่าเซลล์ก่อนล้าง หลังล้าง'
                                     : 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน',
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
+                                height: 1.4,
                                 fontSize: 13,
                                 color: Colors.white))
                       ],
@@ -405,7 +586,6 @@ class _cleansolarState extends State<cleansolar> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: Container(
-        // height: 30,
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -419,9 +599,31 @@ class _cleansolarState extends State<cleansolar> {
                   // width: 160,
                   child: ElevatedButton(
                     onPressed: () {
-                      controller.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.ease);
+                      if (widget.j_status == 1) {
+                        loading();
+                        StartWork().then((jsonResponse) {
+                          print(jsonResponse);
+                          if (jsonResponse['status'] == true) {
+                            Navigator.pop(context);
+                            controller.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
+                          } else {
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(jsonResponse['message']),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        });
+                      } else {
+                        controller.nextPage(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.ease);
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -445,19 +647,19 @@ class _cleansolarState extends State<cleansolar> {
       body: Padding(
         padding: const EdgeInsets.only(left: 30, right: 30),
         child: ListView(
-          physics: BouncingScrollPhysics(),
+          // physics: BouncingScrollPhysics(),
 
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 20,
+              height: 30,
             ),
-            Text('บริษัท : นำโชคเรื่องการเงิน ',
+            Text('บริษัท : ${widget.cus_name} ',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                     color: Color(0xff003175))),
-            Text('สาขา : นนทบุรี',
+            Text('สาขา : ${widget.site_name}',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
@@ -465,29 +667,33 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on_rounded,
-                  color: Color(0xff003175),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Flexible(
-                  child: Text(
-                      '455/37-38 ถ.พระราม6 เขตราชเทวี แขวงถนนเพชรบุรี กทม 10400',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Color(0xff646464))),
-                )
-              ],
+            GestureDetector(
+              onTap: () {
+                openMap(0, 0);
+              },
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.location_on_rounded,
+                    color: Color(0xff003175),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Flexible(
+                    child: Text(widget.cus_address,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Color(0xff646464))),
+                  )
+                ],
+              ),
             ),
             SizedBox(
               height: 10,
             ),
-            Text('วันเดือนปี ติดตั้งแผง : 00 / 00 / 0000',
+            Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -495,7 +701,7 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Text('วันเดือนปี หมดระยะเวลาประกัน : 00 / 00 / 0000',
+            Text('วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -503,7 +709,7 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Text('ปริมาณการติดตั้ง :',
+            Text('ปริมาณการติดตั้ง : ${widget.power_peak}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -523,7 +729,7 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Text('รายละเอียดงาน :',
+            Text('รายละเอียดงาน : ${widget.j_detail}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -531,7 +737,7 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Text('หมายเหตุ :',
+            Text('หมายเหตุ : ${widget.remark_tech}',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
@@ -551,74 +757,157 @@ class _cleansolarState extends State<cleansolar> {
             SizedBox(
               height: 10,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Color(0xff003175),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
+            (contactloading == true)
+                ? Shimmer.fromColors(
+                    baseColor: Colors.grey[300]!,
+                    highlightColor: Colors.grey[100]!,
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('คุณ ใจรัก ในงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
+                        Icon(
+                          Icons.circle,
+                          size: 20,
                         ),
-                        Text('ตำแหน่ง :ประสานงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
                         SizedBox(
-                          height: 5,
+                          width: 10,
                         ),
-                        Text('000-000-0000',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xff464646)))
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  height: 12,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: Container(
+                            height: 35,
+                            width: 35,
+                            decoration: BoxDecoration(
+                              // border: Border.all(width: 3),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(200),
+                              ),
+                              color: Color(0xff003175),
+                            ),
+                            child: Center(
+                                child: Icon(
+                              Icons.phone,
+                              size: 20,
+                            )),
+                          ),
+                        )
                       ],
                     ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: contact.length,
+                    itemBuilder: (context, index) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.person,
+                                color: Color(0xff003175),
+                                size: 20,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(contact[index].j_cont_name,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          color: Color(0xff464646))),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                      'ตำแหน่ง : ${contact[index].j_cont_position}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          color: Color(0xff464646))),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(contact[index].j_cont_tel,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                          color: Color(0xff464646)))
+                                ],
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 30),
+                            child: Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                // border: Border.all(width: 3),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(200),
+                                ),
+                                color: Color(0xff003175),
+                              ),
+                              child: Center(
+                                child: IconButton(
+                                    splashRadius: 20,
+                                    iconSize: 20,
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      _makePhoneCall(contact[index].j_cont_tel);
+                                    },
+                                    icon: Icon(Icons.phone)),
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    },
                   ),
-                )
-              ],
-            ),
             SizedBox(
               height: 10,
             ),
@@ -651,7 +940,7 @@ class _cleansolarState extends State<cleansolar> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('คุณ ตู่',
+                        Text(widget.fullname,
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 13,
@@ -659,7 +948,7 @@ class _cleansolarState extends State<cleansolar> {
                         SizedBox(
                           height: 5,
                         ),
-                        Text('ตำแหน่ง : ประสานงาน',
+                        Text('ตำแหน่ง : ${widget.position}',
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 13,
@@ -667,7 +956,7 @@ class _cleansolarState extends State<cleansolar> {
                         SizedBox(
                           height: 5,
                         ),
-                        Text('000-000-0000',
+                        Text(widget.tel,
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
@@ -676,30 +965,32 @@ class _cleansolarState extends State<cleansolar> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
-                  ),
-                )
+                (widget.tel.isEmpty)
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            // border: Border.all(width: 3),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(200),
+                            ),
+                            color: Color(0xff003175),
+                          ),
+                          child: Center(
+                            child: IconButton(
+                                splashRadius: 20,
+                                iconSize: 20,
+                                color: Colors.white,
+                                onPressed: () {
+                                  _makePhoneCall(widget.tel);
+                                },
+                                icon: Icon(Icons.phone)),
+                          ),
+                        ),
+                      )
               ],
             ),
             SizedBox(
@@ -735,10 +1026,7 @@ class _cleansolarState extends State<cleansolar> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => photopage(
-                                        type: 0,
-                                      )),
+                              MaterialPageRoute(builder: (context) => report()),
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -797,13 +1085,13 @@ class _cleansolarState extends State<cleansolar> {
           ),
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: ListView(
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
+                padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
                 child: GridView.count(
                     shrinkWrap: true,
                     childAspectRatio: 1,
@@ -818,7 +1106,9 @@ class _cleansolarState extends State<cleansolar> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => photopage(
-                                      type: 1,
+                                      type: 0,
+                                      limit: total_taken,
+                                      jidx: widget.jid,
                                     )),
                           );
                         },
@@ -826,7 +1116,9 @@ class _cleansolarState extends State<cleansolar> {
                           height: 80,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Color(0xff149C32),
+                            color: (before_taken == total_taken)
+                                ? Color(0xff149C32)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(color: Color(0xffE0ECDE)),
                             boxShadow: [
@@ -870,7 +1162,10 @@ class _cleansolarState extends State<cleansolar> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
-                                                  color: Colors.white)),
+                                                  color: (before_taken ==
+                                                          total_taken)
+                                                      ? Colors.white
+                                                      : Color(0xff003175))),
                                         ],
                                       ),
                                     ],
@@ -897,7 +1192,8 @@ class _cleansolarState extends State<cleansolar> {
                                               color: Color(0xff003175),
                                             ),
                                             child: Center(
-                                              child: Text('12/12',
+                                              child: Text(
+                                                  '$before_taken/$total_taken',
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -912,7 +1208,10 @@ class _cleansolarState extends State<cleansolar> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 12,
-                                                  color: Colors.white)),
+                                                  color: (before_taken ==
+                                                          total_taken)
+                                                      ? Colors.white
+                                                      : Color(0xff003175))),
                                         ],
                                       ),
                                     ],
@@ -929,7 +1228,9 @@ class _cleansolarState extends State<cleansolar> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => photopage(
-                                      type: 2,
+                                      type: 1,
+                                      limit: total_taken,
+                                      jidx: widget.jid,
                                     )),
                           );
                         },
@@ -937,7 +1238,9 @@ class _cleansolarState extends State<cleansolar> {
                           height: 80,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: (after_taken == total_taken)
+                                ? Color(0xff149C32)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(color: Color(0xffE0ECDE)),
                             boxShadow: [
@@ -977,11 +1280,14 @@ class _cleansolarState extends State<cleansolar> {
                                           SizedBox(
                                             height: 5,
                                           ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
+                                          Text('ถ่ายรูป หลังล้างแผง',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 12,
-                                                  color: Color(0xff003175))),
+                                                  color: (after_taken ==
+                                                          total_taken)
+                                                      ? Colors.white
+                                                      : Color(0xff003175))),
                                         ],
                                       ),
                                     ],
@@ -1008,7 +1314,8 @@ class _cleansolarState extends State<cleansolar> {
                                               color: Color(0xff003175),
                                             ),
                                             child: Center(
-                                              child: Text('0/12',
+                                              child: Text(
+                                                  '$after_taken/$total_taken',
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -1023,7 +1330,10 @@ class _cleansolarState extends State<cleansolar> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 12,
-                                                  color: Color(0xff003175))),
+                                                  color: (after_taken ==
+                                                          total_taken)
+                                                      ? Colors.white
+                                                      : Color(0xff003175))),
                                         ],
                                       ),
                                     ],
@@ -1084,8 +1394,7 @@ class _cleansolarState extends State<cleansolar> {
           ],
         ),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: ListView(
         children: [
           Column(
             children: [
@@ -1565,5 +1874,43 @@ class _cleansolarState extends State<cleansolar> {
             ),
           );
         });
+  }
+}
+
+//api
+class API {
+  static Future getContactLs(idd) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobContactMobileLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+      }),
+    );
+    return response;
+  }
+}
+
+class Album {
+  final String j_cont_name;
+  final String j_cont_position;
+  final String j_cont_tel;
+
+  const Album({
+    required this.j_cont_name,
+    required this.j_cont_position,
+    required this.j_cont_tel,
+  });
+
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return Album(
+      j_cont_name: json['j_cont_name'],
+      j_cont_position: json['j_cont_position'],
+      j_cont_tel: json['j_cont_tel'],
+    );
   }
 }
