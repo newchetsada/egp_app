@@ -1110,7 +1110,13 @@ class _cleansolarState extends State<cleansolar> {
                                       limit: total_taken,
                                       jidx: widget.jid,
                                     )),
-                          );
+                          ).then((value) {
+                            // print('dasdasdas');
+                            setState(() {
+                              getcountphoto(widget.jid);
+                            });
+                          });
+                          ;
                         },
                         child: Container(
                           height: 80,
@@ -1232,7 +1238,10 @@ class _cleansolarState extends State<cleansolar> {
                                       limit: total_taken,
                                       jidx: widget.jid,
                                     )),
-                          );
+                          ).then((value) {
+                            print('dasdasdas');
+                            setState(() {});
+                          });
                         },
                         child: Container(
                           height: 80,

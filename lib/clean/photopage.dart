@@ -9,6 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:http/http.dart' as http;
 
+// import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'package:lottie/lottie.dart';
+
 class photopage extends StatefulWidget {
   @override
   _photopageState createState() => _photopageState();
@@ -23,6 +27,9 @@ class _photopageState extends State<photopage> {
   //img
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
+  XFile? imagefilesone;
+  Uint8List webImage = Uint8List(8);
+
   int limitFile = 0;
   List deleteLs = [];
   String pathPic = 'https://backoffice.energygreenplus.co.th/';
@@ -96,6 +103,8 @@ class _photopageState extends State<photopage> {
           limitpop(limitFile - pic.length);
         } else {
           // imagefiles.addAll(pickedfiles);
+          imagefilesone = pickedfiles[0];
+          webImage = await pickedfiles[0].readAsBytes();
           for (var i = 0; i < pickedfiles.length; i++) {
             pic.add(
                 Album(j_img_id: 0, j_img_name: pickedfiles[i].path, onApi: 0));
@@ -119,6 +128,7 @@ class _photopageState extends State<photopage> {
       //you can use ImageCourse.camera for Camera capture
       if (pickedfile != null) {
         // imagefiles.add(pickedfile);
+        print(pickedfile.path);
         pic.add(Album(j_img_id: 0, j_img_name: pickedfile.path, onApi: 0));
 
         setState(() {});
@@ -130,6 +140,64 @@ class _photopageState extends State<photopage> {
     } catch (e) {
       print("error while picking file.");
     }
+  }
+
+  uploadPic(File image) async {
+    // var stream = new http.ByteStream(DelegatingStream.typed(image.openRead()));
+    // var length = await image.length();
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+
+    request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
+
+    request.fields['jidx'] = widget.jidx.toString();
+    request.fields['imgType'] = widget.type.toString();
+    request.fields['typeId'] = '';
+    request.fields['subTypeId'] = '';
+    request.fields['imgDesId'] = '';
+    request.fields['groupNo'] = '1';
+    request.fields['remark'] = '';
+    request.fields['sign_name'] = '';
+    request.fields['sign_name'] = '';
+    request.fields['userName'] = 'admintest';
+    request.fields['filesName'] = image.path.split('/').last;
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'files', image.readAsBytesSync(),
+        filename: image.path.split('/').last));
+
+    // http.Response response =
+    //     await http.Response.fromStream(await request.send());
+    var response = await request.send();
+    // print(response.);
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    // print(response.body);
+    // return response.body;
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 
   @override
@@ -152,6 +220,16 @@ class _photopageState extends State<photopage> {
     });
   }
 
+  loopupload() async {
+    for (var i = 0; i < pic.length; i++) {
+      if (pic[i].onApi == 0) {
+        print(pic[i].j_img_name);
+        // uploadPic(File(pic[i].j_img_name));
+        await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,9 +250,23 @@ class _photopageState extends State<photopage> {
                     child: ElevatedButton(
                       onPressed: () {
                         // Navigator.pop(context);
+                        loading();
                         print(deleteLs);
+                        // for (var i = 0; i < pic.length; i++) {
+                        //   if (pic[i].onApi == 0) {
+                        //     print(pic[i].j_img_name);
+                        //     // uploadPic(File(pic[i].j_img_name));
+                        //   }
+                        //   Future.delayed(const Duration(seconds: 3));
+                        // }
+                        loopupload().then((value) {
+                          print('ok');
+                          Navigator.pop(context);
+                        });
 
-                        // print(pic.length);
+                        // print(pic[3].j_img_name);
+
+                        // Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
