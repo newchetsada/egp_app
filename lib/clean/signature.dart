@@ -1,14 +1,29 @@
+import 'dart:convert';
+// import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
+import 'package:http/http.dart' as http;
 
 class signature extends StatefulWidget {
   @override
   _signatureState createState() => _signatureState();
+
+  final int jidx;
+  final int imgType;
+  final String signName;
+  final String user;
+  signature(
+      {required this.jidx,
+      required this.imgType,
+      required this.signName,
+      required this.user});
 }
 
 class _signatureState extends State<signature> {
   final _sign = GlobalKey<SignatureState>();
+  ByteData _img = ByteData(0);
 
   @override
   void initState() {
@@ -16,6 +31,61 @@ class _signatureState extends State<signature> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  void poptest(total) {
+    showDialog<void>(
+      context: context,
+      // barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding:
+              EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 10),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [Image.memory(total.buffer.asUint8List())],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  uploadPic(image) async {
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+
+    request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
+
+    request.fields['jidx'] = widget.jidx.toString(); //widget.jidx.toString();
+    request.fields['imgType'] =
+        widget.imgType.toString(); //widget.type.toString();
+    request.fields['typeId'] = '';
+    request.fields['subTypeId'] = '';
+    request.fields['imgDesId'] = '';
+    request.fields['groupNo'] = '1';
+    request.fields['remark'] = '';
+    request.fields['accessories'] = '';
+    request.fields['sign_name'] = widget.signName;
+    request.fields['userName'] = widget.user;
+    request.fields['filesName'] =
+        '${DateTime.now().toString()}.png'; //image.path.split('/').last;
+
+    request.files.add(http.MultipartFile.fromBytes(
+        'files', image.buffer.asUint8List(),
+        filename: '${DateTime.now().toString()}.png'));
+
+    var response = await request.send();
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    // print(response.body);
+    // return response.body;
   }
 
   @override
@@ -79,7 +149,7 @@ class _signatureState extends State<signature> {
                             final sign = _sign.currentState;
                             sign?.clear();
                             setState(() {
-                              // _img = ByteData(0);
+                              _img = ByteData(0);
                             });
                             debugPrint("cleared");
                           },
@@ -95,17 +165,21 @@ class _signatureState extends State<signature> {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () async {
-                            //     final sign = _sign.currentState;
+                            final sign = _sign.currentState;
 
-                            // final image = await sign.getData();
-                            // var data = await image.toByteData(format: ui.ImageByteFormat.png);
-                            // sign.clear();
-                            // final encoded = base64.encode(data.buffer.asUint8List());
-                            // setState(() {
-                            //   _img = data;
-                            // });
-                            // debugPrint("onPressed " + encoded);
-                            Navigator.pop(context);
+                            final image = await sign?.getData();
+
+                            var data = await image?.toByteData(
+                                format: ui.ImageByteFormat.png);
+                            sign?.clear();
+                            // final encoded =
+                            //     base64.encode(data!.buffer.asUint8List());
+                            setState(() {
+                              _img = data!;
+                            });
+                            uploadPic(_img).then((value) {
+                              Navigator.pop(context);
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,

@@ -1853,15 +1853,15 @@ class _researchState extends State<research> {
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => signature()),
-                              ).then((value) {
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                              });
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) => signature()),
+                              // ).then((value) {
+                              //   SystemChrome.setPreferredOrientations([
+                              //     DeviceOrientation.portraitUp,
+                              //   ]);
+                              // });
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

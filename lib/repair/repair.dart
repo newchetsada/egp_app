@@ -2043,15 +2043,18 @@ class _repairState extends State<repair> {
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => signature()),
-                              ).then((value) {
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                              });
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) => signature(  jidx: widget.jid,
+                              //             imgType: type,
+                              //             signName: putname.text,
+                              //             user: userName,)),
+                              // ).then((value) {
+                              //   SystemChrome.setPreferredOrientations([
+                              //     DeviceOrientation.portraitUp,
+                              //   ]);
+                              // });
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

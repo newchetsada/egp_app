@@ -12,6 +12,8 @@ import 'package:http/http.dart' as http;
 // import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 class photopage extends StatefulWidget {
   @override
@@ -30,10 +32,24 @@ class _photopageState extends State<photopage> {
   XFile? imagefilesone;
   Uint8List webImage = Uint8List(8);
 
+  String userName = "Loading...";
+  int? iduser;
+
   int limitFile = 0;
   List deleteLs = [];
   String pathPic = 'https://backoffice.energygreenplus.co.th/';
   var pic = <Album>[];
+
+  getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return String
+    if (prefs.getString('user') != null) {
+      setState(() {
+        userName = prefs.getString('user')!;
+        iduser = prefs.getInt('id')!;
+      });
+    }
+  }
 
   void limitpop(total) {
     showDialog<void>(
@@ -143,8 +159,6 @@ class _photopageState extends State<photopage> {
   }
 
   uploadPic(File image) async {
-    // var stream = new http.ByteStream(DelegatingStream.typed(image.openRead()));
-    // var length = await image.length();
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
@@ -159,19 +173,16 @@ class _photopageState extends State<photopage> {
     request.fields['imgDesId'] = '';
     request.fields['groupNo'] = '1';
     request.fields['remark'] = '';
+    request.fields['accessories'] = '';
     request.fields['sign_name'] = '';
-    request.fields['sign_name'] = '';
-    request.fields['userName'] = 'admintest';
+    request.fields['userName'] = userName;
     request.fields['filesName'] = image.path.split('/').last;
 
     request.files.add(http.MultipartFile.fromBytes(
         'files', image.readAsBytesSync(),
         filename: image.path.split('/').last));
 
-    // http.Response response =
-    //     await http.Response.fromStream(await request.send());
     var response = await request.send();
-    // print(response.);
 
     response.stream.transform(utf8.decoder).listen((value) {
       print(value);
@@ -180,9 +191,29 @@ class _photopageState extends State<photopage> {
     // return response.body;
   }
 
+  deletePic(id) async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobImage'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jImgId': id,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
   void loading() {
     showDialog(
-        barrierDismissible: true,
+        barrierDismissible: false,
         context: context,
         builder: (_) {
           return Center(
@@ -224,9 +255,17 @@ class _photopageState extends State<photopage> {
     for (var i = 0; i < pic.length; i++) {
       if (pic[i].onApi == 0) {
         print(pic[i].j_img_name);
-        // uploadPic(File(pic[i].j_img_name));
-        await Future.delayed(const Duration(seconds: 3));
+        await uploadPic(File(pic[i].j_img_name));
+        // await Future.delayed(const Duration(seconds: 3));
       }
+    }
+  }
+
+  loopdelete() async {
+    for (var i = 0; i < deleteLs.length; i++) {
+      print(deleteLs[i]);
+      await deletePic(deleteLs[i]);
+      // await Future.delayed(const Duration(seconds: 3));
     }
   }
 
@@ -251,22 +290,13 @@ class _photopageState extends State<photopage> {
                       onPressed: () {
                         // Navigator.pop(context);
                         loading();
-                        print(deleteLs);
-                        // for (var i = 0; i < pic.length; i++) {
-                        //   if (pic[i].onApi == 0) {
-                        //     print(pic[i].j_img_name);
-                        //     // uploadPic(File(pic[i].j_img_name));
-                        //   }
-                        //   Future.delayed(const Duration(seconds: 3));
-                        // }
-                        loopupload().then((value) {
-                          print('ok');
-                          Navigator.pop(context);
+                        loopdelete().then((value) {
+                          loopupload().then((value) {
+                            print('ok');
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          });
                         });
-
-                        // print(pic[3].j_img_name);
-
-                        // Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -292,6 +322,7 @@ class _photopageState extends State<photopage> {
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           leading: IconButton(
+              splashRadius: 10,
               color: Color(0xff149C32),
               onPressed: () {
                 Navigator.pop(context);
@@ -381,6 +412,48 @@ class _photopageState extends State<photopage> {
                                                         size: 40,
                                                         color: Colors.grey
                                                             .withOpacity(0.3),
+                                                      ),
+                                                    );
+                                                  },
+
+                                                  loadingBuilder:
+                                                      (BuildContext context,
+                                                          Widget child,
+                                                          ImageChunkEvent?
+                                                              loadingProgress) {
+                                                    if (loadingProgress ==
+                                                        null) {
+                                                      return child;
+                                                    }
+                                                    return Center(
+                                                      child:
+                                                          //  Shimmer
+                                                          //     .fromColors(
+                                                          //         baseColor:
+                                                          //             Colors.grey[
+                                                          //                 300]!,
+                                                          //         highlightColor:
+                                                          //             Colors.grey[
+                                                          //                 100]!,
+                                                          //         child:
+                                                          //             Container(
+                                                          //           // height: double.infinity,
+                                                          //           // width: double.infinity,
+                                                          //           decoration:
+                                                          //               BoxDecoration(
+                                                          //                   color:
+                                                          //                       Colors.green),
+                                                          //         ))
+                                                          CircularProgressIndicator(
+                                                        color: Colors.green,
+                                                        value: loadingProgress
+                                                                    .expectedTotalBytes !=
+                                                                null
+                                                            ? loadingProgress
+                                                                    .cumulativeBytesLoaded /
+                                                                loadingProgress
+                                                                    .expectedTotalBytes!
+                                                            : null,
                                                       ),
                                                     );
                                                   },
@@ -478,6 +551,47 @@ class _photopageState extends State<photopage> {
                                                           size: 40,
                                                           color: Colors.grey
                                                               .withOpacity(0.3),
+                                                        ),
+                                                      );
+                                                    },
+                                                    loadingBuilder: (BuildContext
+                                                            context,
+                                                        Widget child,
+                                                        ImageChunkEvent?
+                                                            loadingProgress) {
+                                                      if (loadingProgress ==
+                                                          null) {
+                                                        return child;
+                                                      }
+                                                      return Center(
+                                                        child:
+                                                            //  Shimmer
+                                                            //     .fromColors(
+                                                            //         baseColor:
+                                                            //             Colors.grey[
+                                                            //                 300]!,
+                                                            //         highlightColor:
+                                                            //             Colors.grey[
+                                                            //                 100]!,
+                                                            //         child:
+                                                            //             Container(
+                                                            //           // height: double.infinity,
+                                                            //           // width: double.infinity,
+                                                            //           decoration:
+                                                            //               BoxDecoration(
+                                                            //                   color:
+                                                            //                       Colors.green),
+                                                            //         ))
+                                                            CircularProgressIndicator(
+                                                          color: Colors.green,
+                                                          value: loadingProgress
+                                                                      .expectedTotalBytes !=
+                                                                  null
+                                                              ? loadingProgress
+                                                                      .cumulativeBytesLoaded /
+                                                                  loadingProgress
+                                                                      .expectedTotalBytes!
+                                                              : null,
                                                         ),
                                                       );
                                                     },

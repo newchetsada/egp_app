@@ -6,6 +6,7 @@ import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/report/report.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
@@ -65,14 +66,20 @@ class _cleansolarState extends State<cleansolar> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
   String userName = "Loading...";
+  int? iduser;
   var contact = <Album>[];
   bool contactloading = true;
+  String sign_name_1 = '';
+  String path_sign1 = '';
+  String sign_name_2 = '';
+  String path_sign2 = '';
 
-  int? iduser;
   bool isLoading = true;
   int before_taken = 0;
   int after_taken = 0;
   int total_taken = 0;
+
+  String pathPic = 'https://backoffice.energygreenplus.co.th/';
 
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -126,6 +133,66 @@ class _cleansolarState extends State<cleansolar> {
           before_taken = jsonResponse[0]['before_taken'];
           after_taken = jsonResponse[0]['after_taken'];
           total_taken = jsonResponse[0]['total_taken'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getsign1(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'jidx': jidx,
+          "groupNo": 1,
+          'typeId': null,
+          'imgType': 3
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        setState(() {
+          sign_name_1 = jsonResponse[0]['sign_name'];
+          path_sign1 = jsonResponse[0]['j_img_name'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getsign2(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'jidx': jidx,
+          "groupNo": 1,
+          'typeId': null,
+          'imgType': 2
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        setState(() {
+          sign_name_2 = jsonResponse[0]['sign_name'];
+          path_sign2 = jsonResponse[0]['j_img_name'];
         });
       }
     } catch (error) {
@@ -191,6 +258,25 @@ class _cleansolarState extends State<cleansolar> {
         });
   }
 
+  void popsign(path) {
+    showDialog<void>(
+      context: context,
+      // barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding:
+              EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 10),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          content: SingleChildScrollView(
+              child: Center(
+            child: Image.network('$pathPic${path}'),
+          )),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -200,8 +286,11 @@ class _cleansolarState extends State<cleansolar> {
     // getUser().then((value) {
     //   getWorkdetail(iduser, widget.jid).then((value) {});
     // });
+    getUser();
     _getAPI(widget.jid);
     getcountphoto(widget.jid);
+    getsign1(widget.jid);
+    getsign2(widget.jid);
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -1239,8 +1328,9 @@ class _cleansolarState extends State<cleansolar> {
                                       jidx: widget.jid,
                                     )),
                           ).then((value) {
-                            print('dasdasdas');
-                            setState(() {});
+                            setState(() {
+                              getcountphoto(widget.jid);
+                            });
                           });
                         },
                         child: Container(
@@ -1483,7 +1573,9 @@ class _cleansolarState extends State<cleansolar> {
                 padding: const EdgeInsets.only(top: 40, left: 40, right: 40),
                 child: GestureDetector(
                     onTap: () {
-                      sheet('ผู้ติดต่อหน้างาน');
+                      (sign_name_1.isNotEmpty)
+                          ? popsign(path_sign1)
+                          : sheet('ผู้ติดต่อหน้างาน', 3);
                     },
                     child: Container(
                       height: 80,
@@ -1510,13 +1602,15 @@ class _cleansolarState extends State<cleansolar> {
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: Color(0xff003175),
+                                color: (sign_name_1.isNotEmpty)
+                                    ? Color(0xff003175)
+                                    : Color(0xffB7B7B7),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
                                 child: Icon(
                                   Icons.person,
-                                  size: 30,
+                                  size: 20,
                                   color: Colors.white,
                                 ),
                               ),
@@ -1524,22 +1618,34 @@ class _cleansolarState extends State<cleansolar> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: Text(
-                              'ผู้ติดต่อหน้างาน',
-                              style: TextStyle(
-                                  color: Color(0xff003175),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'ผู้ติดต่อหน้างาน',
+                                  style: TextStyle(
+                                      color: (sign_name_1.isNotEmpty)
+                                          ? Color(0xff003175)
+                                          : Color(0xffB7B7B7),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14),
+                                ),
+                                (sign_name_1.isNotEmpty)
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(top: 7),
+                                        child: Text(
+                                          sign_name_1,
+                                          style: TextStyle(
+                                              color: Color(0xff003175),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.only(right: 10),
-                          //   child: Icon(
-                          //     Icons.check_circle_rounded,
-                          //     size: 20,
-                          //     color: Color(0xff149C32),
-                          //   ),
-                          // ),
                         ],
                       ),
                     )),
@@ -1548,7 +1654,9 @@ class _cleansolarState extends State<cleansolar> {
                 padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
                 child: GestureDetector(
                     onTap: () {
-                      sheet('หัวหน้าทีม');
+                      (sign_name_2.isNotEmpty)
+                          ? popsign(path_sign2)
+                          : sheet('หัวหน้าทีม', 2);
                     },
                     child: Container(
                       height: 80,
@@ -1575,7 +1683,9 @@ class _cleansolarState extends State<cleansolar> {
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: Color(0xff003175),
+                                color: (sign_name_2.isNotEmpty)
+                                    ? Color(0xff003175)
+                                    : Color(0xffB7B7B7),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
@@ -1589,12 +1699,32 @@ class _cleansolarState extends State<cleansolar> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: Text(
-                              'หัวหน้าทีม',
-                              style: TextStyle(
-                                  color: Color(0xff003175),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'หัวหน้าทีม',
+                                  style: TextStyle(
+                                      color: (sign_name_2.isNotEmpty)
+                                          ? Color(0xff003175)
+                                          : Color(0xffB7B7B7),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14),
+                                ),
+                                (sign_name_2.isNotEmpty)
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(top: 7),
+                                        child: Text(
+                                          sign_name_2,
+                                          style: TextStyle(
+                                              color: Color(0xff003175),
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
                             ),
                           ),
                           // Padding(
@@ -1786,7 +1916,9 @@ class _cleansolarState extends State<cleansolar> {
     );
   }
 
-  void sheet(title) {
+  void sheet(title, type) {
+    var putname = TextEditingController();
+
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -1833,6 +1965,7 @@ class _cleansolarState extends State<cleansolar> {
                           border: Border.all(color: Color(0xff149C32)),
                         ),
                         child: TextField(
+                          controller: putname,
                           // textInputAction: TextInputAction.done,
 
                           decoration: InputDecoration(
@@ -1854,11 +1987,20 @@ class _cleansolarState extends State<cleansolar> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => signature()),
+                                    builder: (context) => signature(
+                                          jidx: widget.jid,
+                                          imgType: type,
+                                          signName: putname.text,
+                                          user: userName,
+                                        )),
                               ).then((value) {
                                 SystemChrome.setPreferredOrientations([
                                   DeviceOrientation.portraitUp,
                                 ]);
+                                setState(() {
+                                  getsign1(widget.jid);
+                                  getsign2(widget.jid);
+                                });
                               });
                             },
                             style: ElevatedButton.styleFrom(
