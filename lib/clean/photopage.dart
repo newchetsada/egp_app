@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 // import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:lottie/lottie.dart';
+import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -30,10 +31,12 @@ class _photopageState extends State<photopage> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
   XFile? imagefilesone;
-  Uint8List webImage = Uint8List(8);
+  // Uint8List webImage = Uint8List(8);
 
   String userName = "Loading...";
   int? iduser;
+
+  var remark = TextEditingController();
 
   int limitFile = 0;
   List deleteLs = [];
@@ -49,6 +52,51 @@ class _photopageState extends State<photopage> {
         iduser = prefs.getInt('id')!;
       });
     }
+  }
+
+  void popPicApi(path) {
+    showDialog<void>(
+      context: context,
+      // barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          content: SingleChildScrollView(
+              child: Center(
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network('$pathPic$path')),
+          )),
+        );
+      },
+    );
+  }
+
+  void popPicPre(file) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return PinchZoom(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.file(
+              File(file),
+            ),
+          ),
+          resetDuration: const Duration(milliseconds: 100),
+          maxScale: 2.5,
+          onZoomStart: () {
+            print('Start zooming');
+          },
+          onZoomEnd: () {
+            print('Stop zooming');
+          },
+        );
+      },
+    );
   }
 
   void limitpop(total) {
@@ -120,10 +168,13 @@ class _photopageState extends State<photopage> {
         } else {
           // imagefiles.addAll(pickedfiles);
           imagefilesone = pickedfiles[0];
-          webImage = await pickedfiles[0].readAsBytes();
+          // webImage = await pickedfiles[0].readAsBytes();
           for (var i = 0; i < pickedfiles.length; i++) {
-            pic.add(
-                Album(j_img_id: 0, j_img_name: pickedfiles[i].path, onApi: 0));
+            pic.add(Album(
+                j_img_id: 0,
+                j_img_name: pickedfiles[i].path,
+                onApi: 0,
+                remark: ''));
           }
         }
 
@@ -145,7 +196,8 @@ class _photopageState extends State<photopage> {
       if (pickedfile != null) {
         // imagefiles.add(pickedfile);
         print(pickedfile.path);
-        pic.add(Album(j_img_id: 0, j_img_name: pickedfile.path, onApi: 0));
+        pic.add(Album(
+            j_img_id: 0, j_img_name: pickedfile.path, onApi: 0, remark: ''));
 
         setState(() {});
 
@@ -211,6 +263,29 @@ class _photopageState extends State<photopage> {
     }
   }
 
+  updateRemark(id, type, note) async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/updateJobDetailInGroup'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': id,
+        'groupNo': 1,
+        'imgType': type,
+        'remark': note,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
   void loading() {
     showDialog(
         barrierDismissible: false,
@@ -240,13 +315,20 @@ class _photopageState extends State<photopage> {
     setState(() {
       limitFile = widget.limit;
     });
-    API.getPicLs(widget.jidx, widget.type).then((response) {
-      print(response.body);
-      setState(() {
-        List list = json.decode(response.body);
-        pic = list.map((m) => Album.fromJson(m)).toList();
+    getUser().then((value) {
+      API.getPicLs(widget.jidx, widget.type).then((response) {
+        // print(response.body);
+        setState(() {
+          List list = json.decode(response.body);
+          pic = list.map((m) => Album.fromJson(m)).toList();
+          if (pic.isEmpty) {
+            remark.text = '';
+          } else {
+            remark.text = pic[0].remark;
+          }
 
-        // isLoading = false;
+          // isLoading = false;
+        });
       });
     });
   }
@@ -288,13 +370,14 @@ class _photopageState extends State<photopage> {
                     // width: 160,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigator.pop(context);
                         loading();
                         loopdelete().then((value) {
                           loopupload().then((value) {
-                            print('ok');
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            updateRemark(widget.jidx, widget.type, remark.text)
+                                .then((value) {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            });
                           });
                         });
                       },
@@ -361,9 +444,7 @@ class _photopageState extends State<photopage> {
                       width: 10,
                     ),
                     Text(
-                      (pic == null)
-                          ? '0/$limitFile'
-                          : '${pic.length}/$limitFile',
+                      '${pic.length}/$limitFile',
                       style: TextStyle(
                           color: Color(0xff149C32),
                           fontSize: 18,
@@ -381,7 +462,7 @@ class _photopageState extends State<photopage> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       crossAxisCount: 2,
-                      children: (pic.length != null)
+                      children: (pic.length > 0)
                           ? (pic.length == limitFile)
                               ? List.generate(pic.length, (index) {
                                   return Container(
@@ -427,23 +508,6 @@ class _photopageState extends State<photopage> {
                                                     }
                                                     return Center(
                                                       child:
-                                                          //  Shimmer
-                                                          //     .fromColors(
-                                                          //         baseColor:
-                                                          //             Colors.grey[
-                                                          //                 300]!,
-                                                          //         highlightColor:
-                                                          //             Colors.grey[
-                                                          //                 100]!,
-                                                          //         child:
-                                                          //             Container(
-                                                          //           // height: double.infinity,
-                                                          //           // width: double.infinity,
-                                                          //           decoration:
-                                                          //               BoxDecoration(
-                                                          //                   color:
-                                                          //                       Colors.green),
-                                                          //         ))
                                                           CircularProgressIndicator(
                                                         color: Colors.green,
                                                         value: loadingProgress
@@ -522,140 +586,136 @@ class _photopageState extends State<photopage> {
                                   if (index > pic.length - 1) {
                                     return add();
                                   } else {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: Color(0xffffffff),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                            color:
-                                                Colors.grey.withOpacity(0.3)),
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            child: (pic[index].onApi == 1)
-                                                ? Image.network(
-                                                    '$pathPic${pic[index].j_img_name}', // this image doesn't exist
-                                                    fit: BoxFit.cover,
-                                                    height: double.infinity,
-                                                    width: double.infinity,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        (pic[index].onApi == 1)
+                                            ? popPicApi(pic[index].j_img_name)
+                                            : popPicPre(pic[index].j_img_name);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Color(0xffffffff),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              color:
+                                                  Colors.grey.withOpacity(0.3)),
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: (pic[index].onApi == 1)
+                                                  ? Image.network(
+                                                      '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                      fit: BoxFit.cover,
+                                                      height: double.infinity,
+                                                      width: double.infinity,
 
-                                                    errorBuilder: (context,
-                                                        error, stackTrace) {
-                                                      return Center(
-                                                        child: Icon(
-                                                          Icons
-                                                              .error_outline_rounded,
-                                                          size: 40,
-                                                          color: Colors.grey
-                                                              .withOpacity(0.3),
-                                                        ),
-                                                      );
-                                                    },
-                                                    loadingBuilder: (BuildContext
-                                                            context,
-                                                        Widget child,
-                                                        ImageChunkEvent?
-                                                            loadingProgress) {
-                                                      if (loadingProgress ==
-                                                          null) {
-                                                        return child;
-                                                      }
-                                                      return Center(
-                                                        child:
-                                                            //  Shimmer
-                                                            //     .fromColors(
-                                                            //         baseColor:
-                                                            //             Colors.grey[
-                                                            //                 300]!,
-                                                            //         highlightColor:
-                                                            //             Colors.grey[
-                                                            //                 100]!,
-                                                            //         child:
-                                                            //             Container(
-                                                            //           // height: double.infinity,
-                                                            //           // width: double.infinity,
-                                                            //           decoration:
-                                                            //               BoxDecoration(
-                                                            //                   color:
-                                                            //                       Colors.green),
-                                                            //         ))
-                                                            CircularProgressIndicator(
-                                                          color: Colors.green,
-                                                          value: loadingProgress
-                                                                      .expectedTotalBytes !=
-                                                                  null
-                                                              ? loadingProgress
-                                                                      .cumulativeBytesLoaded /
-                                                                  loadingProgress
-                                                                      .expectedTotalBytes!
-                                                              : null,
-                                                        ),
-                                                      );
-                                                    },
-                                                  )
-                                                : Image.file(
-                                                    File(pic[index].j_img_name),
-                                                    fit: BoxFit.cover,
-                                                    height: double.infinity,
-                                                    width: double.infinity,
-                                                  ),
-                                          ),
-                                          Column(
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        if (pic[index].onApi ==
-                                                            1) {
-                                                          deleteLs.add(
-                                                              pic[index]
-                                                                  .j_img_id);
-                                                          pic.removeAt(index);
-                                                        } else {
-                                                          pic.removeAt(index);
-                                                        }
-                                                      });
-                                                    },
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10),
-                                                      child: Container(
-                                                        height: 25,
-                                                        width: 25,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(
-                                                                200),
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Center(
+                                                          child: Icon(
+                                                            Icons
+                                                                .error_outline_rounded,
+                                                            size: 40,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.3),
                                                           ),
-                                                          color: Colors.white
-                                                              .withOpacity(0.7),
+                                                        );
+                                                      },
+                                                      loadingBuilder: (BuildContext
+                                                              context,
+                                                          Widget child,
+                                                          ImageChunkEvent?
+                                                              loadingProgress) {
+                                                        if (loadingProgress ==
+                                                            null) {
+                                                          return child;
+                                                        }
+                                                        return Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: Colors.green,
+                                                            value: loadingProgress
+                                                                        .expectedTotalBytes !=
+                                                                    null
+                                                                ? loadingProgress
+                                                                        .cumulativeBytesLoaded /
+                                                                    loadingProgress
+                                                                        .expectedTotalBytes!
+                                                                : null,
+                                                          ),
+                                                        );
+                                                      },
+                                                    )
+                                                  : Image.file(
+                                                      File(pic[index]
+                                                          .j_img_name),
+                                                      fit: BoxFit.cover,
+                                                      height: double.infinity,
+                                                      width: double.infinity,
+                                                    ),
+                                            ),
+                                            Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          if (pic[index]
+                                                                  .onApi ==
+                                                              1) {
+                                                            deleteLs.add(
+                                                                pic[index]
+                                                                    .j_img_id);
+                                                            pic.removeAt(index);
+                                                          } else {
+                                                            pic.removeAt(index);
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: Container(
+                                                          height: 25,
+                                                          width: 25,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  200),
+                                                            ),
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                    0.7),
+                                                          ),
+                                                          child: Center(
+                                                              child: Icon(
+                                                            Icons.close_rounded,
+                                                            size: 20,
+                                                            color: Colors.grey,
+                                                          )),
                                                         ),
-                                                        child: Center(
-                                                            child: Icon(
-                                                          Icons.close_rounded,
-                                                          size: 20,
-                                                          color: Colors.grey,
-                                                        )),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              // Text(index.toString()),
-                                              // Text('${pic[index].j_img_id}')
-                                            ],
-                                          ),
-                                        ],
+                                                  ],
+                                                ),
+                                                // Text(index.toString()),
+                                                // Text('${pic[index].j_img_id}')
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }
@@ -814,6 +874,7 @@ class _photopageState extends State<photopage> {
                               Border.all(color: Colors.grey.withOpacity(0.3)),
                         ),
                         child: TextField(
+                          controller: remark,
                           // textInputAction: TextInputAction.done,
                           keyboardType: TextInputType.multiline,
                           minLines: 3,
@@ -907,15 +968,23 @@ class Album {
   final int j_img_id;
   final String j_img_name;
   final int onApi;
+  final String remark;
 
   const Album(
-      {required this.j_img_id, required this.j_img_name, required this.onApi});
+      {required this.j_img_id,
+      required this.j_img_name,
+      required this.onApi,
+      required this.remark});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-        j_img_id: json['j_img_id'],
-        j_img_name:
-            (json['j_img_name'].toString() == 'null') ? "" : json['j_img_name'],
-        onApi: 1);
+      j_img_id: json['j_img_id'],
+      j_img_name:
+          (json['j_img_name'].toString() == 'null') ? "" : json['j_img_name'],
+      onApi: 1,
+      remark: (json['j_img_remark'].toString() == 'null')
+          ? ""
+          : json['j_img_remark'],
+    );
   }
 }

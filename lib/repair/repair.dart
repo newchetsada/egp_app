@@ -8,6 +8,8 @@ import 'package:egp_app/repair/uploadpic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:http/http.dart' as http;
@@ -32,31 +34,56 @@ class repair extends StatefulWidget {
   final String remark_tech;
   final double lat;
   final double lon;
+  final String fullname;
+  final String position;
+  final String tel;
+  final int j_status;
+  final int ppe_flag;
 
   //
 
-  repair({
-    required this.jid,
-    required this.j_start_date,
-    required this.j_send_date,
-    required this.cus_name,
-    required this.site_name,
-    required this.cus_address,
-    required this.install_date,
-    required this.warranty_expire,
-    required this.power_peak,
-    required this.j_detail,
-    required this.remark_tech,
-    required this.lat,
-    required this.lon,
-  });
+  repair(
+      {required this.jid,
+      required this.j_start_date,
+      required this.j_send_date,
+      required this.cus_name,
+      required this.site_name,
+      required this.cus_address,
+      required this.install_date,
+      required this.warranty_expire,
+      required this.power_peak,
+      required this.j_detail,
+      required this.remark_tech,
+      required this.lat,
+      required this.lon,
+      required this.fullname,
+      required this.position,
+      required this.tel,
+      required this.j_status,
+      required this.ppe_flag});
 }
 
 class _repairState extends State<repair> {
   PageController controller = PageController(initialPage: 0);
   int _curpage = 0;
   var contact = <Album>[];
+  var groupPic = <picLs>[];
+  int? iduser;
+
+  String userName = "Loading...";
+
   bool contactloading = true;
+
+  getUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //Return String
+    if (prefs.getString('user') != null) {
+      setState(() {
+        userName = prefs.getString('user')!;
+        iduser = prefs.getInt('id')!;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -65,6 +92,8 @@ class _repairState extends State<repair> {
       DeviceOrientation.portraitUp,
     ]);
     // Future.delayed(const Duration(milliseconds: 500), () {
+    getUser();
+
     _getAPI(widget.jid);
     // });
   }
@@ -92,9 +121,55 @@ class _repairState extends State<repair> {
       setState(() {
         List list = json.decode(response.body);
         contact = list.map((m) => Album.fromJson(m)).toList();
-        contactloading = false;
+      });
+      API.getPicLs(idd).then((value) {
+        setState(() {
+          List list1 = json.decode(value.body);
+
+          groupPic = list1.map((m) => picLs.fromJson(m)).toList();
+          contactloading = false;
+        });
       });
     });
+  }
+
+  StartWork() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': widget.jid,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      return jsonResponse;
+    }
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 
   void confirmpop() {
@@ -428,7 +503,9 @@ class _repairState extends State<repair> {
                                 ? 'นัดหมายเข้างาน ${widget.j_start_date}\nนัดหมายส่งงาน ${widget.j_send_date}'
                                 : (_curpage == 1)
                                     ? 'ถ่ายรูปตามจุดที่กำหมด พร้อมเขียนรายละเอียดให้ครบถ้วน'
-                                    : 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน',
+                                    : (_curpage == 2)
+                                        ? 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน'
+                                        : 'ตรวจสอบงานก่อนยืนยันส่งงาน',
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 height: 1.4,
@@ -483,9 +560,34 @@ class _repairState extends State<repair> {
                   // width: 160,
                   child: ElevatedButton(
                     onPressed: () {
-                      controller.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.ease);
+                      if (widget.j_status == 1) {
+                        loading();
+                        StartWork().then((jsonResponse) {
+                          print(jsonResponse);
+                          if (jsonResponse['status'] == true) {
+                            Navigator.pop(context);
+                            controller.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
+                          } else {
+                            Navigator.pop(context);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(jsonResponse['message']),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        });
+                      } else {
+                        controller.nextPage(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.ease);
+                      }
+                      // controller.nextPage(
+                      //     duration: Duration(milliseconds: 300),
+                      //     curve: Curves.ease);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -495,7 +597,7 @@ class _repairState extends State<repair> {
                       ),
                     ),
                     child: Text(
-                      'เริ่มดำเนินงาน',
+                      (widget.j_status == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
                       style:
                           TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
@@ -607,6 +709,28 @@ class _repairState extends State<repair> {
             SizedBox(
               height: 10,
             ),
+            (widget.ppe_flag == 1)
+                ? Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: Color(0xff003175),
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('ชุด PPE',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: Color(0xff003175))),
+                    ],
+                  )
+                : Container(),
+            SizedBox(
+              height: 10,
+            ),
             DottedLine(dashColor: Color(0xffD5D5D5)),
             SizedBox(
               height: 10,
@@ -697,6 +821,7 @@ class _repairState extends State<repair> {
                   )
                 : ListView.builder(
                     shrinkWrap: true,
+                    primary: false,
                     itemCount: contact.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -806,7 +931,7 @@ class _repairState extends State<repair> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('คุณ ตู่',
+                        Text(widget.fullname,
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 13,
@@ -814,7 +939,7 @@ class _repairState extends State<repair> {
                         SizedBox(
                           height: 5,
                         ),
-                        Text('ตำแหน่ง : ประสานงาน',
+                        Text('ตำแหน่ง : ${widget.position}',
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 13,
@@ -822,7 +947,7 @@ class _repairState extends State<repair> {
                         SizedBox(
                           height: 5,
                         ),
-                        Text('000-000-0000',
+                        Text(widget.tel,
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
@@ -831,30 +956,32 @@ class _repairState extends State<repair> {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 30),
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                      // border: Border.all(width: 3),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(200),
-                      ),
-                      color: Color(0xff003175),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                          splashRadius: 20,
-                          iconSize: 20,
-                          color: Colors.white,
-                          onPressed: () {
-                            _makePhoneCall('0000000000');
-                          },
-                          icon: Icon(Icons.phone)),
-                    ),
-                  ),
-                )
+                (widget.tel.isEmpty)
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            // border: Border.all(width: 3),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(200),
+                            ),
+                            color: Color(0xff003175),
+                          ),
+                          child: Center(
+                            child: IconButton(
+                                splashRadius: 20,
+                                iconSize: 20,
+                                color: Colors.white,
+                                onPressed: () {
+                                  _makePhoneCall(widget.tel);
+                                },
+                                icon: Icon(Icons.phone)),
+                          ),
+                        ),
+                      )
               ],
             ),
             SizedBox(
@@ -909,7 +1036,24 @@ class _repairState extends State<repair> {
                     //   color: Colors.white,
                     // ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 1,
+                                    ))).then((value) {
+                          API.getPicLs(widget.jid).then((value) {
+                            setState(() {
+                              List list1 = json.decode(value.body);
+                              groupPic =
+                                  list1.map((m) => picLs.fromJson(m)).toList();
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -924,7 +1068,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 2,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -939,7 +1103,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 3,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -954,7 +1138,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 4,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -969,7 +1173,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 5,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -984,7 +1208,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 6,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -999,7 +1243,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 7,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -1014,7 +1278,27 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 8,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -1029,12 +1313,32 @@ class _repairState extends State<repair> {
                     ),
 
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 9,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
                         child: Center(
-                          child: Text('อื่นๆ',
+                          child: Text('สายไฟ',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
@@ -1255,298 +1559,162 @@ class _repairState extends State<repair> {
           Padding(
             padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
             child: GridView.count(
-                shrinkWrap: true,
-                childAspectRatio: 1.2,
-                primary: false,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 10,
-                crossAxisCount: 2,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => uploadPic()));
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xff149C32),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
+              shrinkWrap: true,
+              childAspectRatio: 1.2,
+              primary: false,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 10,
+              crossAxisCount: 2,
+              children: List.generate(groupPic.length, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => uploadPic(
+                                  jidx: widget.jid,
+                                  type_id: groupPic[index].type_id,
+                                ))).then((value) {
+                      API.getPicLs(widget.jid).then((value) {
+                        setState(() {
+                          List list1 = json.decode(value.body);
+                          groupPic =
+                              list1.map((m) => picLs.fromJson(m)).toList();
+                        });
+                      });
+                    });
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      // color: Color(0xff149C32),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xff149C32),
+                          Color(0xff25893A),
                         ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text('PV (แผงโซล่าเซลล์)',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 12,
-                                            color: Colors.white)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      height: 30,
-                                      width: 45,
-                                      decoration: BoxDecoration(
-                                        // border: Border.all(width: 3),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(13),
-                                        ),
-                                        color: Color(0xff003175),
-                                      ),
-                                      child: Center(
-                                        child: Text('5/5',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                                color: Colors.white)),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text('งานทั้งหมด',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: Colors.white)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xff003175).withOpacity(0.1),
+                          blurRadius: 10,
+                          spreadRadius: 0,
+                          offset: Offset(0, 0), // Shadow position
                         ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(groupPic[index].type_name,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Colors.white)),
+                        ],
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => uploadPic()));
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Color(0xff149C32),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text('Inverter',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 12,
-                                            color: Colors.white)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      height: 30,
-                                      width: 45,
-                                      decoration: BoxDecoration(
-                                        // border: Border.all(width: 3),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(13),
-                                        ),
-                                        color: Color(0xff003175),
-                                      ),
-                                      child: Center(
-                                        child: Text('5/5',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 12,
-                                                color: Colors.white)),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text('งานทั้งหมด',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: Colors.white)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.push(context,
-                  //         MaterialPageRoute(builder: (context) => uploadPic()));
-                  //   },
-                  //   child: Container(
-                  //     height: 80,
-                  //     width: double.infinity,
-                  //     decoration: BoxDecoration(
-                  //       color: Color(0xffF9FAF8),
-                  //       borderRadius: BorderRadius.circular(15),
-                  //       border: Border.all(color: Color(0xffE0ECDE)),
-                  //       boxShadow: [
-                  //         BoxShadow(
-                  //           color: Color(0xff149C32).withOpacity(0.1),
-                  //           blurRadius: 10,
-                  //           spreadRadius: 0,
-                  //           offset: Offset(0, 0), // Shadow position
-                  //         ),
-                  //       ],
-                  //     ),
-                  //     child: Column(
-                  //       children: [
-                  //         Container(
-                  //           height: 40,
-                  //           width: double.infinity,
-                  //           decoration: BoxDecoration(
-                  //               color: Colors.white,
-                  //               borderRadius: BorderRadius.only(
-                  //                   topLeft: Radius.circular(15),
-                  //                   topRight: Radius.circular(15))),
-                  //           child: Center(
-                  //             child: Text('PV (แผงโซล่าเซลล์)',
-                  //                 style: TextStyle(
-                  //                     fontWeight: FontWeight.w600,
-                  //                     fontSize: 13,
-                  //                     color: Color(0xff2DAC34))),
-                  //           ),
-                  //         ),
-                  //         Expanded(
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //             children: [
-                  //               Row(
-                  //                 mainAxisAlignment: MainAxisAlignment.center,
-                  //                 children: [
-                  //                   Container(
-                  //                     height: 22,
-                  //                     width: 22,
-                  //                     decoration: BoxDecoration(
-                  //                       // border: Border.all(width: 3),
-                  //                       borderRadius: BorderRadius.all(
-                  //                         Radius.circular(200),
-                  //                       ),
-                  //                       color: Color(0xffB3E8A8),
-                  //                     ),
-                  //                     child: Center(
-                  //                       child: Text('1',
-                  //                           style: TextStyle(
-                  //                               fontWeight: FontWeight.w600,
-                  //                               fontSize: 12,
-                  //                               color: Color(0xff149C32))),
-                  //                     ),
-                  //                   ),
-                  //                   SizedBox(
-                  //                     width: 10,
-                  //                   ),
-                  //                   Text('รูปถ่ายก่อนซ่อม',
-                  //                       style: TextStyle(
-                  //                           fontWeight: FontWeight.w600,
-                  //                           fontSize: 12,
-                  //                           color: Color(0xff2DAC34)))
-                  //                 ],
-                  //               ),
-                  //               Row(
-                  //                 mainAxisAlignment: MainAxisAlignment.center,
-                  //                 children: [
-                  //                   Container(
-                  //                     height: 22,
-                  //                     width: 22,
-                  //                     decoration: BoxDecoration(
-                  //                       // border: Border.all(width: 3),
-                  //                       borderRadius: BorderRadius.all(
-                  //                         Radius.circular(200),
-                  //                       ),
-                  //                       color: Color(0xffB3E8A8),
-                  //                     ),
-                  //                     child: Center(
-                  //                       child: Text('1',
-                  //                           style: TextStyle(
-                  //                               fontWeight: FontWeight.w600,
-                  //                               fontSize: 12,
-                  //                               color: Color(0xff149C32))),
-                  //                     ),
-                  //                   ),
-                  //                   SizedBox(
-                  //                     width: 10,
-                  //                   ),
-                  //                   Text('รูปถ่ายหลังซ่อม',
-                  //                       style: TextStyle(
-                  //                           fontWeight: FontWeight.w600,
-                  //                           fontSize: 12,
-                  //                           color: Color(0xff2DAC34)))
-                  //                 ],
-                  //               )
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                ]),
+                );
+              }),
+
+              // GestureDetector(
+              //   onTap: () {
+              //     Navigator.push(context,
+              //         MaterialPageRoute(builder: (context) => uploadPic()));
+              //   },
+              //   child: Container(
+              //     width: double.infinity,
+              //     decoration: BoxDecoration(
+              //       color: Color(0xff149C32),
+              //       borderRadius: BorderRadius.circular(15),
+              //       boxShadow: [
+              //         BoxShadow(
+              //           color: Color(0xff003175).withOpacity(0.1),
+              //           blurRadius: 10,
+              //           spreadRadius: 0,
+              //           offset: Offset(0, 0), // Shadow position
+              //         ),
+              //       ],
+              //     ),
+              //     child: Padding(
+              //       padding: const EdgeInsets.symmetric(
+              //           horizontal: 15, vertical: 10),
+              //       child: Column(
+              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //         children: [
+              //           Row(
+              //             mainAxisAlignment: MainAxisAlignment.start,
+              //             children: [
+              //               Column(
+              //                 mainAxisAlignment: MainAxisAlignment.start,
+              //                 crossAxisAlignment: CrossAxisAlignment.start,
+              //                 children: [
+              //                   SizedBox(
+              //                     height: 10,
+              //                   ),
+              //                   Text('Inverter',
+              //                       style: TextStyle(
+              //                           fontWeight: FontWeight.w600,
+              //                           fontSize: 12,
+              //                           color: Colors.white)),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //           Row(
+              //             mainAxisAlignment: MainAxisAlignment.end,
+              //             children: [
+              //               Column(
+              //                 crossAxisAlignment: CrossAxisAlignment.end,
+              //                 mainAxisAlignment: MainAxisAlignment.end,
+              //                 children: [
+              //                   Container(
+              //                     height: 30,
+              //                     width: 45,
+              //                     decoration: BoxDecoration(
+              //                       // border: Border.all(width: 3),
+              //                       borderRadius: BorderRadius.all(
+              //                         Radius.circular(13),
+              //                       ),
+              //                       color: Color(0xff003175),
+              //                     ),
+              //                     child: Center(
+              //                       child: Text('5/5',
+              //                           style: TextStyle(
+              //                               fontWeight: FontWeight.w600,
+              //                               fontSize: 12,
+              //                               color: Colors.white)),
+              //                     ),
+              //                   ),
+              //                   SizedBox(
+              //                     height: 5,
+              //                   ),
+              //                   Text('งานทั้งหมด',
+              //                       style: TextStyle(
+              //                           fontWeight: FontWeight.w500,
+              //                           fontSize: 12,
+              //                           color: Colors.white)),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ),
           ),
         ],
       ),
@@ -2097,6 +2265,21 @@ class API {
     );
     return response;
   }
+
+  static Future getPicLs(idd) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForRepair'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+      }),
+    );
+    return response;
+  }
 }
 
 class Album {
@@ -2115,6 +2298,23 @@ class Album {
       j_cont_name: json['j_cont_name'],
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
+    );
+  }
+}
+
+class picLs {
+  final int type_id;
+  final String type_name;
+
+  const picLs({
+    required this.type_id,
+    required this.type_name,
+  });
+
+  factory picLs.fromJson(Map<String, dynamic> json) {
+    return picLs(
+      type_id: json['type_id'],
+      type_name: json['type_name'],
     );
   }
 }

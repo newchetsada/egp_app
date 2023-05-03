@@ -24,6 +24,8 @@ class _homePageState extends State<homePage> {
   var works = <Album>[];
   DateTime datetime = DateTime.now();
 
+  String fullname = 'Loading...';
+
   _getAPI(id) {
     var idd = id;
     API.getWorkLs(idd).then((response) {
@@ -48,12 +50,36 @@ class _homePageState extends State<homePage> {
     }
   }
 
+  Future getUserDetail(userId) async {
+    try {
+      var response = await http.post(
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/master/getTechnicianLs'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'techId': userId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        setState(() {
+          fullname = jsonResponse[0]['tech_fullname'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
   Future<void> _ref() async {
-    // await _getAPI(iduser).then((value) {
     setState(() {
       _getAPI(iduser);
     });
-    // });
   }
 
   @override
@@ -63,6 +89,7 @@ class _homePageState extends State<homePage> {
       DeviceOrientation.portraitUp,
     ]);
     getUser().then((value) {
+      getUserDetail(iduser);
       _getAPI(iduser);
     });
   }
@@ -88,10 +115,10 @@ class _homePageState extends State<homePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Hello, $userName',
+                        'Hello, $fullname',
                         style: TextStyle(
                             color: Color(0xff57A946),
-                            fontSize: 34,
+                            fontSize: 30,
                             fontWeight: FontWeight.w700),
                       ),
                       IconButton(
@@ -101,7 +128,11 @@ class _homePageState extends State<homePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => settingPage()),
-                            );
+                            ).then((value) {
+                              setState(() {
+                                getUserDetail(iduser);
+                              });
+                            });
                           },
                           icon: Icon(
                             Icons.settings_rounded,
@@ -145,20 +176,37 @@ class _homePageState extends State<homePage> {
                 child: ListView.builder(
                   itemCount: works.length,
                   itemBuilder: (context, index) {
-                    return cardClean(
-                        works[index].type_id,
-                        works[index].j_status,
-                        works[index].startdate,
-                        works[index].cus_name,
-                        works[index].jidx);
+                    return (works[index].j_status == 3)
+                        ? Container()
+                        : cardWork(
+                            works[index].type_id,
+                            works[index].j_status,
+                            works[index].startdate,
+                            works[index].cus_name,
+                            works[index].jidx);
                   },
                 ),
               ),
             ),
-            // Center(
-            //   child: Text("It's rainy here"),
-            // ),
-            taskloading()
+            //finished
+            Center(
+              child: RefreshIndicator(
+                onRefresh: () => _ref(),
+                child: ListView.builder(
+                  itemCount: works.length,
+                  itemBuilder: (context, index) {
+                    return (works[index].j_status == 3)
+                        ? cardWork(
+                            works[index].type_id,
+                            works[index].j_status,
+                            works[index].startdate,
+                            works[index].cus_name,
+                            works[index].jidx)
+                        : Container();
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -174,7 +222,7 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget cardClean(type, status, date, comp, id) {
+  Widget cardWork(type, status, date, comp, id) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
       child: GestureDetector(
@@ -197,6 +245,8 @@ class _homePageState extends State<homePage> {
           String position = '';
           String tel = '';
           int j_status = 0;
+          int ppe_flag = 0;
+          String j_remark_complete = '';
 
           //
           showDialog(
@@ -253,6 +303,10 @@ class _homePageState extends State<homePage> {
               position = jsonResponse[0]['position'];
               tel = jsonResponse[0]['tel'];
               j_status = jsonResponse[0]['j_status'];
+              ppe_flag = jsonResponse[0]['ppe_flag'];
+              j_remark_complete = (jsonResponse[0]['j_remark_complete'] == null)
+                  ? ''
+                  : jsonResponse[0]['j_remark_complete'];
             });
           }).then((value) {
             Navigator.pop(context);
@@ -261,24 +315,25 @@ class _homePageState extends State<homePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => cleansolar(
-                              jid: id,
-                              j_start_date: j_start_date,
-                              j_send_date: j_send_date,
-                              cus_name: cus_name,
-                              cus_address: cus_address,
-                              install_date: install_date,
-                              warranty_expire: warranty_expire,
-                              power_peak: power_peak,
-                              j_detail: j_detail,
-                              remark_tech: remark_tech,
-                              lat: lat,
-                              lon: lon,
-                              site_name: site_name,
-                              fullname: fullname,
-                              position: position,
-                              tel: tel,
-                              j_status: j_status,
-                            )),
+                            jid: id,
+                            j_start_date: j_start_date,
+                            j_send_date: j_send_date,
+                            cus_name: cus_name,
+                            cus_address: cus_address,
+                            install_date: install_date,
+                            warranty_expire: warranty_expire,
+                            power_peak: power_peak,
+                            j_detail: j_detail,
+                            remark_tech: remark_tech,
+                            lat: lat,
+                            lon: lon,
+                            site_name: site_name,
+                            fullname: fullname,
+                            position: position,
+                            tel: tel,
+                            j_status: j_status,
+                            ppe_flag: ppe_flag,
+                            j_remark_complete: j_remark_complete)),
                   )
                 : (type == 1 || type == 2)
                     ? Navigator.push(
@@ -298,10 +353,35 @@ class _homePageState extends State<homePage> {
                                   lat: lat,
                                   lon: lon,
                                   site_name: site_name,
+                                  fullname: fullname,
+                                  position: position,
+                                  tel: tel,
+                                  j_status: j_status,
+                                  ppe_flag: ppe_flag,
                                 )))
                     : Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => research()),
+                        MaterialPageRoute(
+                            builder: (context) => research(
+                                jid: id,
+                                j_start_date: j_start_date,
+                                j_send_date: j_send_date,
+                                cus_name: cus_name,
+                                cus_address: cus_address,
+                                install_date: install_date,
+                                warranty_expire: warranty_expire,
+                                power_peak: power_peak,
+                                j_detail: j_detail,
+                                remark_tech: remark_tech,
+                                lat: lat,
+                                lon: lon,
+                                site_name: site_name,
+                                fullname: fullname,
+                                position: position,
+                                tel: tel,
+                                j_status: j_status,
+                                ppe_flag: ppe_flag,
+                                j_remark_complete: j_remark_complete)),
                       );
           });
         },
@@ -388,52 +468,79 @@ class _homePageState extends State<homePage> {
                                     ),
                                   ),
                                 )
-                              : Container(
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffE4D8FF)),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'กำลังดำเนินงาน',
-                                        style: TextStyle(
-                                            color: Color(0xff7540EE),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
+                              : (status == 2)
+                                  ? Container(
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          color: Color(0xffE4D8FF)),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Text(
+                                            'กำลังดำเนินงาน',
+                                            style: TextStyle(
+                                                color: Color(0xff7540EE),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
+                                    )
+                                  : (status == 3)
+                                      ? Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                              color: Color(0xffD5FFD9)),
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Text(
+                                                'เสร็จสิ้น',
+                                                style: TextStyle(
+                                                    color: Color(0xff2DAC34),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
                           SizedBox(
                             width: 5,
                           ),
-                          (datetime.isAfter(DateTime.parse(date)))
-                              ? Container(
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color:
-                                          Color.fromARGB(255, 255, 214, 211)),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'ล่าช้า',
-                                        style: TextStyle(
-                                            color: Color(0xffE44E47),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
+                          (status == 3)
+                              ? Container()
+                              : (datetime.isAfter(DateTime.parse(date)))
+                                  ? Container(
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          color: Color.fromARGB(
+                                              255, 255, 214, 211)),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Text(
+                                            'ล่าช้า',
+                                            style: TextStyle(
+                                                color: Color(0xffE44E47),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                )
-                              : Container()
+                                    )
+                                  : Container()
                         ],
                       )
                     ],
@@ -447,57 +554,57 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget taskloading() {
-    return Center(
-      child: RefreshIndicator(
-        onRefresh: () => _ref(),
-        child: ListView(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.blueGrey,
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.blueGrey,
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.blueGrey,
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.blueGrey,
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget taskloading() {
+  //   return Center(
+  //     child: RefreshIndicator(
+  //       onRefresh: () => _ref(),
+  //       child: ListView(
+  //         children: [
+  //           Padding(
+  //             padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+  //             child: Container(
+  //               height: 200,
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                   color: Colors.blueGrey,
+  //                   borderRadius: BorderRadius.circular(20)),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+  //             child: Container(
+  //               height: 200,
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                   color: Colors.blueGrey,
+  //                   borderRadius: BorderRadius.circular(20)),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+  //             child: Container(
+  //               height: 200,
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                   color: Colors.blueGrey,
+  //                   borderRadius: BorderRadius.circular(20)),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+  //             child: Container(
+  //               height: 200,
+  //               width: double.infinity,
+  //               decoration: BoxDecoration(
+  //                   color: Colors.blueGrey,
+  //                   borderRadius: BorderRadius.circular(20)),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Future getWorkdetail(userId, jidx) async {
     try {
@@ -561,12 +668,12 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-        jidx: json['jidx'],
-        j_detail:
-            (json['j_detail'].toString() == 'null') ? "" : json['j_detail'],
-        startdate: json['j_start_date'],
-        cus_name: json['cus_name'],
-        j_status: json['j_status'],
-        type_id: json['type_flag']);
+      jidx: json['jidx'],
+      j_detail: (json['j_detail'].toString() == 'null') ? "" : json['j_detail'],
+      startdate: json['j_start_date'],
+      cus_name: json['cus_name'],
+      j_status: json['j_status'],
+      type_id: json['type_flag'],
+    );
   }
 }

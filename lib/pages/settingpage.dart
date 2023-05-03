@@ -174,8 +174,13 @@ class _settingPageState extends State<settingPage> {
                                     line: tech_line,
                                     position: tech_position,
                                     tel: tech_tel,
+                                    userName: userName,
                                   )),
-                        );
+                        ).then((value) {
+                          setState(() {
+                            getUserDetail(iduser);
+                          });
+                        });
                       },
                       child: Container(
                         height: 120,

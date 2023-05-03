@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 
 class editprofile extends StatefulWidget {
   @override
@@ -12,6 +16,7 @@ class editprofile extends StatefulWidget {
   final String line;
   final String position;
   final String companame;
+  final String userName;
   editprofile(
       {required this.id,
       required this.fullname,
@@ -19,7 +24,8 @@ class editprofile extends StatefulWidget {
       required this.tel,
       required this.line,
       required this.position,
-      required this.companame});
+      required this.companame,
+      required this.userName});
 }
 
 class _editprofileState extends State<editprofile> {
@@ -29,6 +35,37 @@ class _editprofileState extends State<editprofile> {
   var line = TextEditingController();
   var position = TextEditingController();
   var companame = TextEditingController();
+
+  updateProfile() async {
+    List _body = [
+      {
+        'techId': widget.id,
+        'userName': widget.userName,
+        'fullName': fullname.text,
+        'email': email.text,
+        'tel': tel.text,
+        'line': line.text,
+        'position': position.text,
+        'company': companame.text,
+        'activeFlag': 0
+      }
+    ];
+
+    var response = await http.post(
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/master/updateTechnician'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: json.encode(_body));
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
 
   @override
   void initState() {
@@ -41,6 +78,26 @@ class _editprofileState extends State<editprofile> {
       position.text = widget.position;
       companame.text = widget.companame;
     });
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 
   @override
@@ -82,7 +139,13 @@ class _editprofileState extends State<editprofile> {
                   height: 50,
                   // width: 160,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      loading();
+                      updateProfile().then((value) {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      });
+                    },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Color(0xff149C32),
