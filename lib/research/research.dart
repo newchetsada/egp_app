@@ -4,6 +4,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/report/report.dart';
 import 'package:egp_app/research/groupresearch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,7 @@ class research extends StatefulWidget {
   final int j_status;
   final int ppe_flag;
   final String j_remark_complete;
+  final int type;
 
   //
 
@@ -59,7 +61,8 @@ class research extends StatefulWidget {
       required this.tel,
       required this.j_status,
       required this.ppe_flag,
-      required this.j_remark_complete});
+      required this.j_remark_complete,
+      required this.type});
 }
 
 class _researchState extends State<research> {
@@ -111,7 +114,7 @@ class _researchState extends State<research> {
         contact = list.map((m) => Album.fromJson(m)).toList();
         remarkEnd.text = widget.j_remark_complete;
       });
-      API.getGroupLs(idd).then((value) {
+      API.getGroupLs(idd, widget.type).then((value) {
         setState(() {
           List list1 = json.decode(value.body);
 
@@ -698,16 +701,22 @@ class _researchState extends State<research> {
                       children: [
                         Container(
                           height: 30,
-                          width: 120,
+                          // width: 120,
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20)),
-                          child: Center(
-                              child: Text('สำรวจสถานที่',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: Color(0xff149C32)))),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Center(
+                                child: Text(
+                                    (widget.type == 3)
+                                        ? 'สำรวจสถานที่'
+                                        : 'ตรวจสอบประจำปี',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Color(0xff149C32)))),
+                          ),
                         )
                       ],
                     ),
@@ -848,7 +857,7 @@ class _researchState extends State<research> {
             ),
             GestureDetector(
               onTap: () {
-                openMap(0, 0);
+                openMap(widget.lat, widget.lon);
               },
               child: Row(
                 children: [
@@ -1227,14 +1236,20 @@ class _researchState extends State<research> {
                           // width: 160,
                           child: ElevatedButton(
                             onPressed: () {
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) => photopage(
+                              //             type: 2,
+                              //             limit: 0,
+                              //             jidx: 0,
+                              //           )),
+                              // );
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => photopage(
-                                          type: 2,
-                                          limit: 0,
-                                          jidx: 0,
-                                        )),
+                                    builder: (context) =>
+                                        report(jid: widget.jid)),
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -1319,7 +1334,9 @@ class _researchState extends State<research> {
                                   )),
                         ).then((value) {
                           setState(() {
-                            API.getGroupLs(widget.jid).then((value) {
+                            API
+                                .getGroupLs(widget.jid, widget.type)
+                                .then((value) {
                               setState(() {
                                 List list1 = json.decode(value.body);
 
@@ -2589,10 +2606,11 @@ class API {
     return response;
   }
 
-  static Future getGroupLs(idd) async {
+  static Future getGroupLs(idd, typ) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForSurvey'),
+      Uri.parse((typ == 3)
+          ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForSurvey'
+          : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

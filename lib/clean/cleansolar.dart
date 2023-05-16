@@ -860,7 +860,7 @@ class _cleansolarState extends State<cleansolar> {
             ),
             GestureDetector(
               onTap: () {
-                openMap(0, 0);
+                openMap(widget.lat, widget.lon);
               },
               child: Row(
                 children: [
@@ -1240,7 +1240,9 @@ class _cleansolarState extends State<cleansolar> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => report()),
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      report(jid: widget.jid)),
                             );
                           },
                           style: ElevatedButton.styleFrom(

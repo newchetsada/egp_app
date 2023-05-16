@@ -1,12 +1,45 @@
+import 'dart:convert';
+
 import 'package:egp_app/repair/hero_dialog_route.dart';
+import 'package:egp_app/report/report-uploadmounting.dart';
+import 'package:egp_app/report/report-uploadpic.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 class report extends StatefulWidget {
   @override
   _reportState createState() => _reportState();
+
+  final int jid;
+  report({required this.jid});
 }
 
 class _reportState extends State<report> {
+  var groupPic = <picLs>[];
+
+  _getAPI(id) {
+    var idd = id;
+
+    API.getPicLs(idd).then((value) {
+      setState(() {
+        List list1 = json.decode(value.body);
+
+        groupPic = list1.map((m) => picLs.fromJson(m)).toList();
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
+    _getAPI(widget.jid);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,7 +179,7 @@ class _reportState extends State<report> {
                   GestureDetector(
                     onTap: () {
                       // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => uploadPic()));
+                      //     MaterialPageRoute(builder: (context) => ReportuploadPic()));
                     },
                     child: Container(
                       width: double.infinity,
@@ -211,7 +244,7 @@ class _reportState extends State<report> {
                   GestureDetector(
                     onTap: () {
                       // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => uploadPic()));
+                      //     MaterialPageRoute(builder: (context) => ReportuploadPic()));
                     },
                     child: Container(
                       width: double.infinity,
@@ -275,6 +308,151 @@ class _reportState extends State<report> {
                   ),
                 ]),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
+            child: GridView.count(
+              shrinkWrap: true,
+              childAspectRatio: 1.2,
+              primary: false,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 10,
+              crossAxisCount: 2,
+              children: List.generate(groupPic.length, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    if (groupPic[index].type_id == 2) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ReportuploadPicMounting(
+                                    jidx: widget.jid,
+                                    type_id: groupPic[index].type_id,
+                                  ))).then((value) {
+                        API.getPicLs(widget.jid).then((value) {
+                          setState(() {
+                            List list1 = json.decode(value.body);
+                            groupPic =
+                                list1.map((m) => picLs.fromJson(m)).toList();
+                          });
+                        });
+                      });
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ReportuploadPic(
+                                    jidx: widget.jid,
+                                    type_id: groupPic[index].type_id,
+                                  ))).then((value) {
+                        API.getPicLs(widget.jid).then((value) {
+                          setState(() {
+                            List list1 = json.decode(value.body);
+                            groupPic =
+                                list1.map((m) => picLs.fromJson(m)).toList();
+                          });
+                        });
+                      });
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: (groupPic[index].before_suc ==
+                              groupPic[index].after_suc)
+                          ? LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xff149C32),
+                                Color(0xff25893A),
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white,
+                                Colors.white,
+                              ],
+                            ),
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xff003175).withOpacity(0.1),
+                          blurRadius: 10,
+                          spreadRadius: 0,
+                          offset: Offset(0, 0), // Shadow position
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Text(groupPic[index].type_name,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: (groupPic[index].before_suc ==
+                                          groupPic[index].after_suc)
+                                      ? Color(0xffFFFFFF)
+                                      : Color(0xff003175),
+                                )),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    height: 30,
+                                    width: 45,
+                                    decoration: BoxDecoration(
+                                      // border: Border.all(width: 3),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(13),
+                                      ),
+                                      color: Color(0xff003175),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                          '${groupPic[index].before_suc}/${groupPic[index].after_suc}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12,
+                                              color: Colors.white)),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text('ก่อน/หลัง งานทั้งหมด',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: (groupPic[index].before_suc ==
+                                                  groupPic[index].after_suc)
+                                              ? Colors.white
+                                              : Color(0xff003175))),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
         ],
       ),
     );
@@ -306,8 +484,32 @@ class _reportState extends State<report> {
                     SizedBox(
                       height: 25,
                     ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    // Divider(
+                    //   thickness: 0.5,
+                    //   color: Colors.white,
+                    // ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 1,
+                                    ))).then((value) {
+                          API.getPicLs(widget.jid).then((value) {
+                            setState(() {
+                              List list1 = json.decode(value.body);
+                              groupPic =
+                                  list1.map((m) => picLs.fromJson(m)).toList();
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -320,8 +522,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPicMounting(
+                                      jidx: widget.jid,
+                                      type_id: 2,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -334,8 +557,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 3,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -348,8 +592,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 4,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -362,8 +627,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 5,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -376,8 +662,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 6,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -390,8 +697,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 7,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -404,8 +732,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 8,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -418,8 +767,29 @@ class _reportState extends State<report> {
                         ),
                       ),
                     ),
+
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 9,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
                       child: SizedBox(
                         height: 50,
                         width: double.infinity,
@@ -449,5 +819,44 @@ class _reportState extends State<report> {
             ),
           )),
     );
+  }
+}
+
+//api
+class API {
+  static Future getPicLs(idd) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForRepair'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+      }),
+    );
+    return response;
+  }
+}
+
+class picLs {
+  final int type_id;
+  final String type_name;
+  final int before_suc;
+  final int after_suc;
+
+  const picLs(
+      {required this.type_id,
+      required this.type_name,
+      required this.before_suc,
+      required this.after_suc});
+
+  factory picLs.fromJson(Map<String, dynamic> json) {
+    return picLs(
+        type_id: json['type_id'],
+        type_name: json['type_name'],
+        before_suc: json['before_suc'],
+        after_suc: json['after_suc']);
   }
 }
