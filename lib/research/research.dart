@@ -1388,25 +1388,17 @@ class _researchState extends State<research> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(groupPic[index].type_name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 12,
-                                              color: (groupPic[index]
-                                                          .amount_sub_type_true ==
-                                                      groupPic[index]
-                                                          .amount_sub_type_all)
-                                                  ? Colors.white
-                                                  : Color(0xff003175))),
-                                    ],
+                                  Expanded(
+                                    child: Text(groupPic[index].type_name,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 11,
+                                            color: (groupPic[index]
+                                                        .amount_sub_type_true ==
+                                                    groupPic[index]
+                                                        .amount_sub_type_all)
+                                                ? Colors.white
+                                                : Color(0xff003175))),
                                   ),
                                 ],
                               ),

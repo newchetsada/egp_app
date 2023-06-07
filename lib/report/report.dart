@@ -169,148 +169,6 @@ class _reportState extends State<report> {
           Padding(
             padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
             child: GridView.count(
-                shrinkWrap: true,
-                childAspectRatio: 1.4,
-                primary: false,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 10,
-                crossAxisCount: 2,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => ReportuploadPic()));
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('PV (แผงโซล่าเซลล์)',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                    color: Color(0xff003175))),
-                            Column(
-                              children: [
-                                Container(
-                                  height: 30,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    // border: Border.all(width: 3),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(13),
-                                    ),
-                                    color: Color(0xff003175),
-                                  ),
-                                  child: Center(
-                                    child: Text('6',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15,
-                                            color: Colors.white)),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('รูปถ่ายก่อนซ่อม',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
-                                        color: Color(0xff003175))),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) => ReportuploadPic()));
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Inverter',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
-                                    color: Color(0xff003175))),
-                            Column(
-                              children: [
-                                Container(
-                                  height: 30,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    // border: Border.all(width: 3),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(13),
-                                    ),
-                                    color: Color(0xff003175),
-                                  ),
-                                  child: Center(
-                                    child: Text('6',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15,
-                                            color: Colors.white)),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('รูปถ่ายก่อนซ่อม',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 15,
-                                        color: Color(0xff003175))),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ]),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
-            child: GridView.count(
               shrinkWrap: true,
               childAspectRatio: 1.2,
               primary: false,
@@ -357,24 +215,14 @@ class _reportState extends State<report> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      gradient: (groupPic[index].before_suc ==
-                              groupPic[index].after_suc)
-                          ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff149C32),
-                                Color(0xff25893A),
-                              ],
-                            )
-                          : LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.white,
-                                Colors.white,
-                              ],
-                            ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xff149C32),
+                          Color(0xff25893A),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
@@ -398,10 +246,7 @@ class _reportState extends State<report> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
-                                  color: (groupPic[index].before_suc ==
-                                          groupPic[index].after_suc)
-                                      ? Color(0xffFFFFFF)
-                                      : Color(0xff003175),
+                                  color: Color(0xffFFFFFF),
                                 )),
                           ),
                           Row(
@@ -423,7 +268,7 @@ class _reportState extends State<report> {
                                     ),
                                     child: Center(
                                       child: Text(
-                                          '${groupPic[index].before_suc}/${groupPic[index].after_suc}',
+                                          '${groupPic[index].before_suc}',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12,
@@ -433,14 +278,11 @@ class _reportState extends State<report> {
                                   SizedBox(
                                     height: 5,
                                   ),
-                                  Text('ก่อน/หลัง งานทั้งหมด',
+                                  Text('รูปถ่ายก่อนซ่อม',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 12,
-                                          color: (groupPic[index].before_suc ==
-                                                  groupPic[index].after_suc)
-                                              ? Colors.white
-                                              : Color(0xff003175))),
+                                          color: Colors.white)),
                                 ],
                               ),
                             ],
