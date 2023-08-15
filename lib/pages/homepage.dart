@@ -25,6 +25,8 @@ class _homePageState extends State<homePage> {
   DateTime datetime = DateTime.now();
 
   String fullname = 'Loading...';
+  final _controller = PageController(initialPage: 0);
+  int _selectedIndex = 0;
 
   _getAPI(id) {
     var idd = id;
@@ -42,9 +44,10 @@ class _homePageState extends State<homePage> {
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
+    print(prefs.getString('user'));
     if (prefs.getString('user') != null) {
       setState(() {
-        userName = prefs.getString('user')!;
+        userName = prefs.getString('user') ?? '';
         iduser = prefs.getInt('id')!;
       });
     }
@@ -66,9 +69,10 @@ class _homePageState extends State<homePage> {
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
+        print(jsonResponse);
 
         setState(() {
-          fullname = jsonResponse[0]['tech_fullname'];
+          fullname = jsonResponse[0]['tech_fname'];
         });
       }
     } catch (error) {
@@ -100,74 +104,202 @@ class _homePageState extends State<homePage> {
       initialIndex: 0,
       length: 2,
       child: Scaffold(
-        backgroundColor: Color(0xffF8F8F8),
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(130.0),
+          preferredSize: Size.fromHeight(125.0),
           child: AppBar(
             automaticallyImplyLeading: false,
-            flexibleSpace: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Hello, $fullname',
-                        style: TextStyle(
-                            color: Color(0xff57A946),
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      IconButton(
-                          splashRadius: 20,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => settingPage()),
-                            ).then((value) {
-                              setState(() {
-                                getUserDetail(iduser);
+            flexibleSpace: SafeArea(
+              child: Column(
+                // mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 20, right: 10, top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Hello, $fullname',
+                          style: TextStyle(
+                              color: Color(0xff9DC75B),
+                              fontSize: 30,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        IconButton(
+                            iconSize: 30,
+                            splashRadius: 20,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => settingPage()),
+                              ).then((value) {
+                                setState(() {
+                                  getUserDetail(iduser);
+                                });
                               });
-                            });
-                          },
-                          icon: Icon(
-                            Icons.settings_rounded,
-                            color: Color(0xff96A7AF),
-                          ))
-                    ],
+                            },
+                            icon: Icon(
+                              Icons.settings_rounded,
+                              color: Color(0xff9DC75B),
+                            ))
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: 20, right: 20, top: 10),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedIndex = 0;
+                            });
+                            _controller.animateToPage(0,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
+                          },
+                          child: (_selectedIndex == 0)
+                              ? Container(
+                                  height: 35,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      color: Color(0xffAED76E)),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Text(
+                                        'งาน',
+                                        style: TextStyle(
+                                            color: Color(0xff2A302C),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  height: 35,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      color: Color(0xffffffff),
+                                      border:
+                                          Border.all(color: Color(0xffAED76E))),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Text(
+                                        'งาน',
+                                        style: TextStyle(
+                                            color: Color(0xff9DC75B),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedIndex = 1;
+                            });
+                            _controller.animateToPage(1,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
+                          },
+                          child: (_selectedIndex == 1)
+                              ? Container(
+                                  height: 35,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      color: Color(0xffAED76E)),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Text(
+                                        'เสร็จสิ้น',
+                                        style: TextStyle(
+                                            color: Color(0xff2A302C),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                  height: 35,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      color: Color(0xffffffff),
+                                      border:
+                                          Border.all(color: Color(0xffAED76E))),
+                                  child: Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Text(
+                                        'เสร็จสิ้น',
+                                        style: TextStyle(
+                                            color: Color(0xff9DC75B),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
             elevation: 0,
             backgroundColor: Colors.white,
-            bottom: TabBar(
-              splashBorderRadius: BorderRadius.all(Radius.circular(15)),
-              indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
-              indicatorWeight: 5,
-              indicatorColor: Color(0xff57A946),
-              labelStyle: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-              ),
-              labelColor: Color(0xff57A946),
-              unselectedLabelColor: Color(0xff9D9D9D),
-              tabs: <Widget>[
-                Tab(
-                  text: 'งาน',
-                ),
-                Tab(
-                  text: 'เสร็จสิ้น',
-                ),
-              ],
-            ),
+            // bottom: TabBar(
+            //   splashBorderRadius: BorderRadius.all(Radius.circular(15)),
+            //   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
+            //   indicatorWeight: 5,
+            //   indicatorColor: Color(0xff57A946),
+            //   labelStyle: TextStyle(
+            //     fontWeight: FontWeight.w600,
+            //     fontSize: 15,
+            //   ),
+            //   labelColor: Color(0xff57A946),
+            //   unselectedLabelColor: Color(0xff9D9D9D),
+            //   tabs: <Widget>[
+            //     Icon(Icons.abc)
+            //     // Tab(
+            //     //   text: 'งาน',
+            //     // ),,
+            //     ,
+            //     Tab(
+            //       text: 'เสร็จสิ้น',
+            //     ),
+            //   ],
+            // ),
           ),
         ),
-        body: TabBarView(
+        body: PageView(
+          controller: _controller,
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             Center(
@@ -223,6 +355,13 @@ class _homePageState extends State<homePage> {
   }
 
   Widget cardWork(type, status, date, comp, id) {
+    var col = (status == 1)
+        ? Color(0xff1975D0)
+        : (status == 2)
+            ? Color(0xff7540EE)
+            : (status == 3)
+                ? Color(0xff2DAC34)
+                : Color(0xff9DC75B);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
       child: GestureDetector(
@@ -270,6 +409,7 @@ class _homePageState extends State<homePage> {
 
           getWorkdetail(iduser, id).then((jsonResponse) {
             setState(() {
+              print(jsonResponse);
               j_start_date = DateFormat('dd/MM/yyyy HH:mm')
                   .format(DateTime.parse(jsonResponse[0]['j_start_date']))
                   .toString();
@@ -299,7 +439,8 @@ class _homePageState extends State<homePage> {
               lat = jsonResponse[0]['lat'];
               lon = jsonResponse[0]['lon'];
               site_clener = jsonResponse[0]['site_clener'];
-              fullname = jsonResponse[0]['fullname'];
+              fullname =
+                  '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
               position = jsonResponse[0]['position'];
               tel = jsonResponse[0]['tel'];
               j_status = jsonResponse[0]['j_status'];
@@ -387,26 +528,27 @@ class _homePageState extends State<homePage> {
           });
         },
         child: Container(
-          height: 100,
+          height: 130,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xff57A946).withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 0,
-                offset: Offset(0, 0), // Shadow position
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Color(0xffF5F5F5))
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: Color(0xff57A946).withOpacity(0.1),
+              //     blurRadius: 10,
+              //     spreadRadius: 0,
+              //     offset: Offset(0, 0), // Shadow position
+              //   ),
+              // ],
               ),
-            ],
-          ),
           child: Row(
             children: [
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 15, bottom: 15),
+                      left: 15, right: 15, top: 15, bottom: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -423,89 +565,108 @@ class _homePageState extends State<homePage> {
                                         ? 'สำราจสถานที่'
                                         : 'ตรวจสอบประจำปี',
                             style: TextStyle(
-                                color: Color(0xff064046),
+                                color: Color(0xff9DC75B),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600),
                           ),
-                          Text(
-                            DateFormat('dd/MM/yyyy HH:mm')
-                                .format(DateTime.parse(date)),
-                            style: TextStyle(
-                                color: Color(0xff464646),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
-                          )
                         ],
                       ),
-                      Text(
-                        'บริษัท : $comp',
-                        style: TextStyle(
-                            color: Color(0xff464646),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500),
+                      Row(
+                        children: [
+                          Container(
+                            height: 35,
+                            width: 2,
+                            color: Color(0xff9DC75B),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'บริษัท : $comp',
+                                style: TextStyle(
+                                    color: Color(0xff464646),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                'ไซต์ : $comp',
+                                style: TextStyle(
+                                    color: Color(0xff464646),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       // (status == 1)
                       //     ?
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          (status == 1)
-                              ? Container(
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffE3EFFF)),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'งานใหม่',
-                                        style: TextStyle(
-                                            color: Color(0xff1975D0),
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : (status == 2)
-                                  ? Container(
-                                      height: 20,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20)),
-                                          color: Color(0xffE4D8FF)),
-                                      child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Text(
-                                            'กำลังดำเนินงาน',
-                                            style: TextStyle(
-                                                color: Color(0xff7540EE),
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : (status == 3)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_month_rounded,
+                                size: 20,
+                                color: col,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                DateFormat('dd/MM/yyyy')
+                                    .format(DateTime.parse(date)),
+                                style: TextStyle(
+                                    color: col,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Icon(
+                                Icons.access_time_filled_rounded,
+                                size: 20,
+                                color: col,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                DateFormat('HH:mm')
+                                    .format(DateTime.parse(date)),
+                                style: TextStyle(
+                                    color: col,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              (status == 3)
+                                  ? Container()
+                                  : (datetime.isAfter(DateTime.parse(date)))
                                       ? Container(
-                                          height: 20,
+                                          height: 30,
                                           decoration: BoxDecoration(
                                               borderRadius: BorderRadius.all(
-                                                  Radius.circular(20)),
-                                              color: Color(0xffD5FFD9)),
+                                                  Radius.circular(5)),
+                                              color: Color.fromARGB(
+                                                  255, 255, 214, 211)),
                                           child: Center(
                                             child: Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       horizontal: 10),
                                               child: Text(
-                                                'เสร็จสิ้น',
+                                                'ล่าช้า',
                                                 style: TextStyle(
-                                                    color: Color(0xff2DAC34),
+                                                    color: Color(0xffE44E47),
                                                     fontSize: 12,
                                                     fontWeight:
                                                         FontWeight.w600),
@@ -514,34 +675,81 @@ class _homePageState extends State<homePage> {
                                           ),
                                         )
                                       : Container(),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          (status == 3)
-                              ? Container()
-                              : (datetime.isAfter(DateTime.parse(date)))
+                              SizedBox(
+                                width: 5,
+                              ),
+                              (status == 1)
                                   ? Container(
-                                      height: 20,
+                                      height: 30,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
-                                              Radius.circular(20)),
-                                          color: Color.fromARGB(
-                                              255, 255, 214, 211)),
+                                              Radius.circular(5)),
+                                          color: Color(0xffE3EFFF)),
                                       child: Center(
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 10),
                                           child: Text(
-                                            'ล่าช้า',
+                                            'งานใหม่',
                                             style: TextStyle(
-                                                color: Color(0xffE44E47),
+                                                color: Color(0xff1975D0),
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600),
                                           ),
                                         ),
                                       ),
                                     )
-                                  : Container()
+                                  : (status == 2)
+                                      ? Container(
+                                          height: 30,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5)),
+                                              color: Color(0xffE4D8FF)),
+                                          child: Center(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Text(
+                                                'กำลังดำเนินงาน',
+                                                style: TextStyle(
+                                                    color: Color(0xff7540EE),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : (status == 3)
+                                          ? Container(
+                                              height: 30,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(5)),
+                                                  color: Color(0xffD5FFD9)),
+                                              child: Center(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10),
+                                                  child: Text(
+                                                    'เสร็จสิ้น',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xff2DAC34),
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : Container(),
+                            ],
+                          ),
                         ],
                       )
                     ],

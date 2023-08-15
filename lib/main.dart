@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'EGP',
         theme: ThemeData(
-          fontFamily: 'BaiJamjuree',
+          fontFamily: 'Noto Sans Thai',
           primarySwatch: Colors.blue,
         ),
         home: (isLogin != null) ? homePage() : login(),

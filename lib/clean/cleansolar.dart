@@ -327,7 +327,7 @@ class _cleansolarState extends State<cleansolar> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xff149C32)),
+                      color: Color(0xffAED76E)),
                 ),
                 SizedBox(
                   height: 10,
@@ -375,7 +375,7 @@ class _cleansolarState extends State<cleansolar> {
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Color(0xff149C32),
+                          backgroundColor: Color(0xffAED76E),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32.0),
                           ),
@@ -401,10 +401,6 @@ class _cleansolarState extends State<cleansolar> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        // if (Navigator.of(context).userGestureInProgress) {
-        //   return false;
-        // } else
-
         if (_curpage == 0) {
           Navigator.pop(context);
         } else {
@@ -417,342 +413,209 @@ class _cleansolarState extends State<cleansolar> {
         // return true;
       },
       child: Scaffold(
-        backgroundColor: Color(0xff149C32),
+        backgroundColor: Color(0xffF8FFF6),
         appBar: AppBar(
+          toolbarHeight: 210,
           elevation: 0,
           automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Text(
-            (_curpage == 0) ? 'รายละเอียด' : 'ดำเนินงาน',
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: Color(0xff149C32),
-          leading: IconButton(
-              splashRadius: 15,
-              onPressed: () {
-                FocusScope.of(context).unfocus();
-                if (_curpage == 0) {
-                  Navigator.pop(context);
-                } else {
-                  controller.previousPage(
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.ease);
-                }
-              },
-              icon: Icon(Icons.arrow_back)),
-        ),
-        body: Column(
-          children: [
-            Container(
-              height: 140,
-              decoration: BoxDecoration(
-                color: Color(0xff149C32),
+          backgroundColor: Color(0xffF8FFF6),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: Color(0xffF8FFF6),
+              image: DecorationImage(
+                image: AssetImage("assets/head.png"),
+                fit: BoxFit.cover,
               ),
+            ),
+            child: SafeArea(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  (widget.j_status == 3)
-                      ? Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 60, right: 60),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                                onTap: () {
+                                  FocusScope.of(context).unfocus();
+                                  if (_curpage == 0) {
+                                    Navigator.pop(context);
+                                  } else {
+                                    controller.previousPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.ease);
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: Color(0xff57A946),
+                                  size: 20,
+                                )),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text((_curpage == 0) ? 'รายละเอียด' : 'ดำเนินงาน',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    color: Color(0xff2A302C))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text('ล้างแผง',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xff57A946))),
+                        Text('บริษัท : ${widget.cus_name} ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Color(0xff57A946))),
+                        Text('สาขา : ${widget.site_name}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Color(0xff57A946))),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            openMap(widget.lat, widget.lon);
+                          },
                           child: Row(
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: Colors.white,
-                                    ),
-                                    child: Center(
-                                      child: Text('1',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('รายละเอียด',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Colors.white)),
-                                ],
+                              Icon(
+                                Icons.location_on_rounded,
+                                color: Color(0xff57A946),
                               ),
-                              Expanded(
-                                  child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                child: Divider(
-                                    thickness: 1,
-                                    color: (_curpage > 0)
-                                        ? Colors.white
-                                        : Color(0xffB3E8A8)),
-                              )),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: (_curpage > 0)
-                                          ? Colors.white
-                                          : Color(0xffB3E8A8),
-                                    ),
-                                    child: Center(
-                                      child: Text('2',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('ส่งงาน',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: (_curpage > 0)
-                                              ? Colors.white
-                                              : Color(0xffB3E8A8))),
-                                ],
+                              SizedBox(
+                                width: 10,
                               ),
-                            ],
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 20, right: 20),
-                          child: Row(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: Colors.white,
-                                    ),
-                                    child: Center(
-                                      child: Text('1',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('รายละเอียด',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Colors.white)),
-                                ],
-                              ),
-                              Expanded(
-                                  child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                child: Divider(
-                                    thickness: 1,
-                                    color: (_curpage > 0)
-                                        ? Colors.white
-                                        : Color(0xffB3E8A8)),
-                              )),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: (_curpage > 0)
-                                          ? Colors.white
-                                          : Color(0xffB3E8A8),
-                                    ),
-                                    child: Center(
-                                      child: Text('2',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('ดำเนินงาน',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: (_curpage > 0)
-                                              ? Colors.white
-                                              : Color(0xffB3E8A8))),
-                                ],
-                              ),
-                              Expanded(
-                                  child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                child: Divider(
-                                    thickness: 1,
-                                    color: (_curpage > 1)
-                                        ? Colors.white
-                                        : Color(0xffB3E8A8)),
-                              )),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: (_curpage > 1)
-                                          ? Colors.white
-                                          : Color(0xffB3E8A8),
-                                    ),
-                                    child: Center(
-                                      child: Text('3',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('ตรวจสอบ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: (_curpage > 1)
-                                              ? Colors.white
-                                              : Color(0xffB3E8A8))),
-                                ],
-                              ),
-                              Expanded(
-                                  child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                child: Divider(
-                                    thickness: 1,
-                                    color: (_curpage > 2)
-                                        ? Colors.white
-                                        : Color(0xffB3E8A8)),
-                              )),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      // border: Border.all(width: 3),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(200),
-                                      ),
-                                      color: (_curpage > 2)
-                                          ? Colors.white
-                                          : Color(0xffB3E8A8),
-                                    ),
-                                    child: Center(
-                                      child: Text('4',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 13,
-                                              color: Color(0xff149C32))),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('ส่งงาน',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: (_curpage > 2)
-                                              ? Colors.white
-                                              : Color(0xffB3E8A8))),
-                                ],
-                              ),
+                              Flexible(
+                                child: Text(widget.cus_address,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                        color: Color(0xff646464))),
+                              )
                             ],
                           ),
                         ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25, left: 30),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 30,
-                          width: 100,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Center(
-                              child: Text('ล้างแผง',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: Color(0xff149C32)))),
-                        )
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 30),
-                    child: Row(
-                      children: [
-                        Text(
-                            (_curpage == 0)
-                                ? 'นัดหมายเข้างาน ${widget.j_start_date}\nนัดหมายส่งงาน ${widget.j_send_date}'
-                                : (_curpage == 1)
-                                    ? 'ผู้ใช้งานสุ่มถ่ายรูป แผลโซล่าเซลล์ก่อนล้าง หลังล้าง'
-                                    : (_curpage == 2)
-                                        ? 'ตรวจสอบงานก่อนเซ็นต์ส่งงาน'
-                                        : 'ตรวจสอบงานก่อนยืนยันส่งงาน',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                height: 1.4,
-                                fontSize: 13,
-                                color: Colors.white))
-                      ],
-                    ),
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffE1F5DC),
+                              blurRadius: 20,
+                              spreadRadius: 0,
+                              offset: Offset(0, -3), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: (widget.j_status == 3)
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 30,
+                                  right: 30,
+                                  top: 30,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('รายละเอียด',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 0)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                    Text('ส่งงาน',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 1)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                  ],
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 30,
+                                  right: 30,
+                                  top: 25,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('รายละเอียด',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 0)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                    Text('ดำเนินงาน',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 1)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                    Text('ตรวจสอบ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 2)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                    Text('ส่งงาน',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: (_curpage == 3)
+                                                ? Color(0xff57A946)
+                                                : Color(0xff7A86A1))),
+                                  ],
+                                ),
+                              ),
+                      ),
+                      Container(
+                        height: 15,
+                        color: Colors.white,
+                      ),
+                    ],
                   )
                 ],
               ),
             ),
+          ),
+        ),
+        body: Column(
+          children: [
             Expanded(
                 child: Container(
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25))),
+                color: Colors.white,
+              ),
               child: PageView(
                 physics: NeverScrollableScrollPhysics(),
                 controller: controller,
@@ -777,14 +640,24 @@ class _cleansolarState extends State<cleansolar> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white,
+              blurRadius: 10,
+              spreadRadius: 10,
+              offset: Offset(0, -3), // Shadow position
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 20, bottom: 30, left: 30, right: 30),
+                    top: 0, bottom: 30, left: 30, right: 30),
                 child: SizedBox(
                   height: 50,
                   // width: 160,
@@ -818,15 +691,18 @@ class _cleansolarState extends State<cleansolar> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
+                      shadowColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
                       (widget.j_status == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -835,383 +711,398 @@ class _cleansolarState extends State<cleansolar> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 30, right: 30),
-        child: ListView(
-          // physics: BouncingScrollPhysics(),
-
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 30,
-            ),
-            Text('บริษัท : ${widget.cus_name} ',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: Color(0xff003175))),
-            Text('สาขา : ${widget.site_name}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: Color(0xff003175))),
-            SizedBox(
-              height: 10,
-            ),
-            GestureDetector(
-              onTap: () {
-                openMap(widget.lat, widget.lon);
-              },
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.location_on_rounded,
-                    color: Color(0xff003175),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Flexible(
-                    child: Text(widget.cus_address,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Color(0xff646464))),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xff646464))),
-            SizedBox(
-              height: 10,
-            ),
-            Text('วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xff646464))),
-            SizedBox(
-              height: 10,
-            ),
-            Text('ปริมาณการติดตั้ง : ${widget.power_peak}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xff646464))),
-            SizedBox(
-              height: 10,
-            ),
-            DottedLine(dashColor: Color(0xffD5D5D5)),
-            SizedBox(
-              height: 5,
-            ),
-            Text('รายละเอียด',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: Color(0xff003175))),
-            SizedBox(
-              height: 10,
-            ),
-            Text('รายละเอียดงาน : ${widget.j_detail}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xff646464))),
-            SizedBox(
-              height: 10,
-            ),
-            Text('หมายเหตุ : ${widget.remark_tech}',
-                style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    color: Color(0xff646464))),
-            SizedBox(
-              height: 10,
-            ),
-            (widget.ppe_flag == 1)
-                ? Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: Color(0xff003175),
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text('ชุด PPE',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              color: Color(0xff003175))),
-                    ],
-                  )
-                : Container(),
-            SizedBox(
-              height: 10,
-            ),
-            DottedLine(dashColor: Color(0xffD5D5D5)),
-            SizedBox(
-              height: 10,
-            ),
-            Text('ติดต่อ',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: Color(0xff003175))),
-            SizedBox(
-              height: 10,
-            ),
-            (contactloading == true)
-                ? Shimmer.fromColors(
-                    baseColor: Colors.grey[300]!,
-                    highlightColor: Colors.grey[100]!,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 20,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
+        padding: EdgeInsets.symmetric(vertical: 10),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 90,
+                  child: Row(children: [
+                    Expanded(
+                        child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            stops: [.05, .05],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xff9DC75B),
+                              Colors.transparent, // top Right part
+                            ],
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          border:
+                              Border.all(color: Color(0xffD6EFB4), width: 0.5)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
                               children: [
-                                Container(
-                                  height: 12,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  size: 15,
+                                  color: Color(0xff9DC75B),
                                 ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  height: 12,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  height: 12,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
-                                ),
+                                Text('นัดหมายเข้างาน',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: Color(0xff9DC75B))),
                               ],
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: Container(
-                            height: 35,
-                            width: 35,
-                            decoration: BoxDecoration(
-                              // border: Border.all(width: 3),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(200),
-                              ),
-                              color: Color(0xff003175),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(widget.j_start_date.substring(0, 10),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Color(0xff9DC75B))),
+                                Text(widget.j_start_date.substring(11, 16),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Color(0xff9DC75B))),
+                              ],
                             ),
-                            child: Center(
-                                child: Icon(
-                              Icons.phone,
-                              size: 20,
-                            )),
-                          ),
-                        )
-                      ],
+                          ],
+                        ),
+                      ),
+                    )),
+                    SizedBox(
+                      width: 20,
                     ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    primary: false,
-                    itemCount: contact.length,
-                    itemBuilder: (context, index) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Expanded(
+                        child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            stops: [.05, .05],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xff57A946),
+                              Colors.transparent, // top Right part
+                            ],
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                          border:
+                              Border.all(color: Color(0xff57A946), width: 0.5)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_month_rounded,
+                                  size: 15,
+                                  color: Color(0xff57A946),
+                                ),
+                                Text('นัดหมายส่งงาน',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        color: Color(0xff57A946))),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(widget.j_send_date.substring(0, 10),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Color(0xff57A946))),
+                                Text(widget.j_send_date.substring(11, 16),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                        color: Color(0xff57A946))),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                  ]),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('ขนาดการติดตั้ง : ${widget.power_peak}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('จำนวนแผง : ${widget.power_peak}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('รายละเอียดงาน : ${widget.j_detail}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('หมายเหตุ : ${widget.remark_tech}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+                SizedBox(
+                  height: 10,
+                ),
+                (widget.ppe_flag == 1)
+                    ? Row(
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.person,
-                                color: Color(0xff003175),
-                                size: 20,
+                          Icon(
+                            Icons.check_circle_rounded,
+                            color: Color(0xff57A946),
+                            size: 25,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text('ชุด PPE',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Color(0xff57A946))),
+                        ],
+                      )
+                    : Container(),
+                SizedBox(
+                  height: 10,
+                ),
+                // DottedLine(dashColor: Color(0xffD5D5D5)),
+                SizedBox(
+                  height: 10,
+                ),
+                Text('ติดต่อ',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Color(0xff58A946))),
+                SizedBox(
+                  height: 10,
+                ),
+              ],
+            ),
+          ),
+          (contactloading == true)
+              ? SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                      itemCount: 3,
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.only(left: (index == 0) ? 0 : 10),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[200]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              height: 100,
+                              width: 150,
+                              decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xffE1F5DC),
+                                    Color(0xffD6EFB4),
+                                  ],
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
+                            ),
+                          ),
+                        );
+                      }))
+              : SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: contact.length,
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(left: (index == 0) ? 0 : 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            _makePhoneCall(contact[index].j_cont_tel);
+                          },
+                          child: Container(
+                            width: 150,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xffE1F5DC),
+                                  Color(0xffD6EFB4),
+                                ],
                               ),
-                              Column(
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 15),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Icon(
+                                    Icons.person,
+                                    color: Color(0xff2A302C),
+                                    size: 22,
+                                  ),
                                   Text(contact[index].j_cont_name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 13,
                                           color: Color(0xff464646))),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
                                   Text(
                                       'ตำแหน่ง : ${contact[index].j_cont_position}',
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 13,
                                           color: Color(0xff464646))),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
                                   Text(contact[index].j_cont_tel,
                                       style: TextStyle(
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 13,
+                                          fontSize: 14,
                                           color: Color(0xff464646)))
                                 ],
                               ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                // border: Border.all(width: 3),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(200),
-                                ),
-                                color: Color(0xff003175),
-                              ),
-                              child: Center(
-                                child: IconButton(
-                                    splashRadius: 20,
-                                    iconSize: 20,
-                                    color: Colors.white,
-                                    onPressed: () {
-                                      _makePhoneCall(contact[index].j_cont_tel);
-                                    },
-                                    icon: Icon(Icons.phone)),
-                              ),
                             ),
-                          )
-                        ],
+                          ),
+                        ),
                       );
                     },
                   ),
-            SizedBox(
-              height: 10,
-            ),
-            DottedLine(dashColor: Color(0xffD5D5D5)),
-            SizedBox(
-              height: 10,
-            ),
-            Text('ผู้เปิดงาน',
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: Color(0xff003175))),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: Color(0xff003175),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.fullname,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text('ตำแหน่ง : ${widget.position}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xff464646))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(widget.tel,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xff464646)))
-                      ],
-                    ),
-                  ],
                 ),
-                (widget.tel.isEmpty)
-                    ? Container()
-                    : Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                            // border: Border.all(width: 3),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(200),
-                            ),
-                            color: Color(0xff003175),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                Text('ผู้เปิดงาน',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Color(0xff58A946))),
+                SizedBox(
+                  height: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    widget.tel.isEmpty ? null : _makePhoneCall(widget.tel);
+                  },
+                  child: Container(
+                    width: 150,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xffE1F5DC),
+                          Color(0xffD6EFB4),
+                        ],
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.person,
+                            color: Color(0xff2A302C),
+                            size: 22,
                           ),
-                          child: Center(
-                            child: IconButton(
-                                splashRadius: 20,
-                                iconSize: 20,
-                                color: Colors.white,
-                                onPressed: () {
-                                  _makePhoneCall(widget.tel);
-                                },
-                                icon: Icon(Icons.phone)),
-                          ),
-                        ),
-                      )
+                          Text(widget.fullname,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Color(0xff464646))),
+                          Text('ตำแหน่ง : ${widget.position}',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13,
+                                  color: Color(0xff464646))),
+                          Text(widget.tel,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Color(0xff464646)))
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
               ],
             ),
-            SizedBox(
-              height: 30,
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
@@ -1247,7 +1138,8 @@ class _cleansolarState extends State<cleansolar> {
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff003175),
+                            backgroundColor: Color(0xff2A302C),
+                            shadowColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -1255,7 +1147,9 @@ class _cleansolarState extends State<cleansolar> {
                           child: Text(
                             'แจ้งซ่อม',
                             style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xffAED76E)),
                           ),
                         ),
                       ),
@@ -1281,7 +1175,8 @@ class _cleansolarState extends State<cleansolar> {
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff149C32),
+                            backgroundColor: Color(0xffAED76E),
+                            shadowColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -1289,7 +1184,9 @@ class _cleansolarState extends State<cleansolar> {
                           child: Text(
                             'ถัดไป',
                             style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w600),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff2A302C)),
                           ),
                         ),
                       ),
@@ -1307,10 +1204,10 @@ class _cleansolarState extends State<cleansolar> {
           Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
+                padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
                 child: GridView.count(
                     shrinkWrap: true,
-                    childAspectRatio: 1,
+                    childAspectRatio: 0.75,
                     primary: false,
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 10,
@@ -1337,21 +1234,39 @@ class _cleansolarState extends State<cleansolar> {
                         child: Container(
                           height: 80,
                           width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: (before_taken == total_taken)
-                                ? Color(0xff149C32)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
-                              ),
-                            ],
-                          ),
+                          decoration: (before_taken == total_taken)
+                              ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xffE1F5DC),
+                                      Color(0xffD6EFB4),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Column(
@@ -1366,16 +1281,9 @@ class _cleansolarState extends State<cleansolar> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            height: 30,
+                                          Image.asset(
+                                            'assets/clean.png',
                                             width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -1383,11 +1291,8 @@ class _cleansolarState extends State<cleansolar> {
                                           Text('ถ่ายรูป ก่อนล้างแผง',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: (before_taken ==
-                                                          total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                                  fontSize: 14,
+                                                  color: Color(0xff2A302C))),
                                         ],
                                       ),
                                     ],
@@ -1405,13 +1310,13 @@ class _cleansolarState extends State<cleansolar> {
                                         children: [
                                           Container(
                                             height: 30,
-                                            width: 45,
+                                            width: 50,
                                             decoration: BoxDecoration(
                                               // border: Border.all(width: 3),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(13),
                                               ),
-                                              color: Color(0xff003175),
+                                              color: Color(0xff2A302C),
                                             ),
                                             child: Center(
                                               child: Text(
@@ -1419,7 +1324,7 @@ class _cleansolarState extends State<cleansolar> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
-                                                      fontSize: 12,
+                                                      fontSize: 14,
                                                       color: Colors.white)),
                                             ),
                                           ),
@@ -1430,10 +1335,7 @@ class _cleansolarState extends State<cleansolar> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 12,
-                                                  color: (before_taken ==
-                                                          total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                                  color: Color(0xff2A302C))),
                                         ],
                                       ),
                                     ],
@@ -1463,21 +1365,39 @@ class _cleansolarState extends State<cleansolar> {
                         child: Container(
                           height: 80,
                           width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: (after_taken == total_taken)
-                                ? Color(0xff149C32)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Color(0xffE0ECDE)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff149C32).withOpacity(0.1),
-                                blurRadius: 10,
-                                spreadRadius: 0,
-                                offset: Offset(0, 0), // Shadow position
-                              ),
-                            ],
-                          ),
+                          decoration: (after_taken == total_taken)
+                              ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xffE1F5DC),
+                                      Color(0xffD6EFB4),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Column(
@@ -1492,16 +1412,9 @@ class _cleansolarState extends State<cleansolar> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Container(
-                                            height: 30,
+                                          Image.asset(
+                                            'assets/clean.png',
                                             width: 30,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(200),
-                                              ),
-                                              color: Color(0xff003175),
-                                            ),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -1509,11 +1422,8 @@ class _cleansolarState extends State<cleansolar> {
                                           Text('ถ่ายรูป หลังล้างแผง',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: (after_taken ==
-                                                          total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                                  fontSize: 14,
+                                                  color: Color(0xff2A302C))),
                                         ],
                                       ),
                                     ],
@@ -1531,13 +1441,13 @@ class _cleansolarState extends State<cleansolar> {
                                         children: [
                                           Container(
                                             height: 30,
-                                            width: 45,
+                                            width: 50,
                                             decoration: BoxDecoration(
                                               // border: Border.all(width: 3),
                                               borderRadius: BorderRadius.all(
                                                 Radius.circular(13),
                                               ),
-                                              color: Color(0xff003175),
+                                              color: Color(0xff2A302C),
                                             ),
                                             child: Center(
                                               child: Text(
@@ -1545,7 +1455,7 @@ class _cleansolarState extends State<cleansolar> {
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w600,
-                                                      fontSize: 12,
+                                                      fontSize: 14,
                                                       color: Colors.white)),
                                             ),
                                           ),
@@ -1556,10 +1466,7 @@ class _cleansolarState extends State<cleansolar> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500,
                                                   fontSize: 12,
-                                                  color: (after_taken ==
-                                                          total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                                  color: Color(0xff2A302C))),
                                         ],
                                       ),
                                     ],
@@ -1606,7 +1513,7 @@ class _cleansolarState extends State<cleansolar> {
                             : null,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1628,7 +1535,7 @@ class _cleansolarState extends State<cleansolar> {
           Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 40, left: 40, right: 40),
+                padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
                 child: GestureDetector(
                     onTap: () {
                       (sign_name_1.isNotEmpty)
@@ -1636,20 +1543,14 @@ class _cleansolarState extends State<cleansolar> {
                           : sheet('ผู้ติดต่อหน้างาน', 3);
                     },
                     child: Container(
-                      height: 80,
+                      height: 70,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        color: (sign_name_1.isNotEmpty)
+                            ? Color(0xff9DC75B)
+                            : Color(0xffEEF5E2),
+                        borderRadius: BorderRadius.circular(15),
                         // border: Border.all(color: Color(0xffE0ECDE)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -1657,20 +1558,20 @@ class _cleansolarState extends State<cleansolar> {
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: Container(
-                              height: 40,
-                              width: 40,
+                              height: 35,
+                              width: 35,
                               decoration: BoxDecoration(
                                 color: (sign_name_1.isNotEmpty)
-                                    ? Color(0xff003175)
-                                    : Color(0xffB7B7B7),
+                                    ? Colors.white
+                                    : Color(0xff9CC75B),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(
-                                  Icons.person,
-                                  size: 20,
-                                  color: Colors.white,
-                                ),
+                                child: Icon(Icons.person,
+                                    size: 20,
+                                    color: (sign_name_1.isNotEmpty)
+                                        ? Color(0xff9CC75B)
+                                        : Colors.white),
                               ),
                             ),
                           ),
@@ -1684,18 +1585,18 @@ class _cleansolarState extends State<cleansolar> {
                                   'ผู้ติดต่อหน้างาน',
                                   style: TextStyle(
                                       color: (sign_name_1.isNotEmpty)
-                                          ? Color(0xff003175)
-                                          : Color(0xffB7B7B7),
+                                          ? Colors.white
+                                          : Color(0xffAED76E),
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14),
                                 ),
                                 (sign_name_1.isNotEmpty)
                                     ? Padding(
-                                        padding: const EdgeInsets.only(top: 7),
+                                        padding: const EdgeInsets.only(top: 5),
                                         child: Text(
                                           sign_name_1,
                                           style: TextStyle(
-                                              color: Color(0xff003175),
+                                              color: Colors.white,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12),
                                         ),
@@ -1709,28 +1610,22 @@ class _cleansolarState extends State<cleansolar> {
                     )),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
+                padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
                 child: GestureDetector(
                     onTap: () {
                       (sign_name_2.isNotEmpty)
                           ? popsign(path_sign2)
-                          : sheet('หัวหน้าทีม', 2);
+                          : sheet('ช่าง', 2);
                     },
                     child: Container(
-                      height: 80,
+                      height: 70,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        color: (sign_name_2.isNotEmpty)
+                            ? Color(0xff9DC75B)
+                            : Color(0xffEEF5E2),
+                        borderRadius: BorderRadius.circular(15),
                         // border: Border.all(color: Color(0xffE0ECDE)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xff003175).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -1738,20 +1633,20 @@ class _cleansolarState extends State<cleansolar> {
                           Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: Container(
-                              height: 40,
-                              width: 40,
+                              height: 35,
+                              width: 35,
                               decoration: BoxDecoration(
                                 color: (sign_name_2.isNotEmpty)
-                                    ? Color(0xff003175)
-                                    : Color(0xffB7B7B7),
+                                    ? Colors.white
+                                    : Color(0xff9CC75B),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(
-                                  Icons.person,
-                                  size: 20,
-                                  color: Colors.white,
-                                ),
+                                child: Icon(Icons.person,
+                                    size: 20,
+                                    color: (sign_name_2.isNotEmpty)
+                                        ? Color(0xff9CC75B)
+                                        : Colors.white),
                               ),
                             ),
                           ),
@@ -1762,21 +1657,21 @@ class _cleansolarState extends State<cleansolar> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'หัวหน้าทีม',
+                                  'ช่าง',
                                   style: TextStyle(
                                       color: (sign_name_2.isNotEmpty)
-                                          ? Color(0xff003175)
-                                          : Color(0xffB7B7B7),
+                                          ? Colors.white
+                                          : Color(0xffAED76E),
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14),
                                 ),
                                 (sign_name_2.isNotEmpty)
                                     ? Padding(
-                                        padding: const EdgeInsets.only(top: 7),
+                                        padding: const EdgeInsets.only(top: 5),
                                         child: Text(
                                           sign_name_2,
                                           style: TextStyle(
-                                              color: Color(0xff003175),
+                                              color: Colors.white,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12),
                                         ),
@@ -1820,7 +1715,7 @@ class _cleansolarState extends State<cleansolar> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1848,7 +1743,7 @@ class _cleansolarState extends State<cleansolar> {
             Text(
               'ยืนยันการส่งข้อมูล',
               style: TextStyle(
-                  color: Color(0xff149C32),
+                  color: Color(0xffAED76E),
                   fontSize: 17,
                   fontWeight: FontWeight.w600),
             ),
@@ -1926,7 +1821,7 @@ class _cleansolarState extends State<cleansolar> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1954,7 +1849,7 @@ class _cleansolarState extends State<cleansolar> {
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: Color(0xff149C32))),
+                    color: Color(0xffAED76E))),
             SizedBox(
               height: 10,
             ),
@@ -1988,13 +1883,13 @@ class _cleansolarState extends State<cleansolar> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: (before_taken == total_taken)
-                            ? Color(0xff149C32)
+                            ? Color(0xffAED76E)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Color(0xffE0ECDE)),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xff149C32).withOpacity(0.1),
+                            color: Color(0xffAED76E).withOpacity(0.1),
                             blurRadius: 10,
                             spreadRadius: 0,
                             offset: Offset(0, 0), // Shadow position
@@ -2110,13 +2005,13 @@ class _cleansolarState extends State<cleansolar> {
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: (after_taken == total_taken)
-                            ? Color(0xff149C32)
+                            ? Color(0xffAED76E)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(color: Color(0xffE0ECDE)),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(0xff149C32).withOpacity(0.1),
+                            color: Color(0xffAED76E).withOpacity(0.1),
                             blurRadius: 10,
                             spreadRadius: 0,
                             offset: Offset(0, 0), // Shadow position
@@ -2219,7 +2114,7 @@ class _cleansolarState extends State<cleansolar> {
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: Color(0xff149C32))),
+                    color: Color(0xffAED76E))),
             SizedBox(
               height: 10,
             ),
@@ -2479,7 +2374,7 @@ class _cleansolarState extends State<cleansolar> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 19,
-                                    color: Color(0xff149C32))),
+                                    color: Color(0xffAED76E))),
                           ],
                         ),
                       ),
@@ -2492,7 +2387,7 @@ class _cleansolarState extends State<cleansolar> {
                         decoration: BoxDecoration(
                           color: Color(0xffF8F8F8),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xff149C32)),
+                          border: Border.all(color: Color(0xffAED76E)),
                         ),
                         child: TextField(
                           controller: putname,
@@ -2535,7 +2430,8 @@ class _cleansolarState extends State<cleansolar> {
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Color(0xff149C32),
+                              shadowColor: Colors.white,
+                              backgroundColor: Color(0xffAED76E),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -2543,7 +2439,9 @@ class _cleansolarState extends State<cleansolar> {
                             child: Text(
                               'บันทึก',
                               style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w600),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xff2A302C)),
                             ),
                           ),
                         ),
@@ -2589,7 +2487,7 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_cont_name: json['j_cont_name'],
+      j_cont_name: '${json['j_cont_fname']} ${json['j_cont_lname']}',
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
     );

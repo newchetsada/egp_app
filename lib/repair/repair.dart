@@ -2989,7 +2989,7 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_cont_name: json['j_cont_name'],
+      j_cont_name: '${json['j_cont_fname']} ${json['j_cont_lname']}',
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
     );

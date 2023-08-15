@@ -265,7 +265,7 @@ class _uploadPicState extends State<uploadPic> {
         'groupNo': groupNo,
         'typeId': widget.type_id,
         'imgType': imgType,
-        'accessories': (nothavedevice == true) ? 1 : null,
+        'accessories': (nothavedevice == true) ? 1 : 0,
         'remark': note,
         'userName': userName,
       }),
@@ -1601,8 +1601,7 @@ class _uploadPicState extends State<uploadPic> {
                                                   ? showAdaptiveActionSheet(
                                                       context: context,
                                                       // title: const Text('Title'),
-                                                      actions: <
-                                                          BottomSheetAction>[
+                                                      actions: <BottomSheetAction>[
                                                         BottomSheetAction(
                                                           title: Text('Camera'),
                                                           onPressed: (context) {

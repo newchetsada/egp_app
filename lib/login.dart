@@ -25,6 +25,7 @@ class _loginState extends State<login> {
   addSession(use, id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('user', use);
+    print(use);
     prefs.setInt('id', id);
   }
 
@@ -74,7 +75,14 @@ class _loginState extends State<login> {
                       }
                       return null;
                     },
-                    decoration: InputDecoration(labelText: 'Username')),
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      labelStyle: TextStyle(color: Color(0xffAED76E)),
+                      focusColor: Color(0xffAED76E),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffAED76E)),
+                      ),
+                    )),
                 SizedBox(
                   height: 10,
                 ),
@@ -89,6 +97,11 @@ class _loginState extends State<login> {
                   },
                   decoration: InputDecoration(
                       labelText: 'Password',
+                      labelStyle: TextStyle(color: Color(0xffAED76E)),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffAED76E)),
+                      ),
+                      suffixIconColor: Colors.grey[300],
                       suffixIcon: Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: IconButton(
@@ -112,7 +125,7 @@ class _loginState extends State<login> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff57A946),
+                        backgroundColor: Color(0xffAED76E),
                         fixedSize: Size(90, 35),
                         textStyle: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w500),
@@ -146,7 +159,10 @@ class _loginState extends State<login> {
                           });
                         }
                       },
-                      child: const Text('Login'),
+                      child: const Text(
+                        'Login',
+                        style: TextStyle(color: Color(0xff2A302C)),
+                      ),
                     ),
                   ],
                 ),
