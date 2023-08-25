@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:egp_app/login.dart';
 import 'package:egp_app/pages/changepass.dart';
 import 'package:egp_app/pages/editprofile.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +104,8 @@ class _settingPageState extends State<settingPage> {
         var jsonResponse = json.decode(response.body);
 
         setState(() {
-          tech_fullname = jsonResponse[0]['tech_fullname'];
+          tech_fullname =
+              '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
           tech_position = jsonResponse[0]['tech_position'];
           tech_company = jsonResponse[0]['tech_company'];
           tech_tel = jsonResponse[0]['tech_tel'];
@@ -131,393 +133,383 @@ class _settingPageState extends State<settingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xff149C32),
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          toolbarHeight: 210,
           elevation: 0,
           automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Text(
-            'ตั้งค่า',
-            style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: Color(0xff149C32),
-          leading: IconButton(
-              splashRadius: 15,
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back)),
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xff149C32),
-                ),
+          backgroundColor: Color(0xffF8FFF6),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: Color(0xffF8FFF6),
+              image: DecorationImage(
+                image: AssetImage("assets/head.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SafeArea(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => editprofile(
-                                    id: iduser,
-                                    fullname: tech_fullname,
-                                    companame: tech_company,
-                                    email: tech_email,
-                                    line: tech_line,
-                                    position: tech_position,
-                                    tel: tech_tel,
-                                    userName: userName,
-                                  )),
-                        ).then((value) {
-                          setState(() {
-                            getUserDetail(iduser);
-                          });
-                        });
-                      },
-                      child: Container(
-                        height: 120,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff101F57).withOpacity(0.2),
-                                spreadRadius: 0.5,
-                                blurRadius: 4,
-                                offset:
-                                    Offset(0, 0), // changes position of shadow
-                              ),
-                            ],
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: (isLoading == true)
-                            ? Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.person_alt_circle,
-                                              size: 70,
-                                              color: Color(0xff149C32)
-                                                  .withOpacity(0.5),
-                                            ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 20),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      height: 15,
-                                                      width: double.infinity,
-                                                      decoration: BoxDecoration(
-                                                          color: Colors.black,
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5))),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 5,
-                                                    ),
-                                                    Container(
-                                                      height: 15,
-                                                      width: double.infinity,
-                                                      decoration: BoxDecoration(
-                                                          color: Colors.black,
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          5))),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        size: 20,
-                                        color: Color(0xff149C32),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Color(0xff57A946),
+                            size: 20,
+                          )),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('ตั้งค่า',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xff2A302C))),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Text(
+                    'โปรไฟล์',
+                    style: TextStyle(
+                        fontSize: 27,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xff57A946)),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Column(
+                    children: [
+                      (isLoading == true)
+                          ? Shimmer.fromColors(
+                              baseColor: Colors.grey[200]!,
+                              highlightColor: Colors.grey[50]!,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Row(
                                       children: [
                                         Icon(
                                           CupertinoIcons.person_alt_circle,
                                           size: 70,
-                                          color: Color(0xff149C32)
+                                          color: Color(0xff57A946)
                                               .withOpacity(0.5),
                                         ),
                                         SizedBox(
-                                          width: 10,
+                                          width: 20,
                                         ),
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              tech_fullname,
-                                              style: TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xff003175)),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 20),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  height: 20,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  5))),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Container(
+                                                  height: 20,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.black,
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  5))),
+                                                ),
+                                              ],
                                             ),
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                            Text(
-                                              'แก้ไขโปรไฟล์',
-                                              style: TextStyle(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Color(0xff003175)),
-                                            ),
-                                          ],
+                                          ),
                                         ),
                                       ],
                                     ),
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xffE1F5DC),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Color(0xff149C32)
+                                                  .withOpacity(0.15),
+                                              blurRadius: 10)
+                                        ]),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
                                     Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 20,
-                                      color: Color(0xff149C32),
+                                      CupertinoIcons.person_alt_circle,
+                                      size: 70,
+                                      color: Color(0xff57A946).withOpacity(0.5),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          tech_fullname,
+                                          style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xff57A946)),
+                                        ),
+                                        Text(
+                                          'แก้ไขโปรไฟล์',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xff2A302C)),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => editprofile(
+                                                id: iduser,
+                                                fullname: tech_fullname,
+                                                companame: tech_company,
+                                                email: tech_email,
+                                                line: tech_line,
+                                                position: tech_position,
+                                                tel: tech_tel,
+                                                userName: userName,
+                                              )),
+                                    ).then((value) {
+                                      setState(() {
+                                        getUserDetail(iduser);
+                                      });
+                                    });
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xffE1F5DC),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Color(0xff149C32)
+                                                  .withOpacity(0.15),
+                                              blurRadius: 10)
+                                        ]),
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.edit,
+                                        color: Color(0xff9DC75B),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffE1F5DC),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, -3), // Shadow position
+                          ),
+                        ],
                       ),
                     ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // Text(
-                    //   tech_fullname,
-                    //   style: TextStyle(
-                    //       fontSize: 25,
-                    //       fontWeight: FontWeight.w600,
-                    //       color: Colors.white),
-                    // ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // Text(
-                    //   'ตำแหน่ง : $tech_position',
-                    //   style: TextStyle(
-                    //       fontSize: 15,
-                    //       fontWeight: FontWeight.w600,
-                    //       color: Colors.white),
-                    // ),
-                    // Text(
-                    //   'บริษัท : $tech_company',
-                    //   style: TextStyle(
-                    //       fontSize: 15,
-                    //       fontWeight: FontWeight.w600,
-                    //       color: Colors.white),
-                    // ),
-                    // Text(
-                    //   'email : $tech_email',
-                    //   style: TextStyle(
-                    //       fontSize: 15,
-                    //       fontWeight: FontWeight.w600,
-                    //       color: Colors.white),
-                    // ),
+                    Container(
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
+                )
+              ],
+            )),
+          ),
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.white,
+                blurRadius: 10,
+                spreadRadius: 10,
+                offset: Offset(0, -3), // Shadow position
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 0, bottom: 30, left: 30, right: 30),
+                  child: SizedBox(
+                    height: 50,
+                    // width: 160,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        messaging.getToken().then((value) {
+                          signOut(iduser, userName, value);
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(color: Color(0xff9DC75B)),
+                        elevation: 0,
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        shadowColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'ออกจากระบบ',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff9DC75B)),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: ListView(
-                      children: [
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Text(
-                          'ตั้งค่า',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xff003175)),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => changepass(id: iduser)),
-                            );
-                          },
-                          child: Container(
-                            height: 40,
-                            color: Colors.transparent,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      CupertinoIcons.padlock,
-                                      color: Color(0xff464646),
-                                      size: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      'รหัสผ่าน',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff464646)),
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Color(0xff149C32),
-                                  size: 20,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            print('ok');
-                          },
-                          child: Container(
-                            height: 40,
-                            color: Colors.transparent,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      CupertinoIcons.phone,
-                                      color: Color(0xff464646),
-                                      size: 20,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      'ช่วยเหลือ',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xff464646)),
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  color: Color(0xff149C32),
-                                  size: 20,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                                barrierDismissible: true,
-                                context: context,
-                                builder: (_) {
-                                  return Center(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.8),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      height: 100,
-                                      width: 100,
-                                      child: Center(
-                                          child: Lottie.asset(
-                                              'assets/logoloading.json',
-                                              height: 80)),
-                                    ),
-                                  );
-                                });
-
-                            messaging.getToken().then((value) {
-                              signOut(iduser, userName, value);
-                            });
-                          },
-                          child: Row(
-                            children: [
-                              Text(
-                                'ออกจากระบบ',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xff149C32)),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  )),
-            )
-          ],
+            ],
+          ),
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => changepass(id: iduser)),
+                  );
+                },
+                child: Container(
+                  height: 40,
+                  color: Colors.transparent,
+                  child: Row(
+                    children: [
+                      Icon(
+                        EvaIcons.edit,
+                        color: Color(0xff9DC75B),
+                        size: 25,
+                      ),
+                      // Image.asset('assets/edit-2.svg'),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        'รหัสผ่าน',
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff464646)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Divider(
+                color: Color(0xffD6EFB4),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              GestureDetector(
+                onTap: () {
+                  print('ok');
+                },
+                child: Container(
+                  height: 40,
+                  color: Colors.transparent,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.headset_rounded,
+                        color: Color(0xff9DC75B),
+                        size: 25,
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Text(
+                        'ช่วยเหลือ',
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff464646)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ));
   }
 }

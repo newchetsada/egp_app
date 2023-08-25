@@ -96,8 +96,9 @@ class _signatureState extends State<signature> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
+          centerTitle: false,
           leading: IconButton(
-              color: Color(0xff149C32),
+              color: Color(0xff57A946),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -106,8 +107,8 @@ class _signatureState extends State<signature> {
             'ลายเซ็นต์',
             style: TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: 19,
-                color: Color(0xff149C32)),
+                fontSize: 15,
+                color: Color(0xff57A946)),
           ),
         ),
         body: SafeArea(
@@ -122,7 +123,7 @@ class _signatureState extends State<signature> {
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xff149C32).withOpacity(0.1),
+                        color: Color(0xff57A946).withOpacity(0.1),
                         blurRadius: 10,
                         spreadRadius: 3,
                         offset: Offset(0, 0), // Shadow position
@@ -156,7 +157,7 @@ class _signatureState extends State<signature> {
                           child: Text(
                             'ล้าง',
                             style: TextStyle(
-                                color: Color(0xff464646),
+                                color: Color(0xff9DC75B),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600),
                           )),
@@ -183,7 +184,7 @@ class _signatureState extends State<signature> {
                           },
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff149C32),
+                            backgroundColor: Color(0xff9DC75B),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),

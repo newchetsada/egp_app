@@ -68,24 +68,35 @@ class _changepassState extends State<changepass> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
+        toolbarHeight: 50,
         automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(
-          'เปลี่ยนรหัสผ่าน',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
-            color: Color(0xff149C32),
+        backgroundColor: Colors.white,
+        flexibleSpace: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Row(
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Color(0xff57A946),
+                      size: 20,
+                    )),
+                SizedBox(
+                  width: 10,
+                ),
+                Text('เปลี่ยนรหัสผ่าน',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+              ],
+            ),
           ),
         ),
-        backgroundColor: Colors.white,
-        leading: IconButton(
-            color: Color(0xff149C32),
-            splashRadius: 15,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
       ),
       bottomNavigationBar: Container(
         // height: 30,
@@ -121,15 +132,17 @@ class _changepassState extends State<changepass> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
                       'บันทึก',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -152,9 +165,9 @@ class _changepassState extends State<changepass> {
                 Text(
                   ' กรอกรหัสผ่านเดิม',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff003175),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff9DC75B),
                   ),
                 ),
                 SizedBox(
@@ -182,9 +195,9 @@ class _changepassState extends State<changepass> {
                 Text(
                   ' กรอกรหัสผ่านใหม่',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff003175),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff9DC75B),
                   ),
                 ),
                 SizedBox(
@@ -212,9 +225,9 @@ class _changepassState extends State<changepass> {
                 Text(
                   ' กรอกรหัสผ่านใหม่อีกครั้ง',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xff003175),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff9DC75B),
                   ),
                 ),
                 SizedBox(
@@ -250,8 +263,8 @@ class _changepassState extends State<changepass> {
         //Outline border type for TextFeild
         borderRadius: BorderRadius.all(Radius.circular(10)),
         borderSide: BorderSide(
-          color: Color(0xffD3D3D3),
-          width: 1,
+          color: Color(0xffD6EFB4),
+          width: 0.5,
         ));
   }
 }

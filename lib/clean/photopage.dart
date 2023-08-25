@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:http/http.dart' as http;
@@ -22,8 +23,13 @@ class photopage extends StatefulWidget {
   final int type;
   final int limit;
   final int jidx;
+  final int status;
   const photopage(
-      {super.key, required this.type, required this.limit, required this.jidx});
+      {super.key,
+      required this.type,
+      required this.limit,
+      required this.jidx,
+      required this.status});
 }
 
 class _photopageState extends State<photopage> {
@@ -77,24 +83,39 @@ class _photopageState extends State<photopage> {
   void popPicPre(file) {
     showDialog<void>(
       context: context,
-      barrierDismissible: true, // user must tap button!
+      // barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return PinchZoom(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Image.file(
-              File(file),
-            ),
-          ),
-          resetDuration: const Duration(milliseconds: 100),
-          maxScale: 2.5,
-          onZoomStart: () {
-            print('Start zooming');
-          },
-          onZoomEnd: () {
-            print('Stop zooming');
-          },
-        );
+        // return Expanded(
+        //   child: PinchZoom(
+        //     child: ClipRRect(
+        //       borderRadius: BorderRadius.circular(30),
+        //       child: Image.file(
+        //         File(file),
+        //       ),
+        //     ),
+        //     resetDuration: const Duration(milliseconds: 100),
+        //     maxScale: 2.5,
+        //     onZoomStart: () {
+        //       print('Start zooming');
+        //     },
+        //     onZoomEnd: () {
+        //       print('Stop zooming');
+        //     },
+        //   ),
+        // );
+        return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+            content: SingleChildScrollView(
+              child: Center(
+                  child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  File(file),
+                ),
+              )),
+            ));
       },
     );
   }
@@ -117,7 +138,7 @@ class _photopageState extends State<photopage> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xff149C32)),
+                      color: Color(0xff57A946)),
                 ),
                 SizedBox(
                   height: 10,
@@ -355,106 +376,198 @@ class _photopageState extends State<photopage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        bottomNavigationBar: Container(
-          // height: 30,
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20, bottom: 30, left: 30, right: 30),
-                  child: SizedBox(
-                    height: 50,
-                    // width: 160,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        loading();
-                        loopdelete().then((value) {
-                          loopupload().then((value) {
-                            updateRemark(widget.jidx, widget.type, remark.text)
-                                .then((value) {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            });
-                          });
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Color(0xff149C32),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+        bottomNavigationBar: (widget.status == 3)
+            ? null
+            : Container(
+                // height: 30,
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 20, bottom: 30, left: 30, right: 30),
+                        child: SizedBox(
+                          height: 50,
+                          // width: 160,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              loading();
+                              loopdelete().then((value) {
+                                loopupload().then((value) {
+                                  updateRemark(
+                                          widget.jidx, widget.type, remark.text)
+                                      .then((value) {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  });
+                                });
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              shadowColor: Colors.white,
+                              backgroundColor: Color(0xffAED76E),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'บันทึก',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xff2A302C)),
+                            ),
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'บันทึก',
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-              splashRadius: 10,
-              color: Color(0xff149C32),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back)),
-          title: Text(
-            (widget.type == 2)
-                ? 'แจ้งซ่อม'
-                : (widget.type == 0)
-                    ? 'ถ่ายรูป ก่อนล้างแผง'
-                    : 'ถ่ายรูป หลังล้างแผง',
-            style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 19,
-                color: Color(0xff149C32)),
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: ListView(
-              children: [
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'รูปถ่ายก่อนล้างแผง',
-                      style: TextStyle(
-                          color: Color(0xff003175),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      '${pic.length}/$limitFile',
-                      style: TextStyle(
-                          color: Color(0xff149C32),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700),
                     ),
                   ],
                 ),
-                //new test
+              ),
+        appBar: AppBar(
+          elevation: 0,
+          toolbarHeight: 100,
+          backgroundColor: Color(0xffF8FFF6),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: Color(0xffF8FFF6),
+              image: DecorationImage(
+                image: AssetImage("assets/head.png"),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: SafeArea(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Padding(
-                    padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Color(0xff57A946),
+                            size: 20,
+                          )),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                          (widget.type == 2)
+                              ? 'แจ้งซ่อม'
+                              : (widget.type == 0)
+                                  ? 'ถ่ายรูป ก่อนล้างแผง'
+                                  : 'ถ่ายรูป หลังล้างแผง',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xff2A302C))),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffE1F5DC),
+                              blurRadius: 20,
+                              spreadRadius: 0,
+                              offset: Offset(0, -3), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 30,
+                            right: 30,
+                            top: 20,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                (widget.type == 0)
+                                    ? 'รูปถ่ายก่อนล้างแผง'
+                                    : 'รูปถ่ายหลังล้างแผง',
+                                style: TextStyle(
+                                    color: Color(0xff9DC75B),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                '${pic.length}/$limitFile',
+                                style: TextStyle(
+                                    color: Color(0xff9DC75B),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        )),
+                    Container(
+                      height: 15,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: Colors.white,
+                        //     blurRadius: 5,
+                        //     spreadRadius: 5,
+                        //     offset: Offset(0, 10), // Shadow position
+                        //   ),
+                        // ],
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            )),
+          ),
+          // leading: IconButton(
+          //     splashRadius: 10,
+          //     color: Color(0xff57A946),
+          //     onPressed: () {
+          //       Navigator.pop(context);
+          //     },
+          //     icon: Icon(Icons.arrow_back)),
+          // title: Text(
+          //   (widget.type == 2)
+          //       ? 'แจ้งซ่อม'
+          //       : (widget.type == 0)
+          //           ? 'ถ่ายรูป ก่อนล้างแผง'
+          //           : 'ถ่ายรูป หลังล้างแผง',
+          //   style: TextStyle(
+          //       fontWeight: FontWeight.w600,
+          //       fontSize: 19,
+          //       color: Color(0xff57A946)),
+          // ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: ListView(
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                    padding: const EdgeInsets.only(top: 0, bottom: 0),
                     child: GridView.count(
                       shrinkWrap: true,
                       childAspectRatio: 1.3,
@@ -462,436 +575,439 @@ class _photopageState extends State<photopage> {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                       crossAxisCount: 2,
-                      children: (pic.length > 0)
-                          ? (pic.length == limitFile)
-                              ? List.generate(pic.length, (index) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffffffff),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: Colors.grey.withOpacity(0.3)),
-                                    ),
-                                    child: Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          child: (pic[index].onApi == 1)
-                                              ? Image.network(
-                                                  '$pathPic${pic[index].j_img_name}', // this image doesn't exist
-                                                  fit: BoxFit.cover,
-                                                  height: double.infinity,
-                                                  width: double.infinity,
+                      children: (widget.status == 3)
+                          ? List.generate(pic.length, (index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  (pic[index].onApi == 1)
+                                      ? popPicApi(pic[index].j_img_name)
+                                      : popPicPre(pic[index].j_img_name);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffffffff),
+                                    borderRadius: BorderRadius.circular(15),
+                                    // border: Border.all(
+                                    //     color:
+                                    //         Colors.grey.withOpacity(0.3)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(13),
+                                    child: (pic[index].onApi == 1)
+                                        ? Image.network(
+                                            '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                            fit: BoxFit.cover,
+                                            height: double.infinity,
+                                            width: double.infinity,
 
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Center(
-                                                      child: Icon(
-                                                        Icons
-                                                            .error_outline_rounded,
-                                                        size: 40,
-                                                        color: Colors.grey
-                                                            .withOpacity(0.3),
-                                                      ),
-                                                    );
-                                                  },
-
-                                                  loadingBuilder:
-                                                      (BuildContext context,
-                                                          Widget child,
-                                                          ImageChunkEvent?
-                                                              loadingProgress) {
-                                                    if (loadingProgress ==
-                                                        null) {
-                                                      return child;
-                                                    }
-                                                    return Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        color: Colors.green,
-                                                        value: loadingProgress
-                                                                    .expectedTotalBytes !=
-                                                                null
-                                                            ? loadingProgress
-                                                                    .cumulativeBytesLoaded /
-                                                                loadingProgress
-                                                                    .expectedTotalBytes!
-                                                            : null,
-                                                      ),
-                                                    );
-                                                  },
-                                                )
-                                              : Image.file(
-                                                  File(pic[index].j_img_name),
-                                                  fit: BoxFit.cover,
-                                                  height: double.infinity,
-                                                  width: double.infinity,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Center(
+                                                child: Icon(
+                                                  Icons.error_outline_rounded,
+                                                  size: 40,
+                                                  color: Colors.grey
+                                                      .withOpacity(0.3),
                                                 ),
-                                        ),
-                                        Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if (pic[index].onApi ==
-                                                          1) {
-                                                        deleteLs.add(pic[index]
-                                                            .j_img_id);
-                                                        pic.removeAt(index);
-                                                      } else {
-                                                        pic.removeAt(index);
-                                                      }
-                                                    });
-                                                  },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    child: Container(
-                                                      height: 25,
-                                                      width: 25,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                          Radius.circular(200),
-                                                        ),
-                                                        color: Colors.white
-                                                            .withOpacity(0.7),
-                                                      ),
-                                                      child: Center(
-                                                          child: Icon(
-                                                        Icons.close_rounded,
-                                                        size: 20,
-                                                        color: Colors.grey,
-                                                      )),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            // Text(index.toString()),
-                                            // Text('${pic[index].j_img_id}')
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                })
-                              : List.generate(pic.length + 1, (index) {
-                                  if (index > pic.length - 1) {
-                                    return add();
-                                  } else {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        (pic[index].onApi == 1)
-                                            ? popPicApi(pic[index].j_img_name)
-                                            : popPicPre(pic[index].j_img_name);
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Color(0xffffffff),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                              color:
-                                                  Colors.grey.withOpacity(0.3)),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: (pic[index].onApi == 1)
-                                                  ? Image.network(
-                                                      '$pathPic${pic[index].j_img_name}', // this image doesn't exist
-                                                      fit: BoxFit.cover,
-                                                      height: double.infinity,
-                                                      width: double.infinity,
+                                              );
+                                            },
 
-                                                      errorBuilder: (context,
-                                                          error, stackTrace) {
-                                                        return Center(
-                                                          child: Icon(
-                                                            Icons
-                                                                .error_outline_rounded,
-                                                            size: 40,
-                                                            color: Colors.grey
-                                                                .withOpacity(
-                                                                    0.3),
-                                                          ),
-                                                        );
-                                                      },
-                                                      loadingBuilder: (BuildContext
-                                                              context,
-                                                          Widget child,
-                                                          ImageChunkEvent?
-                                                              loadingProgress) {
-                                                        if (loadingProgress ==
-                                                            null) {
-                                                          return child;
-                                                        }
-                                                        return Center(
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            color: Colors.green,
-                                                            value: loadingProgress
-                                                                        .expectedTotalBytes !=
-                                                                    null
-                                                                ? loadingProgress
-                                                                        .cumulativeBytesLoaded /
-                                                                    loadingProgress
-                                                                        .expectedTotalBytes!
-                                                                : null,
-                                                          ),
-                                                        );
-                                                      },
-                                                    )
-                                                  : Image.file(
-                                                      File(pic[index]
-                                                          .j_img_name),
-                                                      fit: BoxFit.cover,
-                                                      height: double.infinity,
-                                                      width: double.infinity,
-                                                    ),
-                                            ),
-                                            Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.end,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          if (pic[index]
-                                                                  .onApi ==
-                                                              1) {
-                                                            deleteLs.add(
-                                                                pic[index]
-                                                                    .j_img_id);
-                                                            pic.removeAt(index);
-                                                          } else {
-                                                            pic.removeAt(index);
-                                                          }
-                                                        });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10),
-                                                        child: Container(
-                                                          height: 25,
-                                                          width: 25,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(
-                                                              Radius.circular(
-                                                                  200),
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                    Widget child,
+                                                    ImageChunkEvent?
+                                                        loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : Image.file(
+                                            File(pic[index].j_img_name),
+                                            fit: BoxFit.cover,
+                                            height: double.infinity,
+                                            width: double.infinity,
+                                          ),
+                                  ),
+                                ),
+                              );
+                            })
+                          : (pic.length > 0)
+                              ? (pic.length == limitFile)
+                                  ? List.generate(pic.length, (index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          (pic[index].onApi == 1)
+                                              ? popPicApi(pic[index].j_img_name)
+                                              : popPicPre(
+                                                  pic[index].j_img_name);
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Color(0xffffffff),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            // border: Border.all(
+                                            //     color:
+                                            //         Colors.grey.withOpacity(0.3)),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(13),
+                                                child: (pic[index].onApi == 1)
+                                                    ? Image.network(
+                                                        '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                        fit: BoxFit.cover,
+                                                        height: double.infinity,
+                                                        width: double.infinity,
+
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Center(
+                                                            child: Icon(
+                                                              Icons
+                                                                  .error_outline_rounded,
+                                                              size: 40,
+                                                              color: Colors.grey
+                                                                  .withOpacity(
+                                                                      0.3),
                                                             ),
-                                                            color: Colors.white
-                                                                .withOpacity(
-                                                                    0.7),
+                                                          );
+                                                        },
+
+                                                        loadingBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Widget child,
+                                                                ImageChunkEvent?
+                                                                    loadingProgress) {
+                                                          if (loadingProgress ==
+                                                              null) {
+                                                            return child;
+                                                          }
+                                                          return Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              color:
+                                                                  Colors.green,
+                                                              value: loadingProgress
+                                                                          .expectedTotalBytes !=
+                                                                      null
+                                                                  ? loadingProgress
+                                                                          .cumulativeBytesLoaded /
+                                                                      loadingProgress
+                                                                          .expectedTotalBytes!
+                                                                  : null,
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : Image.file(
+                                                        File(pic[index]
+                                                            .j_img_name),
+                                                        fit: BoxFit.cover,
+                                                        height: double.infinity,
+                                                        width: double.infinity,
+                                                      ),
+                                              ),
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            if (pic[index]
+                                                                    .onApi ==
+                                                                1) {
+                                                              deleteLs.add(pic[
+                                                                      index]
+                                                                  .j_img_id);
+                                                              pic.removeAt(
+                                                                  index);
+                                                            } else {
+                                                              pic.removeAt(
+                                                                  index);
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          child: Container(
+                                                            height: 25,
+                                                            width: 25,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .all(
+                                                                Radius.circular(
+                                                                    200),
+                                                              ),
+                                                              color: Colors
+                                                                  .white
+                                                                  .withOpacity(
+                                                                      0.7),
+                                                            ),
+                                                            child: Center(
+                                                                child: Icon(
+                                                              Icons
+                                                                  .close_rounded,
+                                                              size: 20,
+                                                              color:
+                                                                  Colors.grey,
+                                                            )),
                                                           ),
-                                                          child: Center(
-                                                              child: Icon(
-                                                            Icons.close_rounded,
-                                                            size: 20,
-                                                            color: Colors.grey,
-                                                          )),
                                                         ),
                                                       ),
+                                                    ],
+                                                  ),
+                                                  // Text(index.toString()),
+                                                  // Text('${pic[index].j_img_id}')
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    })
+                                  : List.generate(pic.length + 1, (index) {
+                                      if (index > pic.length - 1) {
+                                        return add();
+                                      } else {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            (pic[index].onApi == 1)
+                                                ? popPicApi(
+                                                    pic[index].j_img_name)
+                                                : popPicPre(
+                                                    pic[index].j_img_name);
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(0xffffffff),
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              // border: Border.all(
+                                              //     color: Colors.grey
+                                              //         .withOpacity(0.3)),
+                                            ),
+                                            child: Stack(
+                                              children: [
+                                                ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(13),
+                                                  child: (pic[index].onApi == 1)
+                                                      ? Image.network(
+                                                          '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+
+                                                          errorBuilder:
+                                                              (context, error,
+                                                                  stackTrace) {
+                                                            return Center(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .error_outline_rounded,
+                                                                size: 40,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.3),
+                                                              ),
+                                                            );
+                                                          },
+                                                          loadingBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  Widget child,
+                                                                  ImageChunkEvent?
+                                                                      loadingProgress) {
+                                                            if (loadingProgress ==
+                                                                null) {
+                                                              return child;
+                                                            }
+                                                            return Center(
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                color: Colors
+                                                                    .green,
+                                                                value: loadingProgress
+                                                                            .expectedTotalBytes !=
+                                                                        null
+                                                                    ? loadingProgress
+                                                                            .cumulativeBytesLoaded /
+                                                                        loadingProgress
+                                                                            .expectedTotalBytes!
+                                                                    : null,
+                                                              ),
+                                                            );
+                                                          },
+                                                        )
+                                                      : Image.file(
+                                                          File(pic[index]
+                                                              .j_img_name),
+                                                          fit: BoxFit.cover,
+                                                          height:
+                                                              double.infinity,
+                                                          width:
+                                                              double.infinity,
+                                                        ),
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            setState(() {
+                                                              if (pic[index]
+                                                                      .onApi ==
+                                                                  1) {
+                                                                deleteLs.add(pic[
+                                                                        index]
+                                                                    .j_img_id);
+                                                                pic.removeAt(
+                                                                    index);
+                                                              } else {
+                                                                pic.removeAt(
+                                                                    index);
+                                                              }
+                                                            });
+                                                          },
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            child: Container(
+                                                              height: 25,
+                                                              width: 25,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          200),
+                                                                ),
+                                                                color: Colors
+                                                                    .white
+                                                                    .withOpacity(
+                                                                        0.7),
+                                                              ),
+                                                              child: Center(
+                                                                  child: Icon(
+                                                                Icons
+                                                                    .close_rounded,
+                                                                size: 20,
+                                                                color:
+                                                                    Colors.grey,
+                                                              )),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
+                                                    // Text(index.toString()),
+                                                    // Text('${pic[index].j_img_id}')
                                                   ],
                                                 ),
-                                                // Text(index.toString()),
-                                                // Text('${pic[index].j_img_id}')
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                })
-                          : <Widget>[
-                              add(),
-                            ],
+                                          ),
+                                        );
+                                      }
+                                    })
+                              : <Widget>[
+                                  add(),
+                                ],
                     )),
-                // Padding(
-                //     padding: const EdgeInsets.only(top: 20, bottom: 20),
-                //     child: GridView.count(
-                //       shrinkWrap: true,
-                //       childAspectRatio: 1.3,
-                //       primary: false,
-                //       crossAxisSpacing: 10,
-                //       mainAxisSpacing: 10,
-                //       crossAxisCount: 2,
-                //       children: (imagefiles.length != null)
-                //           ? (imagefiles.length == limitFile)
-                //               ? List.generate(imagefiles.length, (index) {
-                //                   return Container(
-                //                     decoration: BoxDecoration(
-                //                       image: DecorationImage(
-                //                         image: FileImage(
-                //                           File(imagefiles[index].path),
-                //                         ),
-                //                         fit: BoxFit.cover,
-                //                       ),
-                //                       color: Color(0xffffffff),
-                //                       borderRadius: BorderRadius.circular(10),
-                //                       border:
-                //                           Border.all(color: Color(0xffF1FAEF)),
-                //                     ),
-                //                     child: Column(
-                //                       children: [
-                //                         Row(
-                //                           mainAxisAlignment:
-                //                               MainAxisAlignment.end,
-                //                           children: [
-                //                             GestureDetector(
-                //                               onTap: () {
-                //                                 setState(() {
-                //                                   imagefiles.removeAt(index);
-                //                                 });
-                //                               },
-                //                               child: Padding(
-                //                                 padding:
-                //                                     const EdgeInsets.all(10),
-                //                                 child: Container(
-                //                                   height: 25,
-                //                                   width: 25,
-                //                                   decoration: BoxDecoration(
-                //                                     // border: Border.all(
-                //                                     //     width: 1,
-                //                                     //     color: Colors.grey),
-                //                                     borderRadius:
-                //                                         BorderRadius.all(
-                //                                       Radius.circular(200),
-                //                                     ),
-                //                                     color: Colors.white
-                //                                         .withOpacity(0.7),
-                //                                   ),
-                //                                   child: Center(
-                //                                       child: Icon(
-                //                                     Icons.close_rounded,
-                //                                     size: 20,
-                //                                     color: Colors.grey,
-                //                                   )),
-                //                                 ),
-                //                               ),
-                //                             ),
-                //                           ],
-                //                         ),
-                //                       ],
-                //                     ),
-                //                   );
-                //                 })
-                //               : List.generate(imagefiles.length + 1, (index) {
-                //                   if (index > imagefiles.length - 1) {
-                //                     return add();
-                //                   } else {
-                //                     return Container(
-                //                       decoration: BoxDecoration(
-                //                         image: DecorationImage(
-                //                           image: FileImage(
-                //                             File(imagefiles[index].path),
-                //                           ),
-                //                           fit: BoxFit.cover,
-                //                         ),
-                //                         color: Color(0xffffffff),
-                //                         borderRadius: BorderRadius.circular(10),
-                //                         border: Border.all(
-                //                             color: Color(0xffF1FAEF)),
-                //                       ),
-                //                       child: Column(
-                //                         children: [
-                //                           Row(
-                //                             mainAxisAlignment:
-                //                                 MainAxisAlignment.end,
-                //                             children: [
-                //                               GestureDetector(
-                //                                 onTap: () {
-                //                                   setState(() {
-                //                                     imagefiles.removeAt(index);
-                //                                   });
-                //                                 },
-                //                                 child: Padding(
-                //                                   padding:
-                //                                       const EdgeInsets.all(10),
-                //                                   child: Container(
-                //                                     height: 25,
-                //                                     width: 25,
-                //                                     decoration: BoxDecoration(
-                //                                       // border: Border.all(
-                //                                       //     width: 1,
-                //                                       //     color: Colors.grey),
-                //                                       borderRadius:
-                //                                           BorderRadius.all(
-                //                                         Radius.circular(200),
-                //                                       ),
-                //                                       color: Colors.white
-                //                                           .withOpacity(0.7),
-                //                                     ),
-                //                                     child: Center(
-                //                                         child: Icon(
-                //                                       Icons.close_rounded,
-                //                                       size: 20,
-                //                                       color: Colors.grey,
-                //                                     )),
-                //                                   ),
-                //                                 ),
-                //                               ),
-                //                             ],
-                //                           ),
-                //                         ],
-                //                       ),
-                //                     );
-                //                   }
-                //                 })
-                //           : <Widget>[
-                //               add(),
-                //             ],
-                //     )),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Container(
-                        // height: 100,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border:
-                              Border.all(color: Colors.grey.withOpacity(0.3)),
-                        ),
-                        child: TextField(
-                          controller: remark,
-                          // textInputAction: TextInputAction.done,
-                          keyboardType: TextInputType.multiline,
-                          minLines: 3,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            hintText: 'หมายเหตุ',
-                            hintStyle: TextStyle(
-                                color: Color(0xff003175),
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.white,
+                    //     blurRadius: 7,
+                    //     spreadRadius: 10,
+                    //     offset: Offset(0, -2), // Shadow position
+                    //   ),
+                    // ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'หมายเหตุ',
+                        style: TextStyle(
+                            color: Color(0xff9DC75B),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Container(
+                          // height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border:
+                                Border.all(color: Colors.grey.withOpacity(0.3)),
+                          ),
+                          child: TextField(
+                            controller: remark,
+                            // textInputAction: TextInputAction.done,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 2,
+                            maxLines: 3,
+                            readOnly: (widget.status == 3) ? true : false,
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(
+                                  color: Color(0xff003175),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 10,
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -928,14 +1044,14 @@ class _photopageState extends State<photopage> {
         // width: double.infinity,
         decoration: BoxDecoration(
           color: Color(0xffffffff),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Color(0xffAED76E)),
         ),
         child: Center(
           child: Icon(
             Icons.add,
-            color: Color(0xffB3E8A8),
-            size: 80,
+            color: Color(0xffD6EFB4),
+            size: 50,
           ),
         ),
       ),

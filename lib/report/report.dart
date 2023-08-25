@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:egp_app/report/report-uploadmounting.dart';
 import 'package:egp_app/report/report-uploadpic.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -63,15 +64,18 @@ class _reportState extends State<report> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      shadowColor: Colors.white,
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
                       'บันทึก',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -82,97 +86,159 @@ class _reportState extends State<report> {
       ),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        toolbarHeight: 140,
+        backgroundColor: Color(0xffF8FFF6),
         automaticallyImplyLeading: false,
-        leading: IconButton(
-            color: Color(0xff149C32),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
-        title: Text(
-          'แจ้งซ่อม',
-          style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 19,
-              color: Color(0xff149C32)),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Color(0xffF8FFF6),
+            image: DecorationImage(
+              image: AssetImage("assets/head.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Color(0xff57A946),
+                          size: 20,
+                        )),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('แจ้งซ่อม',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Color(0xff2A302C))),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xffE1F5DC),
+                          blurRadius: 20,
+                          spreadRadius: 0,
+                          offset: Offset(0, -3), // Shadow position
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 30, left: 30, right: 30),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              HeroDialogRoute(
+                                  builder: (BuildContext context) =>
+                                      _buildPopUp(context)));
+                        },
+                        child: Hero(
+                          tag: "bg",
+                          child: Material(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Container(
+                              height: 60,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                // color: Color(0xff57A946),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xffE1F5DC),
+                                    Color(0xffD6EFB4),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                                // border: Border.all(color: Color(0xffE0ECDE)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xff57A946).withOpacity(0.1),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: Offset(0, 0), // Shadow position
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('เพิ่มเรื่องซ่อมบำรุง',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 15,
+                                            color: Color(0xff2A302C))),
+                                    Icon(
+                                      EvaIcons.plusCircle,
+                                      color: Colors.white,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.white,
+                      //     blurRadius: 5,
+                      //     spreadRadius: 5,
+                      //     offset: Offset(0, 10), // Shadow position
+                      //   ),
+                      // ],
+                    ),
+                  ),
+                ],
+              )
+            ],
+          )),
         ),
       ),
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 30, left: 40, right: 40),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    HeroDialogRoute(
-                        builder: (BuildContext context) =>
-                            _buildPopUp(context)));
-              },
-              child: Hero(
-                tag: "bg",
-                child: Material(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: Container(
-                    height: 70,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Color(0xff003175),
-                      borderRadius: BorderRadius.circular(15),
-                      // border: Border.all(color: Color(0xffE0ECDE)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xff003175).withOpacity(0.1),
-                          blurRadius: 10,
-                          spreadRadius: 0,
-                          offset: Offset(0, 0), // Shadow position
-                        ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('เพิ่มเรื่องซ่อมบำรุง',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.white)),
-                          Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                                // border: Border.all(width: 3),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(200),
-                                ),
-                                color: Colors.white),
-                            child: Center(
-                              child: Icon(
-                                Icons.add,
-                                color: Color(0xff003175),
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15, left: 40, right: 40),
+            padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
             child: GridView.count(
               shrinkWrap: true,
               childAspectRatio: 1.2,
               primary: false,
-              crossAxisSpacing: 20,
+              crossAxisSpacing: 30,
               mainAxisSpacing: 10,
               crossAxisCount: 2,
               children: List.generate(groupPic.length, (index) {
@@ -216,17 +282,17 @@ class _reportState extends State<report> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                         colors: [
-                          Color(0xff149C32),
-                          Color(0xff25893A),
+                          Color(0xffE1F5DC),
+                          Color(0xffD6EFB4),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xff003175).withOpacity(0.1),
+                          color: Color(0xff57A946).withOpacity(0.1),
                           blurRadius: 10,
                           spreadRadius: 0,
                           offset: Offset(0, 0), // Shadow position
@@ -235,7 +301,7 @@ class _reportState extends State<report> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
+                          horizontal: 15, vertical: 15),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +312,7 @@ class _reportState extends State<report> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
-                                  color: Color(0xffFFFFFF),
+                                  color: Color(0xff2A302C),
                                 )),
                           ),
                           Row(
@@ -264,7 +330,7 @@ class _reportState extends State<report> {
                                       borderRadius: BorderRadius.all(
                                         Radius.circular(13),
                                       ),
-                                      color: Color(0xff003175),
+                                      color: Color(0xff2A302C),
                                     ),
                                     child: Center(
                                       child: Text(
@@ -275,14 +341,6 @@ class _reportState extends State<report> {
                                               color: Colors.white)),
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text('รูปถ่ายก่อนซ่อม',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Colors.white)),
                                 ],
                               ),
                             ],
@@ -309,8 +367,15 @@ class _reportState extends State<report> {
               height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Color(0xff003175),
-              ),
+                  // gradient: LinearGradient(
+                  //   begin: Alignment.topLeft,
+                  //   end: Alignment.bottomRight,
+                  //   colors: [
+                  //     Color(0xffE1F5DC),
+                  //     Color(0xffD6EFB4),
+                  //   ],
+                  // ),
+                  color: Color(0xffF8FFF6)),
               child: SafeArea(
                 child: ListView(
                   children: [
@@ -322,7 +387,7 @@ class _reportState extends State<report> {
                         style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 24,
-                            color: Colors.white)),
+                            color: Color(0xff57A946))),
                     SizedBox(
                       height: 25,
                     ),
@@ -331,7 +396,7 @@ class _reportState extends State<report> {
                     ),
                     // Divider(
                     //   thickness: 0.5,
-                    //   color: Colors.white,
+                    //   color: Color(0xff2A302C),
                     // ),
                     GestureDetector(
                       onTap: () {
@@ -360,7 +425,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -395,7 +460,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -430,7 +495,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -465,7 +530,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -500,7 +565,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -535,7 +600,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -570,7 +635,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -605,7 +670,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -640,7 +705,7 @@ class _reportState extends State<report> {
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
-                                  color: Colors.white)),
+                                  color: Color(0xff9DC75B))),
                         ),
                       ),
                     ),
@@ -649,7 +714,7 @@ class _reportState extends State<report> {
                     ),
                     IconButton(
                         iconSize: 30,
-                        color: Colors.white,
+                        color: Color(0xff57A946),
                         splashRadius: 20,
                         onPressed: () {
                           Navigator.pop(context);

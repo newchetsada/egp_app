@@ -106,24 +106,35 @@ class _editprofileState extends State<editprofile> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
+        toolbarHeight: 50,
         automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(
-          'แก้ไขโปรไฟล์',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
-            color: Color(0xff149C32),
+        backgroundColor: Colors.white,
+        flexibleSpace: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Row(
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.arrow_back,
+                      color: Color(0xff57A946),
+                      size: 20,
+                    )),
+                SizedBox(
+                  width: 10,
+                ),
+                Text('แก้ไขโปรไฟล์',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xff2A302C))),
+              ],
+            ),
           ),
         ),
-        backgroundColor: Colors.white,
-        leading: IconButton(
-            color: Color(0xff149C32),
-            splashRadius: 15,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
       ),
       bottomNavigationBar: Container(
         // height: 30,
@@ -147,16 +158,19 @@ class _editprofileState extends State<editprofile> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
+                      // elevation: 0,
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
                       'บันทึก',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -180,7 +194,7 @@ class _editprofileState extends State<editprofile> {
                   Icon(
                     CupertinoIcons.person_alt_circle,
                     size: 130,
-                    color: Color(0xff149C32).withOpacity(0.5),
+                    color: Color(0xff57A946).withOpacity(0.5),
                   ),
                 ],
               ),
@@ -188,11 +202,32 @@ class _editprofileState extends State<editprofile> {
                 height: 20,
               ),
               Text(
-                ' ชื่อ-นามสกุล',
+                ' ชื่อ',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
+                ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              TextField(
+                controller: fullname,
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
+                    enabledBorder: myinputborder(),
+                    focusedBorder: myinputborder()),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                ' นามสกุล',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -211,9 +246,9 @@ class _editprofileState extends State<editprofile> {
               Text(
                 ' Email',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -232,9 +267,9 @@ class _editprofileState extends State<editprofile> {
               Text(
                 ' Phone number',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -253,9 +288,9 @@ class _editprofileState extends State<editprofile> {
               Text(
                 ' Line ID',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -274,9 +309,9 @@ class _editprofileState extends State<editprofile> {
               Text(
                 ' ตำแหน่ง',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -295,9 +330,9 @@ class _editprofileState extends State<editprofile> {
               Text(
                 ' ชื่อบริษัท',
                 style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff003175),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff9DC75B),
                 ),
               ),
               SizedBox(
@@ -310,6 +345,9 @@ class _editprofileState extends State<editprofile> {
                     enabledBorder: myinputborder(),
                     focusedBorder: myinputborder()),
               ),
+              SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ),
@@ -321,10 +359,10 @@ class _editprofileState extends State<editprofile> {
     //return type is OutlineInputBorder
     return OutlineInputBorder(
         //Outline border type for TextFeild
-        borderRadius: BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(15)),
         borderSide: BorderSide(
-          color: Color(0xffD3D3D3),
-          width: 1,
+          color: Color(0xffD6EFB4),
+          width: 0.5,
         ));
   }
 }

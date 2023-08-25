@@ -53,6 +53,7 @@ dependencies:
   cached_network_image: ^3.2.3
   pinch_zoom: ^1.0.0
   flutter_slidable: ^2.0.0
+  eva_icons_flutter: ^3.1.0
 
 
 

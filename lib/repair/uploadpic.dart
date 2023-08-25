@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,8 @@ class uploadPic extends StatefulWidget {
 
   final int jidx;
   final int type_id;
-  uploadPic({required this.jidx, required this.type_id});
+  final int status;
+  uploadPic({required this.jidx, required this.type_id, required this.status});
 }
 
 class _uploadPicState extends State<uploadPic> {
@@ -332,63 +334,132 @@ class _uploadPicState extends State<uploadPic> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        toolbarHeight: (widget.status == 3) ? 80 : 140,
+        backgroundColor: Color(0xffF8FFF6),
         automaticallyImplyLeading: false,
-        leading: IconButton(
-            splashRadius: 20,
-            color: Color(0xff149C32),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back)),
-        title: Text(
-          typeName,
-          style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 19,
-              color: Color(0xff149C32)),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        // height: 30,
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 20, bottom: 30, left: 30, right: 30),
-                child: SizedBox(
-                  height: 50,
-                  // width: 160,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            color: Color(0xffF8FFF6),
+            image: DecorationImage(
+              image: AssetImage("assets/head.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: SafeArea(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Color(0xff57A946),
+                          size: 20,
+                        )),
+                    SizedBox(
+                      width: 10,
                     ),
-                    child: Text(
-                      'บันทึก',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
-                  ),
+                    Text(typeName,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Color(0xff2A302C))),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Column(
+                children: [
+                  Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffE1F5DC),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            offset: Offset(0, -3), // Shadow position
+                          ),
+                        ],
+                      ),
+                      child: (widget.status == 3)
+                          ? Container(
+                              height: 20,
+                            )
+                          : addcard()),
+                  Container(
+                    height: 15,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.white,
+                      //     blurRadius: 5,
+                      //     spreadRadius: 5,
+                      //     offset: Offset(0, 10), // Shadow position
+                      //   ),
+                      // ],
+                    ),
+                  ),
+                ],
+              )
+            ],
+          )),
         ),
       ),
+      bottomNavigationBar: (widget.status == 3)
+          ? null
+          : Container(
+              // height: 30,
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 20, bottom: 30, left: 30, right: 30),
+                      child: SizedBox(
+                        height: 50,
+                        // width: 160,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.white,
+                            backgroundColor: Color(0xffAED76E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'บันทึก',
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff2A302C)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
       body: SafeArea(
           child: Column(
         children: [
-          addcard(),
           (lsloading == true)
               ? Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
@@ -420,128 +491,140 @@ class _uploadPicState extends State<uploadPic> {
                       itemBuilder: ((context, index) {
                         return Padding(
                             padding: const EdgeInsets.only(
-                                top: 20, left: 25, right: 25),
-                            child: Slidable(
-                                endActionPane: ActionPane(
-                                  extentRatio: 0.2,
-                                  motion: BehindMotion(),
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    SlidableAction(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
-                                      onPressed: ((context) {
-                                        // print(group);
-                                        showDialog(
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (context) {
-                                              return (defaultTargetPlatform ==
-                                                      TargetPlatform.android)
-                                                  ? AlertDialog(
-                                                      actionsPadding:
-                                                          EdgeInsets.all(5),
-                                                      // title: Text(
-                                                      //     'ต้องการลบข้อมูลหรือไม่'),
-                                                      contentPadding:
-                                                          EdgeInsets.only(
-                                                              top: 30,
-                                                              bottom: 20),
-                                                      content: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                              'ต้องการลบข้อมูลหรือไม่'),
-                                                        ],
-                                                      ),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteGroup(groupLs[
-                                                                          index]
-                                                                      .group_no)
-                                                                  .then(
-                                                                      (value) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    )
-                                                  : CupertinoAlertDialog(
-                                                      content: Text(
-                                                          'ต้องการลบข้อมูลหรือไม่'),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteGroup(groupLs[
-                                                                          index]
-                                                                      .group_no)
-                                                                  .then(
-                                                                      (value) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    );
-                                            }).then((value) {
-                                          API
-                                              .getGroup(
-                                                  widget.jidx, widget.type_id)
-                                              .then((value) {
-                                            setState(() {
-                                              List list =
-                                                  json.decode(value.body);
-                                              groupLs = list
-                                                  .map((m) => Group.fromJson(m))
-                                                  .toList();
-                                            });
-                                          });
-                                        });
-                                      }),
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
-                                      icon: Icons.delete,
-                                      label: 'ลบ',
-                                    ),
-                                  ],
-                                ),
-                                child: items(
-                                    groupLs[index].group_no,
+                                bottom: 10, left: 30, right: 30),
+                            child: (widget.status == 3)
+                                ? items(
+                                    index + 1,
                                     groupLs[index].before,
                                     groupLs[index].after,
-                                    groupLs[index].max_img)));
+                                    groupLs[index].max_img)
+                                : Slidable(
+                                    endActionPane: ActionPane(
+                                      extentRatio: 0.2,
+                                      motion: BehindMotion(),
+                                      children: [
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        SlidableAction(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                          onPressed: ((context) {
+                                            // print(group);
+                                            showDialog(
+                                                barrierDismissible: false,
+                                                context: context,
+                                                builder: (context) {
+                                                  return (defaultTargetPlatform ==
+                                                          TargetPlatform
+                                                              .android)
+                                                      ? AlertDialog(
+                                                          actionsPadding:
+                                                              EdgeInsets.all(5),
+                                                          // title: Text(
+                                                          //     'ต้องการลบข้อมูลหรือไม่'),
+                                                          contentPadding:
+                                                              EdgeInsets.only(
+                                                                  top: 30,
+                                                                  bottom: 20),
+                                                          content: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Text(
+                                                                  'ต้องการลบข้อมูลหรือไม่'),
+                                                            ],
+                                                          ),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                    context); //close Dialog
+                                                              },
+                                                              child: Text(
+                                                                  'ยกเลิก'),
+                                                            ),
+                                                            TextButton(
+                                                                style: TextButton
+                                                                    .styleFrom(
+                                                                  primary: Colors
+                                                                      .red, // Text Color
+                                                                ),
+                                                                onPressed: () {
+                                                                  deleteGroup(groupLs[
+                                                                              index]
+                                                                          .group_no)
+                                                                      .then(
+                                                                          (value) {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    Text('ลบ')),
+                                                          ],
+                                                        )
+                                                      : CupertinoAlertDialog(
+                                                          content: Text(
+                                                              'ต้องการลบข้อมูลหรือไม่'),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.pop(
+                                                                    context); //close Dialog
+                                                              },
+                                                              child: Text(
+                                                                  'ยกเลิก'),
+                                                            ),
+                                                            TextButton(
+                                                                style: TextButton
+                                                                    .styleFrom(
+                                                                  primary: Colors
+                                                                      .red, // Text Color
+                                                                ),
+                                                                onPressed: () {
+                                                                  deleteGroup(groupLs[
+                                                                              index]
+                                                                          .group_no)
+                                                                      .then(
+                                                                          (value) {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    Text('ลบ')),
+                                                          ],
+                                                        );
+                                                }).then((value) {
+                                              API
+                                                  .getGroup(widget.jidx,
+                                                      widget.type_id)
+                                                  .then((value) {
+                                                setState(() {
+                                                  List list =
+                                                      json.decode(value.body);
+                                                  groupLs = list
+                                                      .map((m) =>
+                                                          Group.fromJson(m))
+                                                      .toList();
+                                                });
+                                              });
+                                            });
+                                          }),
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          icon: Icons.delete,
+                                          label: 'ลบ',
+                                        ),
+                                      ],
+                                    ),
+                                    child: items(
+                                        index + 1,
+                                        groupLs[index].before,
+                                        groupLs[index].after,
+                                        groupLs[index].max_img)));
                       })),
                 )
         ],
@@ -551,7 +634,7 @@ class _uploadPicState extends State<uploadPic> {
 
   Widget addcard() {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
+      padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
       child: GestureDetector(
         onTap: () {
           // beforeSheet(null);
@@ -595,14 +678,21 @@ class _uploadPicState extends State<uploadPic> {
           });
         },
         child: Container(
-          height: 80,
+          height: 60,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Color(0xff003175),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xffE1F5DC),
+                Color(0xffD6EFB4),
+              ],
+            ),
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: Color(0xff57A946).withOpacity(0.1),
+                color: Color(0xff149C32).withOpacity(0.1),
                 blurRadius: 10,
                 spreadRadius: 0,
                 offset: Offset(0, 0), // Shadow position
@@ -618,24 +708,11 @@ class _uploadPicState extends State<uploadPic> {
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 17,
-                        color: Colors.white)),
-                Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    // border: Border.all(width: 3),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(200),
-                    ),
-                    color: Color(0xff149C32),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
+                        color: Color(0xff2A302C))),
+                Icon(
+                  EvaIcons.plusCircle,
+                  color: Colors.white,
+                  size: 30,
                 ),
               ],
             ),
@@ -708,15 +785,15 @@ class _uploadPicState extends State<uploadPic> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Color(0xffE0ECDE)),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0xff149C32).withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 0,
-              offset: Offset(0, 0), // Shadow position
-            ),
-          ],
+          border: Border.all(color: Color(0xffD6EFB4)),
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Color(0xff57A946).withOpacity(0.1),
+          //     blurRadius: 10,
+          //     spreadRadius: 0,
+          //     offset: Offset(0, 0), // Shadow position
+          //   ),
+          // ],
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -730,8 +807,8 @@ class _uploadPicState extends State<uploadPic> {
                   Text(' ชุดที่ $group $typeName',
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Color(0xff003175))),
+                          fontSize: 15,
+                          color: Color(0xff9DC75B))),
                   SizedBox(
                     height: 5,
                   ),
@@ -740,12 +817,13 @@ class _uploadPicState extends State<uploadPic> {
                       Container(
                         height: 25,
                         decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xffAED76E)),
                           borderRadius: BorderRadius.all(
                             Radius.circular(13),
                           ),
                           color: (before == max)
-                              ? Color(0xffD5FFD9)
-                              : Color(0xffD3D3D3),
+                              ? Color(0xffAED76E)
+                              : Colors.white,
                         ),
                         child: Center(
                           child: Padding(
@@ -753,10 +831,10 @@ class _uploadPicState extends State<uploadPic> {
                             child: Text('ก่อนซ่อมบำรุง',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: (before == max)
-                                        ? Color(0xff149C32)
-                                        : Color(0xff7B7B7B))),
+                                        ? Color(0xffffffff)
+                                        : Color(0xffAED76E))),
                           ),
                         ),
                       ),
@@ -768,12 +846,12 @@ class _uploadPicState extends State<uploadPic> {
                         // width: 45,
                         decoration: BoxDecoration(
                           // border: Border.all(width: 3),
+                          border: Border.all(color: Color(0xffAED76E)),
                           borderRadius: BorderRadius.all(
                             Radius.circular(13),
                           ),
-                          color: (after == max)
-                              ? Color(0xffD5FFD9)
-                              : Color(0xffD3D3D3),
+                          color:
+                              (after == max) ? Color(0xffAED76E) : Colors.white,
                         ),
                         child: Center(
                           child: Padding(
@@ -781,10 +859,10 @@ class _uploadPicState extends State<uploadPic> {
                             child: Text('หลังซ่อมบำรุง',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     color: (after == max)
-                                        ? Color(0xff149C32)
-                                        : Color(0xff7B7B7B))),
+                                        ? Color(0xffffffff)
+                                        : Color(0xffAED76E))),
                           ),
                         ),
                       ),
@@ -792,26 +870,26 @@ class _uploadPicState extends State<uploadPic> {
                   )
                 ],
               ),
-              Container(
-                height: 25,
-                width: 25,
-                decoration: BoxDecoration(
-                  // border: Border.all(width: 3),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(200),
-                  ),
-                  color: (before == max && after == max)
-                      ? Color(0xff149C32)
-                      : Color(0xffB7B7B7),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
+              // Container(
+              //   height: 25,
+              //   width: 25,
+              //   decoration: BoxDecoration(
+              //     // border: Border.all(width: 3),
+              //     borderRadius: BorderRadius.all(
+              //       Radius.circular(200),
+              //     ),
+              //     color: (before == max && after == max)
+              //         ? Color(0xff57A946)
+              //         : Color(0xffB7B7B7),
+              //   ),
+              //   child: Center(
+              //     child: Icon(
+              //       Icons.check,
+              //       color: Colors.white,
+              //       size: 20,
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -830,7 +908,7 @@ class _uploadPicState extends State<uploadPic> {
   //         borderRadius: BorderRadius.circular(10),
   //         boxShadow: [
   //           BoxShadow(
-  //             color: Color(0xff149C32).withOpacity(0.1),
+  //             color: Color(0xff57A946).withOpacity(0.1),
   //             blurRadius: 10,
   //             spreadRadius: 0,
   //             offset: Offset(0, 0), // Shadow position
@@ -1004,8 +1082,8 @@ class _uploadPicState extends State<uploadPic> {
                 value,
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    color: Color(0xff149C32)),
+                    fontSize: 14,
+                    color: Color(0xff9DC75B)),
               ),
             );
           }).toList();
@@ -1018,245 +1096,258 @@ class _uploadPicState extends State<uploadPic> {
                 duration: const Duration(milliseconds: 100),
                 curve: Curves.decelerate,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(30),
                   child: SingleChildScrollView(
                     reverse: false,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 12, top: 5, bottom: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                  (group == '')
-                                      ? 'เพิ่มชุด $typeName'
-                                      : 'ชุดที่ $group $typeName',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15,
-                                      color: Color(0xff003175))),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Color(0xffFAFAFA),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Row(
-                                        children: [
-                                          Text('ยี่ห้อแผง',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: Color(0xff149C32))),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Container(
-                                            height: 30,
-                                            width: 150,
-                                            padding: EdgeInsets.only(
-                                                left: 10, right: 5),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                  width: 0.5,
-                                                  color: Color(0xffD3D3D3)),
-                                            ),
-                                            child: DropdownButtonHideUnderline(
-                                              child: DropdownButton(
-                                                icon: Icon(
-                                                    Icons
-                                                        .keyboard_arrow_down_rounded,
-                                                    size: 20,
-                                                    color: Color(0xff149C32)),
-                                                items: items,
-                                                onChanged: (value) {
-                                                  mystate(() {
-                                                    _selectedValue = value!;
-                                                  });
-                                                },
-                                                value: _selectedValue,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Row(
-                                        children: [
-                                          Text('อาการ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
-                                                  color: Color(0xff149C32))),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: Row(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              mystate(() {
-                                                detail = 'แผงแตก';
-                                              });
-                                            },
-                                            child: Container(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      (detail == 'แผงแตก')
-                                                          ? Icons
-                                                              .radio_button_checked
-                                                          : Icons
-                                                              .radio_button_off,
-                                                      color: Color(0xff149C32),
-                                                      size: 20,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Text('แผงแตก',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 12,
-                                                            color: Color(
-                                                                0xff149C32))),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              mystate(() {
-                                                detail = 'แผงดับ';
-                                              });
-                                            },
-                                            child: Container(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      (detail == 'แผงดับ')
-                                                          ? Icons
-                                                              .radio_button_checked
-                                                          : Icons
-                                                              .radio_button_off,
-                                                      color: Color(0xff149C32),
-                                                      size: 20,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    Text('แผงดับ',
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 12,
-                                                            color: Color(
-                                                                0xff149C32))),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                                (group == '')
+                                    ? 'เพิ่มชุด $typeName'
+                                    : 'ชุดที่ $group $typeName',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Color(0xff2A302C))),
+                          ],
                         ),
                         SizedBox(
                           height: 10,
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Color(0xffFAFAFA),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text('ก่อนซ่อม',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15,
-                                            color: Color(0xff003175))),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                GridView.count(
-                                    shrinkWrap: true,
-                                    childAspectRatio: 1.25,
-                                    primary: false,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    crossAxisCount: 2,
-                                    children: List.generate(desLs_before.length,
-                                        (index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          (desLs_before[index]
-                                                  .j_img_name
-                                                  .isEmpty)
-                                              ? showAdaptiveActionSheet(
-                                                  context: context,
-                                                  // title: const Text('Title'),
-                                                  actions: <BottomSheetAction>[
-                                                    BottomSheetAction(
-                                                      title: Text('Camera'),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                children: [
+                                  Text('ยี่ห้อแผง',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Color(0xff9DC75B))),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  (widget.status == 3)
+                                      ? Text('$_selectedValue',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                              color: Color(0xff9DC75B)))
+                                      : Container(
+                                          height: 30,
+                                          width: 150,
+                                          padding: EdgeInsets.only(
+                                              left: 10, right: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            border: Border.all(
+                                                width: 0.5,
+                                                color: Color(0xffD3D3D3)),
+                                          ),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton(
+                                              icon: Icon(
+                                                  Icons
+                                                      .keyboard_arrow_down_rounded,
+                                                  size: 20,
+                                                  color: Color(0xff9DC75B)),
+                                              items: items,
+                                              onChanged: (value) {
+                                                mystate(() {
+                                                  _selectedValue = value!;
+                                                });
+                                              },
+                                              value: _selectedValue,
+                                            ),
+                                          ),
+                                        ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Row(
+                                children: [
+                                  Text('อาการ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Color(0xff9DC75B))),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: (widget.status == 3)
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          Text('$detail',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9DC75B))),
+                                        ],
+                                      ),
+                                    )
+                                  : Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            mystate(() {
+                                              detail = 'แผงแตก';
+                                            });
+                                          },
+                                          child: Container(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    (detail == 'แผงแตก')
+                                                        ? Icons
+                                                            .radio_button_checked
+                                                        : Icons
+                                                            .radio_button_off,
+                                                    color: Color(0xff9DC75B),
+                                                    size: 20,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text('แผงแตก',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 14,
+                                                          color: Color(
+                                                              0xff9DC75B))),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            mystate(() {
+                                              detail = 'แผงดับ';
+                                            });
+                                          },
+                                          child: Container(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    (detail == 'แผงดับ')
+                                                        ? Icons
+                                                            .radio_button_checked
+                                                        : Icons
+                                                            .radio_button_off,
+                                                    color: Color(0xff9DC75B),
+                                                    size: 20,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text('แผงดับ',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 14,
+                                                          color: Color(
+                                                              0xff9DC75B))),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Text('ก่อนซ่อม',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Color(0xff2A302C))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        GridView.count(
+                            shrinkWrap: true,
+                            childAspectRatio: 1.1,
+                            primary: false,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            crossAxisCount: 2,
+                            children:
+                                List.generate(desLs_before.length, (index) {
+                              return GestureDetector(
+                                onTap: (widget.status == 3)
+                                    ? null
+                                    : () {
+                                        (desLs_before[index].j_img_name.isEmpty)
+                                            ? showAdaptiveActionSheet(
+                                                context: context,
+                                                // title: const Text('Title'),
+                                                actions: <BottomSheetAction>[
+                                                  BottomSheetAction(
+                                                    title: Text('Camera'),
+                                                    onPressed: (context) {
+                                                      openCamera()
+                                                          .then((value) {
+                                                        mystate(() {
+                                                          desLs_before[index]
+                                                                  .j_img_name =
+                                                              value.path;
+                                                          desLs_before[index]
+                                                              .onApi = 0;
+                                                        });
+                                                      });
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                  BottomSheetAction(
+                                                      title: Text('Photos'),
                                                       onPressed: (context) {
-                                                        openCamera()
+                                                        openPhoto()
                                                             .then((value) {
                                                           mystate(() {
                                                             desLs_before[index]
@@ -1266,13 +1357,336 @@ class _uploadPicState extends State<uploadPic> {
                                                                 .onApi = 0;
                                                           });
                                                         });
+
                                                         Navigator.pop(context);
-                                                      },
+                                                      }),
+                                                ],
+                                                cancelAction: CancelAction(
+                                                    title: Text('Cancel')),
+                                              )
+                                            : null;
+                                      },
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Color(0xffffffff),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          border: Border.all(
+                                              color: (desLs_before[index]
+                                                      .j_img_name
+                                                      .isEmpty)
+                                                  ? Color(0xffAED76E)
+                                                  : Colors.transparent),
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(13),
+                                                child:
+                                                    // (pic[index].onApi == 1)
+                                                    //     ?
+                                                    (desLs_before[index]
+                                                            .j_img_name
+                                                            .isNotEmpty)
+                                                        ? (desLs_before[index]
+                                                                    .onApi ==
+                                                                1)
+                                                            ? Image.network(
+                                                                '$pathPic${desLs_before[index].j_img_name}', // this image doesn't exist
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: double
+                                                                    .infinity,
+                                                                width: double
+                                                                    .infinity,
+
+                                                                errorBuilder:
+                                                                    (context,
+                                                                        error,
+                                                                        stackTrace) {
+                                                                  return Center(
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .error_outline_rounded,
+                                                                      size: 40,
+                                                                      color: Colors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                                loadingBuilder: (BuildContext
+                                                                        context,
+                                                                    Widget
+                                                                        child,
+                                                                    ImageChunkEvent?
+                                                                        loadingProgress) {
+                                                                  if (loadingProgress ==
+                                                                      null) {
+                                                                    return child;
+                                                                  }
+                                                                  return Center(
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      value: loadingProgress.expectedTotalBytes !=
+                                                                              null
+                                                                          ? loadingProgress.cumulativeBytesLoaded /
+                                                                              loadingProgress.expectedTotalBytes!
+                                                                          : null,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              )
+                                                            : Image.file(
+                                                                File(desLs_before[
+                                                                        index]
+                                                                    .j_img_name),
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: double
+                                                                    .infinity,
+                                                                width: double
+                                                                    .infinity,
+                                                              )
+                                                        : Container()),
+                                            (desLs_before[index]
+                                                    .j_img_name
+                                                    .isNotEmpty)
+                                                ? (widget.status == 3)
+                                                    ? Container()
+                                                    : Column(
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  mystate(() {
+                                                                    if (desLs_before[index]
+                                                                            .onApi ==
+                                                                        1) {
+                                                                      deleteLs.add(
+                                                                          desLs_before[index]
+                                                                              .j_img_id);
+                                                                      print(
+                                                                          deleteLs);
+                                                                    }
+                                                                    desLs_before[
+                                                                            index]
+                                                                        .j_img_name = '';
+                                                                  });
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(5),
+                                                                  child:
+                                                                      Container(
+                                                                    height: 20,
+                                                                    width: 20,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            200),
+                                                                      ),
+                                                                      color: Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.7),
+                                                                    ),
+                                                                    child: Center(
+                                                                        child: Icon(
+                                                                      Icons
+                                                                          .close_rounded,
+                                                                      size: 15,
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    )),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      )
+                                                : Center(
+                                                    child: Icon(
+                                                      Icons.add,
+                                                      color: Color(0xffD6EFB4),
+                                                      size: 50,
                                                     ),
-                                                    BottomSheetAction(
-                                                        title: Text('Photos'),
+                                                  ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Text(
+                                          desLs_before[index].img_description,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 10,
+                                              color: Color(0xff464646))),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            })),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Text('สาเหตุการชำรุดของอุปกรณ์',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: Color(0xff9DC75B))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          // height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Color(0xffD6EFB4)),
+                          ),
+                          child: TextField(
+                            // textInputAction: TextInputAction.done,
+                            controller: before_note,
+                            readOnly: (widget.status == 3) ? true : false,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 1,
+                            maxLines: 5,
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(fontSize: 14),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Text('หลังซ่อม',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Color(0xff2A302C))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: (widget.status == 3)
+                                  ? null
+                                  : () {
+                                      mystate(() {
+                                        deleteLs.clear();
+                                        for (var i = 0;
+                                            i < desLs_after.length;
+                                            i++) {
+                                          if (desLs_after[i].onApi == 1) {
+                                            deleteLs
+                                                .add(desLs_after[i].j_img_id);
+                                            print(deleteLs);
+                                          }
+                                        }
+                                        (nothavedevice)
+                                            ? nothavedevice = false
+                                            : nothavedevice = true;
+                                      });
+                                      print(nothavedevice);
+                                    },
+                              child: Container(
+                                height: 35,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: (nothavedevice == true)
+                                            ? Color(0xff9DC75B)
+                                            : Color(0xffD3D3D3)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20))),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_outline_outlined,
+                                        color: (nothavedevice == true)
+                                            ? Color(0xff9DC75B)
+                                            : Color(0xffD3D3D3),
+                                        size: 15,
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text('ไม่มีอุปกรณ์ซ่อมบำรุง',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                              color: (nothavedevice == true)
+                                                  ? Color(0xff9DC75B)
+                                                  : Color(0xffD3D3D3))),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        GridView.count(
+                            shrinkWrap: true,
+                            childAspectRatio: 1.1,
+                            primary: false,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            crossAxisCount: 2,
+                            children:
+                                List.generate(desLs_after.length, (index) {
+                              return GestureDetector(
+                                onTap: (widget.status == 3)
+                                    ? null
+                                    : () {
+                                        (nothavedevice == true)
+                                            ? null
+                                            : (desLs_after[index]
+                                                    .j_img_name
+                                                    .isEmpty)
+                                                ? showAdaptiveActionSheet(
+                                                    context: context,
+                                                    // title: const Text('Title'),
+                                                    actions: <BottomSheetAction>[
+                                                      BottomSheetAction(
+                                                        title: Text('Camera'),
                                                         onPressed: (context) {
-                                                          openPhoto()
+                                                          openCamera()
                                                               .then((value) {
                                                             mystate(() {
                                                               desLs_before[
@@ -1284,629 +1698,307 @@ class _uploadPicState extends State<uploadPic> {
                                                                   .onApi = 0;
                                                             });
                                                           });
-
                                                           Navigator.pop(
                                                               context);
-                                                        }),
-                                                  ],
-                                                  cancelAction: CancelAction(
-                                                      title: Text('Cancel')),
-                                                )
-                                              : null;
-                                        },
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: Color(0xffffffff),
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  border: Border.all(
-                                                      color: Color(0xff4FA73C)),
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        child:
-                                                            // (pic[index].onApi == 1)
-                                                            //     ?
-                                                            (desLs_before[index]
-                                                                    .j_img_name
-                                                                    .isNotEmpty)
-                                                                ? (desLs_before[index]
-                                                                            .onApi ==
-                                                                        1)
-                                                                    ? Image
-                                                                        .network(
-                                                                        '$pathPic${desLs_before[index].j_img_name}', // this image doesn't exist
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                        height:
-                                                                            double.infinity,
-                                                                        width: double
-                                                                            .infinity,
-
-                                                                        errorBuilder: (context,
-                                                                            error,
-                                                                            stackTrace) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Icon(
-                                                                              Icons.error_outline_rounded,
-                                                                              size: 40,
-                                                                              color: Colors.grey.withOpacity(0.3),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        loadingBuilder: (BuildContext context,
-                                                                            Widget
-                                                                                child,
-                                                                            ImageChunkEvent?
-                                                                                loadingProgress) {
-                                                                          if (loadingProgress ==
-                                                                              null) {
-                                                                            return child;
-                                                                          }
-                                                                          return Center(
-                                                                            child:
-                                                                                CircularProgressIndicator(
-                                                                              color: Colors.green,
-                                                                              value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      )
-                                                                    : Image
-                                                                        .file(
-                                                                        File(desLs_before[index]
-                                                                            .j_img_name),
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                        height:
-                                                                            double.infinity,
-                                                                        width: double
-                                                                            .infinity,
-                                                                      )
-                                                                : Container()),
-                                                    (desLs_before[index]
-                                                            .j_img_name
-                                                            .isNotEmpty)
-                                                        ? Column(
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .end,
-                                                                children: [
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      mystate(
-                                                                          () {
-                                                                        if (desLs_before[index].onApi ==
-                                                                            1) {
-                                                                          deleteLs
-                                                                              .add(desLs_before[index].j_img_id);
-                                                                          print(
-                                                                              deleteLs);
-                                                                        }
-                                                                        desLs_before[index].j_img_name =
-                                                                            '';
-                                                                      });
-                                                                    },
-                                                                    child:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets.all(
-                                                                              5),
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            20,
-                                                                        width:
-                                                                            20,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.all(
-                                                                            Radius.circular(200),
-                                                                          ),
-                                                                          color: Colors
-                                                                              .white
-                                                                              .withOpacity(0.7),
-                                                                        ),
-                                                                        child: Center(
-                                                                            child: Icon(
-                                                                          Icons
-                                                                              .close_rounded,
-                                                                          size:
-                                                                              15,
-                                                                          color:
-                                                                              Colors.grey,
-                                                                        )),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          )
-                                                        : Center(
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              color: Color(
-                                                                  0xffB3E8A8),
-                                                              size: 50,
-                                                            ),
-                                                          ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Text(
-                                                  desLs_before[index]
-                                                      .img_description,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color:
-                                                          Color(0xff464646))),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    })),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                  // height: 100,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffF8F8F8),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border:
-                                        Border.all(color: Color(0xffE0ECDE)),
-                                  ),
-                                  child: TextField(
-                                    // textInputAction: TextInputAction.done,
-                                    controller: before_note,
-                                    keyboardType: TextInputType.multiline,
-                                    minLines: 1,
-                                    maxLines: 5,
-                                    decoration: InputDecoration(
-                                      hintText: 'หมายเหตุ',
-                                      hintStyle: TextStyle(fontSize: 14),
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.all(10),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Color(0xffFAFAFA),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Text('หลังซ่อม',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15,
-                                            color: Color(0xff003175))),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        mystate(() {
-                                          deleteLs.clear();
-                                          for (var i = 0;
-                                              i < desLs_after.length;
-                                              i++) {
-                                            if (desLs_after[i].onApi == 1) {
-                                              deleteLs
-                                                  .add(desLs_after[i].j_img_id);
-                                              print(deleteLs);
-                                            }
-                                          }
-                                          (nothavedevice)
-                                              ? nothavedevice = false
-                                              : nothavedevice = true;
-                                        });
-                                        print(nothavedevice);
-                                      },
-                                      child: Container(
-                                        height: 35,
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: (nothavedevice == true)
-                                                    ? Color(0xff149C32)
-                                                    : Color(0xffD3D3D3)),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(10))),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons
-                                                    .check_circle_outline_outlined,
-                                                color: (nothavedevice == true)
-                                                    ? Color(0xff149C32)
-                                                    : Color(0xffD3D3D3),
-                                                size: 15,
-                                              ),
-                                              SizedBox(
-                                                width: 5,
-                                              ),
-                                              Text('ไม่มีอุปกรณ์ซ่อมบำรุง',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 12,
-                                                      color: (nothavedevice ==
-                                                              true)
-                                                          ? Color(0xff149C32)
-                                                          : Color(0xffD3D3D3))),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                GridView.count(
-                                    shrinkWrap: true,
-                                    childAspectRatio: 1.25,
-                                    primary: false,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                    crossAxisCount: 2,
-                                    children: List.generate(desLs_after.length,
-                                        (index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          (nothavedevice == true)
-                                              ? null
-                                              : (desLs_after[index]
-                                                      .j_img_name
-                                                      .isEmpty)
-                                                  ? showAdaptiveActionSheet(
-                                                      context: context,
-                                                      // title: const Text('Title'),
-                                                      actions: <BottomSheetAction>[
-                                                        BottomSheetAction(
-                                                          title: Text('Camera'),
+                                                        },
+                                                      ),
+                                                      BottomSheetAction(
+                                                          title: Text('Photos'),
                                                           onPressed: (context) {
-                                                            openCamera()
+                                                            openPhoto()
                                                                 .then((value) {
                                                               mystate(() {
-                                                                desLs_before[
-                                                                            index]
+                                                                desLs_after[index]
                                                                         .j_img_name =
                                                                     value.path;
-                                                                desLs_before[
+                                                                desLs_after[
                                                                         index]
                                                                     .onApi = 0;
                                                               });
                                                             });
+
                                                             Navigator.pop(
                                                                 context);
-                                                          },
-                                                        ),
-                                                        BottomSheetAction(
-                                                            title:
-                                                                Text('Photos'),
-                                                            onPressed:
-                                                                (context) {
-                                                              openPhoto().then(
-                                                                  (value) {
-                                                                mystate(() {
-                                                                  desLs_after[index]
-                                                                          .j_img_name =
-                                                                      value
-                                                                          .path;
-                                                                  desLs_after[
-                                                                          index]
-                                                                      .onApi = 0;
-                                                                });
-                                                              });
-
-                                                              Navigator.pop(
-                                                                  context);
-                                                            }),
-                                                      ],
-                                                      cancelAction:
-                                                          CancelAction(
-                                                              title: Text(
-                                                                  'Cancel')),
-                                                    )
-                                                  : null;
-                                        },
-                                        child: Column(
+                                                          }),
+                                                    ],
+                                                    cancelAction: CancelAction(
+                                                        title: Text('Cancel')),
+                                                  )
+                                                : null;
+                                      },
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        decoration: (nothavedevice == true)
+                                            ? BoxDecoration(
+                                                color: Color(0xffffffff),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                border: Border.all(
+                                                    color: Color(0xffD3D3D3)),
+                                              )
+                                            : BoxDecoration(
+                                                color: Color(0xffffffff),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                border: Border.all(
+                                                    color: (desLs_after[index]
+                                                            .j_img_name
+                                                            .isEmpty)
+                                                        ? Color(0xffAED76E)
+                                                        : Colors.transparent),
+                                              ),
+                                        child: Stack(
                                           children: [
-                                            Expanded(
-                                              child: Container(
-                                                decoration: (nothavedevice ==
-                                                        true)
-                                                    ? BoxDecoration(
-                                                        color:
-                                                            Color(0xffffffff),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        border: Border.all(
-                                                            color: Color(
-                                                                0xffD3D3D3)),
-                                                      )
-                                                    : BoxDecoration(
-                                                        color:
-                                                            Color(0xffffffff),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        border: Border.all(
-                                                            color: Color(
-                                                                0xff4FA73C)),
-                                                      ),
-                                                child: Stack(
-                                                  children: [
-                                                    ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        child:
-                                                            // (pic[index].onApi == 1)
-                                                            //     ?
-                                                            (desLs_after[index]
-                                                                    .j_img_name
-                                                                    .isNotEmpty)
-                                                                ? (desLs_after[index]
-                                                                            .onApi ==
-                                                                        1)
-                                                                    ? Image
-                                                                        .network(
-                                                                        '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                        height:
-                                                                            double.infinity,
-                                                                        width: double
-                                                                            .infinity,
-
-                                                                        errorBuilder: (context,
-                                                                            error,
-                                                                            stackTrace) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Icon(
-                                                                              Icons.error_outline_rounded,
-                                                                              size: 40,
-                                                                              color: Colors.grey.withOpacity(0.3),
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        loadingBuilder: (BuildContext context,
-                                                                            Widget
-                                                                                child,
-                                                                            ImageChunkEvent?
-                                                                                loadingProgress) {
-                                                                          if (loadingProgress ==
-                                                                              null) {
-                                                                            return child;
-                                                                          }
-                                                                          return Center(
-                                                                            child:
-                                                                                CircularProgressIndicator(
-                                                                              color: Colors.green,
-                                                                              value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                      )
-                                                                    : Image
-                                                                        .file(
-                                                                        File(desLs_after[index]
-                                                                            .j_img_name),
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                        height:
-                                                                            double.infinity,
-                                                                        width: double
-                                                                            .infinity,
-                                                                      )
-                                                                : Container()),
+                                            ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(13),
+                                                child:
+                                                    // (pic[index].onApi == 1)
+                                                    //     ?
                                                     (desLs_after[index]
                                                             .j_img_name
                                                             .isNotEmpty)
-                                                        ? Column(
-                                                            children: [
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .end,
-                                                                children: [
-                                                                  GestureDetector(
-                                                                    onTap: () {
-                                                                      mystate(
-                                                                          () {
-                                                                        if (desLs_after[index].onApi ==
-                                                                            1) {
-                                                                          deleteLs
-                                                                              .add(desLs_after[index].j_img_id);
-                                                                          print(
-                                                                              deleteLs);
-                                                                        }
-                                                                        desLs_after[index].j_img_name =
-                                                                            '';
-                                                                      });
-                                                                    },
-                                                                    child:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets.all(
-                                                                              5),
-                                                                      child:
-                                                                          Container(
-                                                                        height:
-                                                                            20,
-                                                                        width:
-                                                                            20,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.all(
-                                                                            Radius.circular(200),
-                                                                          ),
-                                                                          color: Colors
-                                                                              .white
-                                                                              .withOpacity(0.7),
-                                                                        ),
-                                                                        child: Center(
-                                                                            child: Icon(
-                                                                          Icons
-                                                                              .close_rounded,
-                                                                          size:
-                                                                              15,
-                                                                          color:
-                                                                              Colors.grey,
-                                                                        )),
-                                                                      ),
+                                                        ? (desLs_after[index]
+                                                                    .onApi ==
+                                                                1)
+                                                            ? Image.network(
+                                                                '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: double
+                                                                    .infinity,
+                                                                width: double
+                                                                    .infinity,
+
+                                                                errorBuilder:
+                                                                    (context,
+                                                                        error,
+                                                                        stackTrace) {
+                                                                  return Center(
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .error_outline_rounded,
+                                                                      size: 40,
+                                                                      color: Colors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.3),
                                                                     ),
+                                                                  );
+                                                                },
+                                                                loadingBuilder: (BuildContext
+                                                                        context,
+                                                                    Widget
+                                                                        child,
+                                                                    ImageChunkEvent?
+                                                                        loadingProgress) {
+                                                                  if (loadingProgress ==
+                                                                      null) {
+                                                                    return child;
+                                                                  }
+                                                                  return Center(
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      value: loadingProgress.expectedTotalBytes !=
+                                                                              null
+                                                                          ? loadingProgress.cumulativeBytesLoaded /
+                                                                              loadingProgress.expectedTotalBytes!
+                                                                          : null,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              )
+                                                            : Image.file(
+                                                                File(desLs_after[
+                                                                        index]
+                                                                    .j_img_name),
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: double
+                                                                    .infinity,
+                                                                width: double
+                                                                    .infinity,
+                                                              )
+                                                        : Container()),
+                                            (desLs_after[index]
+                                                    .j_img_name
+                                                    .isNotEmpty)
+                                                ? Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              mystate(() {
+                                                                if (desLs_after[
+                                                                            index]
+                                                                        .onApi ==
+                                                                    1) {
+                                                                  deleteLs.add(
+                                                                      desLs_after[
+                                                                              index]
+                                                                          .j_img_id);
+                                                                  print(
+                                                                      deleteLs);
+                                                                }
+                                                                desLs_after[
+                                                                        index]
+                                                                    .j_img_name = '';
+                                                              });
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              child: Container(
+                                                                height: 20,
+                                                                width: 20,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .all(
+                                                                    Radius
+                                                                        .circular(
+                                                                            200),
                                                                   ),
-                                                                ],
+                                                                  color: Colors
+                                                                      .white
+                                                                      .withOpacity(
+                                                                          0.7),
+                                                                ),
+                                                                child: Center(
+                                                                    child: Icon(
+                                                                  Icons
+                                                                      .close_rounded,
+                                                                  size: 15,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                )),
                                                               ),
-                                                            ],
-                                                          )
-                                                        : Center(
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              color: (nothavedevice ==
-                                                                      true)
-                                                                  ? Color(
-                                                                      0xffD3D3D3)
-                                                                  : Color(
-                                                                      0xffB3E8A8),
-                                                              size: 50,
                                                             ),
                                                           ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Text(
-                                                  desLs_after[index]
-                                                      .img_description,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12,
-                                                      color:
-                                                          Color(0xff464646))),
-                                            ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Center(
+                                                    child: Icon(
+                                                      Icons.add,
+                                                      color: (nothavedevice ==
+                                                              true)
+                                                          ? Color(0xffD3D3D3)
+                                                          : Color(0xffD6EFB4),
+                                                      size: 50,
+                                                    ),
+                                                  ),
                                           ],
                                         ),
-                                      );
-                                    })),
-                                SizedBox(
-                                  height: 10,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Text(
+                                          desLs_after[index].img_description,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 10,
+                                              color: Color(0xff464646))),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  // height: 100,
+                              );
+                            })),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Text('สาเหตุการชำรุดของอุปกรณ์',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: Color(0xff9DC75B))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          // height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Color(0xffD6EFB4)),
+                          ),
+                          child: TextField(
+                            // textInputAction: TextInputAction.done,
+                            controller: after_note,
+                            readOnly: (widget.status == 3) ? true : false,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 1,
+                            maxLines: 5,
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(fontSize: 14),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10),
+                            ),
+                          ),
+                        ),
+                        (widget.status == 3)
+                            ? Container()
+                            : Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 20, bottom: 0),
+                                child: SizedBox(
+                                  height: 50,
                                   width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xffF8F8F8),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border:
-                                        Border.all(color: Color(0xffE0ECDE)),
-                                  ),
-                                  child: TextField(
-                                    // textInputAction: TextInputAction.done,
-                                    controller: after_note,
-                                    keyboardType: TextInputType.multiline,
-                                    minLines: 1,
-                                    maxLines: 5,
-                                    decoration: InputDecoration(
-                                      hintText: 'หมายเหตุ',
-                                      hintStyle: TextStyle(fontSize: 14),
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.all(10),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      loading();
+                                      loopdelete().then((value) {
+                                        loopupload(group).then((value) {
+                                          loopupload_after(group).then((value) {
+                                            updateRemark(gg, 0,
+                                                    '$_selectedValue||$detail||${before_note.text}')
+                                                .then((value) {
+                                              updateRemark(
+                                                      gg, 1, after_note.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        });
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 0,
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Color(0xffAED76E),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'บันทึก',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xff2A302C)),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 0),
-                          child: SizedBox(
-                            height: 50,
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                loading();
-                                loopdelete().then((value) {
-                                  loopupload(group).then((value) {
-                                    loopupload_after(group).then((value) {
-                                      updateRemark(gg, 0,
-                                              '$_selectedValue||$detail||${before_note.text}')
-                                          .then((value) {
-                                        updateRemark(gg, 1, after_note.text)
-                                            .then((value) {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                        });
-                                      });
-                                    });
-                                  });
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Color(0xff149C32),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
                               ),
-                              child: Text(
-                                'บันทึก',
-                                style: TextStyle(
-                                    fontSize: 15, fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

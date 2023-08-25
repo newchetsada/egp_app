@@ -375,6 +375,7 @@ class _cleansolarState extends State<cleansolar> {
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
+                          shadowColor: Colors.white,
                           backgroundColor: Color(0xffAED76E),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32.0),
@@ -383,7 +384,9 @@ class _cleansolarState extends State<cleansolar> {
                         child: Text(
                           'ยืนยันส่งงาน',
                           style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w600),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff2A302C)),
                         ),
                       ),
                     ),
@@ -413,7 +416,7 @@ class _cleansolarState extends State<cleansolar> {
         // return true;
       },
       child: Scaffold(
-        backgroundColor: Color(0xffF8FFF6),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           toolbarHeight: 210,
           elevation: 0,
@@ -533,26 +536,33 @@ class _cleansolarState extends State<cleansolar> {
                                 padding: const EdgeInsets.only(
                                   left: 30,
                                   right: 30,
-                                  top: 30,
+                                  top: 25,
                                 ),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('รายละเอียด',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 0)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
-                                    Text('ส่งงาน',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 1)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text('รายละเอียด',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: (_curpage == 0)
+                                                    ? Color(0xff57A946)
+                                                    : Color(0xff7A86A1))),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text('ส่งงาน',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: (_curpage == 1)
+                                                    ? Color(0xff57A946)
+                                                    : Color(0xff7A86A1))),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               )
@@ -963,72 +973,85 @@ class _cleansolarState extends State<cleansolar> {
                           ),
                         );
                       }))
-              : SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    itemCount: contact.length,
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(left: (index == 0) ? 0 : 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            _makePhoneCall(contact[index].j_cont_tel);
-                          },
-                          child: Container(
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xffE1F5DC),
-                                  Color(0xffD6EFB4),
-                                ],
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 15),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.person,
-                                    color: Color(0xff2A302C),
-                                    size: 22,
+              : (contact.isEmpty)
+                  ? SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: Text('ไม่มีข้อมูลผู้ติดต่อ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Color.fromARGB(255, 153, 156, 153))),
+                      ),
+                    )
+                  : SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        itemCount: contact.length,
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding:
+                                EdgeInsets.only(left: (index == 0) ? 0 : 10),
+                            child: GestureDetector(
+                              onTap: () {
+                                _makePhoneCall(contact[index].j_cont_tel);
+                              },
+                              child: Container(
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10)),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xffE1F5DC),
+                                      Color(0xffD6EFB4),
+                                    ],
                                   ),
-                                  Text(contact[index].j_cont_name,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 13,
-                                          color: Color(0xff464646))),
-                                  Text(
-                                      'ตำแหน่ง : ${contact[index].j_cont_position}',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 13,
-                                          color: Color(0xff464646))),
-                                  Text(contact[index].j_cont_tel,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xff464646)))
-                                ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 15),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.person,
+                                        color: Color(0xff2A302C),
+                                        size: 22,
+                                      ),
+                                      Text(contact[index].j_cont_name,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13,
+                                              color: Color(0xff464646))),
+                                      Text(
+                                          'ตำแหน่ง : ${contact[index].j_cont_position}',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13,
+                                              color: Color(0xff464646))),
+                                      Text(contact[index].j_cont_tel,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: Color(0xff464646)))
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                          );
+                        },
+                      ),
+                    ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
@@ -1117,46 +1140,48 @@ class _cleansolarState extends State<cleansolar> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 20, left: 30, right: 30),
-                      child: SizedBox(
-                        height: 50,
-                        // width: 160,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      report(jid: widget.jid)),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Color(0xff2A302C),
-                            shadowColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+              (widget.j_status == 3)
+                  ? Container()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 20, left: 30, right: 30),
+                            child: SizedBox(
+                              height: 50,
+                              // width: 160,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            report(jid: widget.jid)),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: Color(0xff2A302C),
+                                  shadowColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'แจ้งซ่อม',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xffAED76E)),
+                                ),
+                              ),
                             ),
                           ),
-                          child: Text(
-                            'แจ้งซ่อม',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xffAED76E)),
-                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1168,11 +1193,14 @@ class _cleansolarState extends State<cleansolar> {
                         height: 50,
                         // width: 160,
                         child: ElevatedButton(
-                          onPressed: () {
-                            controller.nextPage(
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease);
-                          },
+                          onPressed: (before_taken == total_taken &&
+                                  after_taken == total_taken)
+                              ? () {
+                                  controller.nextPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.ease);
+                                }
+                              : null,
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
                             backgroundColor: Color(0xffAED76E),
@@ -1222,6 +1250,7 @@ class _cleansolarState extends State<cleansolar> {
                                       type: 0,
                                       limit: total_taken,
                                       jidx: widget.jid,
+                                      status: widget.j_status,
                                     )),
                           ).then((value) {
                             // print('dasdasdas');
@@ -1355,6 +1384,7 @@ class _cleansolarState extends State<cleansolar> {
                                       type: 1,
                                       limit: total_taken,
                                       jidx: widget.jid,
+                                      status: widget.j_status,
                                     )),
                           ).then((value) {
                             setState(() {
@@ -1513,6 +1543,7 @@ class _cleansolarState extends State<cleansolar> {
                             : null,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
+                      shadowColor: Colors.white,
                       backgroundColor: Color(0xffAED76E),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -1520,8 +1551,10 @@ class _cleansolarState extends State<cleansolar> {
                     ),
                     child: Text(
                       'ถัดไป',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -1722,8 +1755,10 @@ class _cleansolarState extends State<cleansolar> {
                     ),
                     child: Text(
                       (widget.j_status == 3) ? 'เสร็จสิ้น' : 'ยืนยันส่งงาน',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -1733,12 +1768,12 @@ class _cleansolarState extends State<cleansolar> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: ListView(
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 40,
+              height: 10,
             ),
             Text(
               'ยืนยันการส่งข้อมูล',
@@ -1753,9 +1788,9 @@ class _cleansolarState extends State<cleansolar> {
             Text(
               'ระบบจะส่งข้อมูลหลังจากผู้ใช้งานกดปุ่มยืนยันส่งงาน หากมีการส่งข้อมูลแล้ว ผู้ใช้งานจะไม่สามารถเข้ามาแก้ไขข้อมูลเพิ่มเติมได้อีก',
               style: TextStyle(
-                  color: Color(0xff7B7B7B),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500),
+                  color: Color(0xff464646),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400),
             ),
             SizedBox(
               height: 20,
@@ -1763,18 +1798,18 @@ class _cleansolarState extends State<cleansolar> {
             Text(
               'หมายเหตุ',
               style: TextStyle(
-                  color: Color(0xff464646),
+                  color: Color(0xffAED76E),
                   fontSize: 15,
                   fontWeight: FontWeight.w600),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 15),
+              padding: const EdgeInsets.only(top: 5),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Color(0xffE0ECDE)),
+                  border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
                   controller: remarkEnd,
@@ -1804,14 +1839,24 @@ class _cleansolarState extends State<cleansolar> {
       backgroundColor: Colors.transparent,
       bottomNavigationBar: Container(
         // height: 30,
-        color: Colors.white,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white,
+              blurRadius: 10,
+              spreadRadius: 10,
+              offset: Offset(0, -3), // Shadow position
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    top: 15, bottom: 30, left: 30, right: 30),
+                    top: 0, bottom: 30, left: 30, right: 30),
                 child: SizedBox(
                   height: 50,
                   // width: 160,
@@ -1828,8 +1873,10 @@ class _cleansolarState extends State<cleansolar> {
                     ),
                     child: Text(
                       'ตกลง',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff2A302C)),
                     ),
                   ),
                 ),
@@ -1842,9 +1889,6 @@ class _cleansolarState extends State<cleansolar> {
         padding: const EdgeInsets.only(left: 30, right: 30),
         child: ListView(
           children: [
-            SizedBox(
-              height: 30,
-            ),
             Text('ดำเนินงาน',
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
@@ -1855,7 +1899,7 @@ class _cleansolarState extends State<cleansolar> {
             ),
             GridView.count(
                 shrinkWrap: true,
-                childAspectRatio: 1,
+                childAspectRatio: 0.75,
                 primary: false,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 10,
@@ -1863,39 +1907,59 @@ class _cleansolarState extends State<cleansolar> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => photopage(
-                      //             type: 0,
-                      //             limit: total_taken,
-                      //             jidx: widget.jid,
-                      //           )),
-                      // ).then((value) {
-                      //   // print('dasdasdas');
-                      //   setState(() {
-                      //     getcountphoto(widget.jid);
-                      //   });
-                      // });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => photopage(
+                                  type: 0,
+                                  limit: total_taken,
+                                  jidx: widget.jid,
+                                  status: widget.j_status,
+                                )),
+                      ).then((value) {
+                        // print('dasdasdas');
+                        setState(() {
+                          getcountphoto(widget.jid);
+                        });
+                      });
+                      ;
                     },
                     child: Container(
                       height: 80,
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: (before_taken == total_taken)
-                            ? Color(0xffAED76E)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Color(0xffE0ECDE)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffAED76E).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
+                      decoration: (before_taken == total_taken)
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xffE1F5DC),
+                                  Color(0xffD6EFB4),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            )
+                          : BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Color(0xffAED76E)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Column(
@@ -1909,16 +1973,9 @@ class _cleansolarState extends State<cleansolar> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        height: 30,
+                                      Image.asset(
+                                        'assets/clean.png',
                                         width: 30,
-                                        decoration: BoxDecoration(
-                                          // border: Border.all(width: 3),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(200),
-                                          ),
-                                          color: Color(0xff003175),
-                                        ),
                                       ),
                                       SizedBox(
                                         height: 5,
@@ -1926,11 +1983,8 @@ class _cleansolarState extends State<cleansolar> {
                                       Text('ถ่ายรูป ก่อนล้างแผง',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 12,
-                                              color:
-                                                  (before_taken == total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                              fontSize: 14,
+                                              color: Color(0xff2A302C))),
                                     ],
                                   ),
                                 ],
@@ -1946,20 +2000,20 @@ class _cleansolarState extends State<cleansolar> {
                                     children: [
                                       Container(
                                         height: 30,
-                                        width: 45,
+                                        width: 50,
                                         decoration: BoxDecoration(
                                           // border: Border.all(width: 3),
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(13),
                                           ),
-                                          color: Color(0xff003175),
+                                          color: Color(0xff2A302C),
                                         ),
                                         child: Center(
                                           child: Text(
                                               '$before_taken/$total_taken',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                   color: Colors.white)),
                                         ),
                                       ),
@@ -1970,10 +2024,7 @@ class _cleansolarState extends State<cleansolar> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 12,
-                                              color:
-                                                  (before_taken == total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                              color: Color(0xff2A302C))),
                                     ],
                                   ),
                                 ],
@@ -1986,38 +2037,57 @@ class _cleansolarState extends State<cleansolar> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => photopage(
-                      //             type: 1,
-                      //             limit: total_taken,
-                      //             jidx: widget.jid,
-                      //           )),
-                      // ).then((value) {
-                      //   setState(() {
-                      //     getcountphoto(widget.jid);
-                      //   });
-                      // });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => photopage(
+                                  type: 1,
+                                  limit: total_taken,
+                                  jidx: widget.jid,
+                                  status: widget.j_status,
+                                )),
+                      ).then((value) {
+                        setState(() {
+                          getcountphoto(widget.jid);
+                        });
+                      });
                     },
                     child: Container(
                       height: 80,
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: (after_taken == total_taken)
-                            ? Color(0xffAED76E)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Color(0xffE0ECDE)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffAED76E).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
+                      decoration: (after_taken == total_taken)
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xffE1F5DC),
+                                  Color(0xffD6EFB4),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            )
+                          : BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Color(0xffAED76E)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Column(
@@ -2031,16 +2101,9 @@ class _cleansolarState extends State<cleansolar> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        height: 30,
+                                      Image.asset(
+                                        'assets/clean.png',
                                         width: 30,
-                                        decoration: BoxDecoration(
-                                          // border: Border.all(width: 3),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(200),
-                                          ),
-                                          color: Color(0xff003175),
-                                        ),
                                       ),
                                       SizedBox(
                                         height: 5,
@@ -2048,11 +2111,8 @@ class _cleansolarState extends State<cleansolar> {
                                       Text('ถ่ายรูป หลังล้างแผง',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 12,
-                                              color:
-                                                  (after_taken == total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                              fontSize: 14,
+                                              color: Color(0xff2A302C))),
                                     ],
                                   ),
                                 ],
@@ -2068,20 +2128,20 @@ class _cleansolarState extends State<cleansolar> {
                                     children: [
                                       Container(
                                         height: 30,
-                                        width: 45,
+                                        width: 50,
                                         decoration: BoxDecoration(
                                           // border: Border.all(width: 3),
                                           borderRadius: BorderRadius.all(
                                             Radius.circular(13),
                                           ),
-                                          color: Color(0xff003175),
+                                          color: Color(0xff2A302C),
                                         ),
                                         child: Center(
                                           child: Text(
                                               '$after_taken/$total_taken',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 12,
+                                                  fontSize: 14,
                                                   color: Colors.white)),
                                         ),
                                       ),
@@ -2092,10 +2152,7 @@ class _cleansolarState extends State<cleansolar> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 12,
-                                              color:
-                                                  (after_taken == total_taken)
-                                                      ? Colors.white
-                                                      : Color(0xff003175))),
+                                              color: Color(0xff2A302C))),
                                     ],
                                   ),
                                 ],
@@ -2125,20 +2182,14 @@ class _cleansolarState extends State<cleansolar> {
                       : sheet('ผู้ติดต่อหน้างาน', 3);
                 },
                 child: Container(
-                  height: 80,
+                  height: 70,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: (sign_name_1.isNotEmpty)
+                        ? Color(0xff9DC75B)
+                        : Color(0xffEEF5E2),
+                    borderRadius: BorderRadius.circular(15),
                     // border: Border.all(color: Color(0xffE0ECDE)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xff003175).withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        offset: Offset(0, 0), // Shadow position
-                      ),
-                    ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -2146,20 +2197,20 @@ class _cleansolarState extends State<cleansolar> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
                         child: Container(
-                          height: 40,
-                          width: 40,
+                          height: 35,
+                          width: 35,
                           decoration: BoxDecoration(
                             color: (sign_name_1.isNotEmpty)
-                                ? Color(0xff003175)
-                                : Color(0xffB7B7B7),
+                                ? Colors.white
+                                : Color(0xff9CC75B),
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(
-                              Icons.person,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                            child: Icon(Icons.person,
+                                size: 20,
+                                color: (sign_name_1.isNotEmpty)
+                                    ? Color(0xff9CC75B)
+                                    : Colors.white),
                           ),
                         ),
                       ),
@@ -2173,18 +2224,18 @@ class _cleansolarState extends State<cleansolar> {
                               'ผู้ติดต่อหน้างาน',
                               style: TextStyle(
                                   color: (sign_name_1.isNotEmpty)
-                                      ? Color(0xff003175)
-                                      : Color(0xffB7B7B7),
+                                      ? Colors.white
+                                      : Color(0xffAED76E),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14),
                             ),
                             (sign_name_1.isNotEmpty)
                                 ? Padding(
-                                    padding: const EdgeInsets.only(top: 7),
+                                    padding: const EdgeInsets.only(top: 5),
                                     child: Text(
                                       sign_name_1,
                                       style: TextStyle(
-                                          color: Color(0xff003175),
+                                          color: Colors.white,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 12),
                                     ),
@@ -2203,23 +2254,17 @@ class _cleansolarState extends State<cleansolar> {
                 onTap: () {
                   (sign_name_2.isNotEmpty)
                       ? popsign(path_sign2)
-                      : sheet('หัวหน้าทีม', 2);
+                      : sheet('ช่าง', 2);
                 },
                 child: Container(
-                  height: 80,
+                  height: 70,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    color: (sign_name_2.isNotEmpty)
+                        ? Color(0xff9DC75B)
+                        : Color(0xffEEF5E2),
+                    borderRadius: BorderRadius.circular(15),
                     // border: Border.all(color: Color(0xffE0ECDE)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0xff003175).withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        offset: Offset(0, 0), // Shadow position
-                      ),
-                    ],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -2227,20 +2272,20 @@ class _cleansolarState extends State<cleansolar> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20),
                         child: Container(
-                          height: 40,
-                          width: 40,
+                          height: 35,
+                          width: 35,
                           decoration: BoxDecoration(
                             color: (sign_name_2.isNotEmpty)
-                                ? Color(0xff003175)
-                                : Color(0xffB7B7B7),
+                                ? Colors.white
+                                : Color(0xff9CC75B),
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(
-                              Icons.person,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+                            child: Icon(Icons.person,
+                                size: 20,
+                                color: (sign_name_2.isNotEmpty)
+                                    ? Color(0xff9CC75B)
+                                    : Colors.white),
                           ),
                         ),
                       ),
@@ -2251,21 +2296,21 @@ class _cleansolarState extends State<cleansolar> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'หัวหน้าทีม',
+                              'ช่าง',
                               style: TextStyle(
                                   color: (sign_name_2.isNotEmpty)
-                                      ? Color(0xff003175)
-                                      : Color(0xffB7B7B7),
+                                      ? Colors.white
+                                      : Color(0xffAED76E),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14),
                             ),
                             (sign_name_2.isNotEmpty)
                                 ? Padding(
-                                    padding: const EdgeInsets.only(top: 7),
+                                    padding: const EdgeInsets.only(top: 5),
                                     child: Text(
                                       sign_name_2,
                                       style: TextStyle(
-                                          color: Color(0xff003175),
+                                          color: Colors.white,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 12),
                                     ),
@@ -2278,40 +2323,13 @@ class _cleansolarState extends State<cleansolar> {
                   ),
                 )),
             SizedBox(
-              height: 20,
-            ),
-            Row(
-              children: [
-                Container(
-                  height: 30,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      color: Color(0xffD5FFD9)),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        'เสร็จสิ้น',
-                        style: TextStyle(
-                            color: Color(0xff2DAC34),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
               height: 10,
             ),
-            Text(
-              'หมายเหตุ',
-              style: TextStyle(
-                  color: Color(0xff464646),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600),
-            ),
+            Text('หมายเหตุ',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: Color(0xffAED76E))),
             Padding(
               padding: const EdgeInsets.only(top: 5),
               child: Container(
@@ -2319,7 +2337,7 @@ class _cleansolarState extends State<cleansolar> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Color(0xffE0ECDE)),
+                  border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
                   controller: remarkEnd,
@@ -2335,6 +2353,9 @@ class _cleansolarState extends State<cleansolar> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 30,
+            )
           ],
         ),
       ),

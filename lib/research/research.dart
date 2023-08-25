@@ -314,7 +314,7 @@ class _researchState extends State<research> {
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xff149C32)),
+                      color: Color(0xff57A946)),
                 ),
                 SizedBox(
                   height: 10,
@@ -367,7 +367,7 @@ class _researchState extends State<research> {
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Color(0xff149C32),
+                          backgroundColor: Color(0xff57A946),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32.0),
                           ),
@@ -409,7 +409,7 @@ class _researchState extends State<research> {
         // return true;
       },
       child: Scaffold(
-        backgroundColor: Color(0xff149C32),
+        backgroundColor: Color(0xff57A946),
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
@@ -418,7 +418,7 @@ class _researchState extends State<research> {
             (_curpage == 0) ? 'รายละเอียด' : 'ดำเนินงาน',
             style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
           ),
-          backgroundColor: Color(0xff149C32),
+          backgroundColor: Color(0xff57A946),
           leading: IconButton(
               splashRadius: 15,
               onPressed: () {
@@ -438,7 +438,7 @@ class _researchState extends State<research> {
             Container(
               height: 140,
               decoration: BoxDecoration(
-                color: Color(0xff149C32),
+                color: Color(0xff57A946),
               ),
               child: Column(
                 children: [
@@ -465,7 +465,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -507,7 +507,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -547,7 +547,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -589,7 +589,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -633,7 +633,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -677,7 +677,7 @@ class _researchState extends State<research> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 13,
-                                              color: Color(0xff149C32))),
+                                              color: Color(0xff57A946))),
                                     ),
                                   ),
                                   SizedBox(
@@ -715,7 +715,7 @@ class _researchState extends State<research> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 15,
-                                        color: Color(0xff149C32)))),
+                                        color: Color(0xff57A946)))),
                           ),
                         )
                       ],
@@ -815,7 +815,7 @@ class _researchState extends State<research> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xff57A946),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1290,7 +1290,7 @@ class _researchState extends State<research> {
                                 : null,
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Color(0xff149C32),
+                              backgroundColor: Color(0xff57A946),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -1367,7 +1367,7 @@ class _researchState extends State<research> {
                         decoration: BoxDecoration(
                           color: (groupPic[index].amount_sub_type_true ==
                                   groupPic[index].amount_sub_type_all)
-                              ? Color(0xff149C32)
+                              ? Color(0xff57A946)
                               : Color(0xffFFFFFF),
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
@@ -1486,7 +1486,7 @@ class _researchState extends State<research> {
                             : null,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xff57A946),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1700,7 +1700,7 @@ class _researchState extends State<research> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xff57A946),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1728,7 +1728,7 @@ class _researchState extends State<research> {
             Text(
               'ยืนยันการส่งข้อมูล',
               style: TextStyle(
-                  color: Color(0xff149C32),
+                  color: Color(0xff57A946),
                   fontSize: 17,
                   fontWeight: FontWeight.w600),
             ),
@@ -1806,7 +1806,7 @@ class _researchState extends State<research> {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Color(0xff149C32),
+                      backgroundColor: Color(0xff57A946),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -1834,7 +1834,7 @@ class _researchState extends State<research> {
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: Color(0xff149C32))),
+                    color: Color(0xff57A946))),
             SizedBox(
               height: 10,
             ),
@@ -1888,7 +1888,7 @@ class _researchState extends State<research> {
                     decoration: BoxDecoration(
                       color: (groupPic[index].amount_sub_type_true ==
                               groupPic[index].amount_sub_type_all)
-                          ? Color(0xff149C32)
+                          ? Color(0xff57A946)
                           : Color(0xffFFFFFF),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
@@ -2010,13 +2010,13 @@ class _researchState extends State<research> {
             //           width: double.infinity,
             //           decoration: BoxDecoration(
             //             color: (before_taken == total_taken)
-            //                 ? Color(0xff149C32)
+            //                 ? Color(0xff57A946)
             //                 : Colors.white,
             //             borderRadius: BorderRadius.circular(15),
             //             border: Border.all(color: Color(0xffE0ECDE)),
             //             boxShadow: [
             //               BoxShadow(
-            //                 color: Color(0xff149C32).withOpacity(0.1),
+            //                 color: Color(0xff57A946).withOpacity(0.1),
             //                 blurRadius: 10,
             //                 spreadRadius: 0,
             //                 offset: Offset(0, 0), // Shadow position
@@ -2132,13 +2132,13 @@ class _researchState extends State<research> {
             //           width: double.infinity,
             //           decoration: BoxDecoration(
             //             color: (after_taken == total_taken)
-            //                 ? Color(0xff149C32)
+            //                 ? Color(0xff57A946)
             //                 : Colors.white,
             //             borderRadius: BorderRadius.circular(15),
             //             border: Border.all(color: Color(0xffE0ECDE)),
             //             boxShadow: [
             //               BoxShadow(
-            //                 color: Color(0xff149C32).withOpacity(0.1),
+            //                 color: Color(0xff57A946).withOpacity(0.1),
             //                 blurRadius: 10,
             //                 spreadRadius: 0,
             //                 offset: Offset(0, 0), // Shadow position
@@ -2242,7 +2242,7 @@ class _researchState extends State<research> {
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
-                    color: Color(0xff149C32))),
+                    color: Color(0xff57A946))),
             SizedBox(
               height: 10,
             ),
@@ -2502,7 +2502,7 @@ class _researchState extends State<research> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 19,
-                                    color: Color(0xff149C32))),
+                                    color: Color(0xff57A946))),
                           ],
                         ),
                       ),
@@ -2515,7 +2515,7 @@ class _researchState extends State<research> {
                         decoration: BoxDecoration(
                           color: Color(0xffF8F8F8),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xff149C32)),
+                          border: Border.all(color: Color(0xff57A946)),
                         ),
                         child: TextField(
                           controller: putname,
@@ -2558,7 +2558,7 @@ class _researchState extends State<research> {
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Color(0xff149C32),
+                              backgroundColor: Color(0xff57A946),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -2629,7 +2629,7 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_cont_name: json['j_cont_name'],
+      j_cont_name: '${json['j_cont_fname']} ${json['j_cont_lname']}',
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
     );
