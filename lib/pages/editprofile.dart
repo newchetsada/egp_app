@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 
 class editprofile extends StatefulWidget {
@@ -10,68 +14,108 @@ class editprofile extends StatefulWidget {
   _editprofileState createState() => _editprofileState();
 
   final int? id;
-  final String fullname;
+  final String fname;
+  final String lname;
   final String email;
   final String tel;
   final String line;
   final String position;
   final String companame;
   final String userName;
+  final String pic;
   editprofile(
       {required this.id,
-      required this.fullname,
+      required this.fname,
+      required this.lname,
       required this.email,
       required this.tel,
       required this.line,
       required this.position,
       required this.companame,
-      required this.userName});
+      required this.userName,
+      required this.pic});
 }
 
 class _editprofileState extends State<editprofile> {
-  var fullname = TextEditingController();
+  final ImagePicker imgpicker = ImagePicker();
+  File? _pickedImage;
+  var fname = TextEditingController();
+  var lname = TextEditingController();
   var email = TextEditingController();
   var tel = TextEditingController();
   var line = TextEditingController();
   var position = TextEditingController();
   var companame = TextEditingController();
 
-  updateProfile() async {
-    List _body = [
-      {
-        'techId': widget.id,
-        'userName': widget.userName,
-        'fullName': fullname.text,
-        'email': email.text,
-        'tel': tel.text,
-        'line': line.text,
-        'position': position.text,
-        'company': companame.text,
-        'activeFlag': 0
+  openCamera() async {
+    try {
+      var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
+      if (pickedfile != null) {
+        return pickedfile;
+      } else {
+        print("No image is selected.");
       }
-    ];
-
-    var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/master/updateTechnician'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-        },
-        body: json.encode(_body));
-    print(response.statusCode);
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse;
+    } catch (e) {
+      print("error while picking file.");
     }
+  }
+
+  openPhoto() async {
+    try {
+      var pickedfile = await imgpicker.pickImage(
+          source: ImageSource.gallery,
+          maxHeight: 480,
+          maxWidth: 640,
+          imageQuality: 50);
+      if (pickedfile != null) {
+        return pickedfile;
+      } else {
+        print("No image is selected.");
+      }
+    } catch (e) {
+      print("error while picking file.");
+    }
+  }
+
+  updatePro(File? image) async {
+    var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://backoffice.energygreenplus.co.th/api/master/updateTechnician'));
+    request.headers['X-API-Key'] = 'evdplusm8DdW+Wd3UCweHj';
+    request.fields['techId'] = widget.id.toString();
+    request.fields['userName'] = widget.userName;
+    request.fields['fname'] = fname.text;
+    request.fields['lname'] = lname.text;
+    request.fields['email'] = email.text;
+    request.fields['tel'] = tel.text;
+    request.fields['line'] = line.text;
+    request.fields['position'] = position.text;
+    request.fields['company'] = companame.text;
+    request.fields['activeFlag'] = '0';
+    request.fields['filesName'] =
+        (image == null) ? '' : image.path.split('/').last;
+    if (image != null) {
+      request.files.add(http.MultipartFile.fromBytes(
+          'files', image.readAsBytesSync(),
+          filename: image.path.split('/').last));
+    }
+
+    var response = await request.send();
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    // print(response.body);
+    // return response.body;
   }
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      fullname.text = widget.fullname;
+      fname.text = widget.fname;
+      lname.text = widget.lname;
       email.text = widget.email;
       tel.text = widget.tel;
       line.text = widget.line;
@@ -152,7 +196,7 @@ class _editprofileState extends State<editprofile> {
                   child: ElevatedButton(
                     onPressed: () {
                       loading();
-                      updateProfile().then((value) {
+                      updatePro(_pickedImage).then((value) {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       });
@@ -191,10 +235,89 @@ class _editprofileState extends State<editprofile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    CupertinoIcons.person_alt_circle,
-                    size: 130,
-                    color: Color(0xff57A946).withOpacity(0.5),
+                  GestureDetector(
+                    onTap: () {
+                      showAdaptiveActionSheet(
+                        context: context,
+                        // title: const Text('Title'),
+                        actions: <BottomSheetAction>[
+                          BottomSheetAction(
+                            title: Text(
+                              'Camera',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontFamily: 'Noto Sans Thai',
+                              ),
+                            ),
+                            onPressed: (context) {
+                              openCamera().then((value) {
+                                setState(() {
+                                  if (value != null) {
+                                    _pickedImage = File(value.path);
+                                  }
+                                  // desLs_before[index].j_img_name = value.path;
+                                });
+                              });
+                              Navigator.pop(context);
+                            },
+                          ),
+                          BottomSheetAction(
+                              title: Text(
+                                'Photos',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Noto Sans Thai',
+                                ),
+                              ),
+                              onPressed: (context) {
+                                openPhoto().then((value) {
+                                  setState(() {
+                                    if (value != null) {
+                                      _pickedImage = File(value.path);
+                                    }
+                                    // desLs_before[index].j_img_name = value.path;
+                                  });
+                                });
+
+                                Navigator.pop(context);
+                              }),
+                        ],
+                        cancelAction: CancelAction(
+                            title: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'Noto Sans Thai',
+                          ),
+                        )),
+                      );
+                    },
+                    child: SizedBox(
+                        height: 130,
+                        width: 130,
+                        child: _pickedImage == null
+                            ? (widget.pic.isEmpty)
+                                ? Icon(
+                                    CupertinoIcons.person_alt_circle,
+                                    size: 130,
+                                    color: Color(0xff57A946).withOpacity(0.5),
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: Image.network(
+                                        fit: BoxFit.cover,
+                                        height: double.infinity,
+                                        width: double.infinity,
+                                        'https://backoffice.energygreenplus.co.th/${widget.pic}'),
+                                  )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: Image.file(
+                                    fit: BoxFit.cover,
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                    _pickedImage!),
+                              )),
                   ),
                 ],
               ),
@@ -213,7 +336,7 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
-                controller: fullname,
+                controller: fname,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
                     enabledBorder: myinputborder(),
@@ -234,7 +357,7 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
-                controller: fullname,
+                controller: lname,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
                     enabledBorder: myinputborder(),
@@ -277,6 +400,10 @@ class _editprofileState extends State<editprofile> {
               ),
               TextField(
                 controller: tel,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Only numbers can be entered
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
                     enabledBorder: myinputborder(),

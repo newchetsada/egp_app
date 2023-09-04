@@ -3,36 +3,45 @@ import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class groupresearch extends StatefulWidget {
+class acaudit extends StatefulWidget {
   @override
-  _groupresearchState createState() => _groupresearchState();
+  _acauditState createState() => _acauditState();
 
   final int jidx;
   final int typeId;
   final String typeName;
   final int status;
+  final int group;
 
-  groupresearch(
+  acaudit(
       {required this.jidx,
       required this.typeId,
       required this.typeName,
-      required this.status});
+      required this.status,
+      required this.group});
 }
 
-class _groupresearchState extends State<groupresearch> {
+class _acauditState extends State<acaudit> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
   var groupSub = <SubLs>[];
   String pathPic = 'https://backoffice.energygreenplus.co.th/';
   var pic = <Album>[];
   var remark = TextEditingController();
+  var av = TextEditingController();
   List deleteLs = [];
+  int? pass;
+  String? _selectedValue;
+  List brandls = ['V', 'A', 'Ohm', 'W/m2'];
 
   String userName = "Loading...";
   int? iduser;
@@ -55,10 +64,13 @@ class _groupresearchState extends State<groupresearch> {
         // return pickedfiles;
         for (var i = 0; i < pickedfiles.length; i++) {
           pic.add(Album(
-              j_img_id: 0,
+              j_img_check_id: 0,
               j_img_name: pickedfiles[i].path,
               onApi: 0,
-              remark: ''));
+              remark: '',
+              check: 0,
+              measured_value: null,
+              sub_type_unit: null));
         }
         // setState(() {});
       } else {
@@ -69,6 +81,46 @@ class _groupresearchState extends State<groupresearch> {
     }
   }
 
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
+  }
+
   openCamera() async {
     try {
       var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
@@ -76,7 +128,13 @@ class _groupresearchState extends State<groupresearch> {
       if (pickedfile != null) {
         // return pickedfile;
         pic.add(Album(
-            j_img_id: 0, j_img_name: pickedfile.path, onApi: 0, remark: ''));
+            j_img_check_id: 0,
+            j_img_name: pickedfile.path,
+            onApi: 0,
+            remark: '',
+            check: 0,
+            measured_value: null,
+            sub_type_unit: null));
 
         // setState(() {});
 
@@ -113,19 +171,19 @@ class _groupresearchState extends State<groupresearch> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklist'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
     request.fields['jidx'] = widget.jidx.toString();
-    request.fields['imgType'] = '0';
     request.fields['typeId'] = widget.typeId.toString();
     request.fields['subTypeId'] = sub;
-    request.fields['imgDesId'] = '';
-    request.fields['groupNo'] = '1';
+    request.fields['groupNo'] = widget.group.toString();
     request.fields['remark'] = '';
-    request.fields['accessories'] = '';
     request.fields['sign_name'] = '';
+    request.fields['measuredValue'] = '';
+    request.fields['imgType'] = '0';
+
     request.fields['userName'] = userName;
     request.fields['filesName'] = image.path.split('/').last;
 
@@ -145,13 +203,15 @@ class _groupresearchState extends State<groupresearch> {
   deletePic(id) async {
     var response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobImage'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/deleteImageChecklist'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(<dynamic, dynamic>{
-        'jImgId': id,
+        'jidx': widget.jidx,
+        'jImgCheckId': id,
+        'typeId': widget.typeId,
         'userName': userName,
       }),
     );
@@ -165,18 +225,21 @@ class _groupresearchState extends State<groupresearch> {
   updateRemark(id, type, sub, note) async {
     var response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/updateJobDetailInGroup'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklistDetailIn'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(<dynamic, dynamic>{
         'jidx': id,
-        'groupNo': 1,
+        'groupNo': widget.group,
         'imgType': 0,
         'typeId': type,
         'subTypeId': sub,
         'remark': note,
+        'measuredValue': (av.text == '') ? 0.0 : double.parse(av.text),
+        'subTypeUnit': _selectedValue,
+        'check': pass,
         'userName': userName,
       }),
     );
@@ -191,28 +254,14 @@ class _groupresearchState extends State<groupresearch> {
   void initState() {
     super.initState();
     getUser();
-    if (widget.typeId != 13) {
-      API.getSubLs(widget.jidx, widget.typeId).then((response) {
-        setState(() {
-          List list = json.decode(response.body);
-          groupSub = list.map((m) => SubLs.fromJson(m)).toList();
-          // contactloading = false;
-        });
+    API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
+      setState(() {
+        List list = json.decode(response.body);
+        print(list);
+        groupSub = list.map((m) => SubLs.fromJson(m)).toList();
+        // contactloading = false;
       });
-    } else {
-      API.getPicLs(widget.jidx, widget.typeId, null).then((response) {
-        // print(response.body);
-        setState(() {
-          List list = json.decode(response.body);
-          pic = list.map((m) => Album.fromJson(m)).toList();
-          if (pic.isEmpty) {
-            remark.text = '';
-          } else {
-            remark.text = pic[0].remark;
-          }
-        });
-      });
-    }
+    });
   }
 
   loopupload(subid) async {
@@ -241,34 +290,30 @@ class _groupresearchState extends State<groupresearch> {
             ? null
             : Container(
                 // height: 30,
-                color: Colors.white,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white,
+                      blurRadius: 10,
+                      spreadRadius: 10,
+                      offset: Offset(0, -3), // Shadow position
+                    ),
+                  ],
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(
-                            top: 20, bottom: 30, left: 30, right: 30),
+                            bottom: 30, left: 30, right: 30),
                         child: SizedBox(
                           height: 50,
                           // width: 160,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (widget.typeId == 13) {
-                                loading();
-                                loopdelete().then((value) {
-                                  loopupload("").then((value) {
-                                    updateRemark(widget.jidx, widget.typeId,
-                                            null, remark.text)
-                                        .then((value) {
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    });
-                                  });
-                                });
-                              } else {
-                                Navigator.pop(context);
-                              }
+                              Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
@@ -294,7 +339,7 @@ class _groupresearchState extends State<groupresearch> {
               ),
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: 100,
+          toolbarHeight: 60,
           backgroundColor: Color(0xffF8FFF6),
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
@@ -325,52 +370,38 @@ class _groupresearchState extends State<groupresearch> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text(widget.typeName,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Color(0xff2A302C))),
+                      Expanded(
+                        child: Text(widget.typeName,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xff2A302C))),
+                      ),
                     ],
                   ),
                 ),
                 Column(
                   children: [
                     Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(25),
-                              topRight: Radius.circular(25)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffE1F5DC),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: Offset(0, -3), // Shadow position
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 30,
-                            right: 30,
-                            top: 20,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                widget.typeName,
-                                style: TextStyle(
-                                    color: Color(0xff9DC75B),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                        )),
-                    Container(
                       height: 15,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffE1F5DC),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            offset: Offset(0, -3), // Shadow position
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 10,
                       decoration: BoxDecoration(
                         color: Colors.white,
 
@@ -390,358 +421,121 @@ class _groupresearchState extends State<groupresearch> {
             )),
           ),
         ),
-        body: (widget.typeId == 13)
-            ? ListView(
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                children: [
-                  GridView.count(
-                      shrinkWrap: true,
-                      childAspectRatio: 1.15,
-                      primary: false,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      crossAxisCount: 2,
-                      children: (widget.status == 3)
-                          ? List.generate(pic.length, (index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  // (pic[index].onApi == 1)
-                                  //     ? popPicApi(pic[index].j_img_name)
-                                  //     : popPicPre(pic[index].j_img_name);
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(13),
-                                  child: (pic[index].onApi == 1)
-                                      ? Image.network(
-                                          '$pathPic${pic[index].j_img_name}', // this image doesn't exist
-                                          fit: BoxFit.cover,
-                                          height: double.infinity,
-                                          width: double.infinity,
-
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Center(
-                                              child: Icon(
-                                                Icons.error_outline_rounded,
-                                                size: 40,
-                                                color: Colors.grey
-                                                    .withOpacity(0.3),
-                                              ),
-                                            );
-                                          },
-                                          loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent?
-                                                  loadingProgress) {
-                                            if (loadingProgress == null) {
-                                              return child;
-                                            }
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.green,
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
-                                              ),
-                                            );
-                                          },
-                                        )
-                                      : Image.file(
-                                          File(pic[index].j_img_name),
-                                          fit: BoxFit.cover,
-                                          height: double.infinity,
-                                          width: double.infinity,
-                                        ),
-                                ),
-                              );
-                            })
-                          : List.generate(pic.length + 1, (index) {
-                              if (index > pic.length - 1) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    showAdaptiveActionSheet(
-                                      context: context,
-                                      // title: const Text('Title'),
-                                      actions: <BottomSheetAction>[
-                                        BottomSheetAction(
-                                          title: Text('Camera'),
-                                          onPressed: (context) {
-                                            openCamera().then((value) {
-                                              setState(() {});
-                                            });
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                        BottomSheetAction(
-                                            title: Text('Photos'),
-                                            onPressed: (context) {
-                                              openImages().then((value) {
-                                                setState(() {});
-                                              });
-                                              Navigator.pop(context);
-                                            }),
-                                      ],
-                                      cancelAction:
-                                          CancelAction(title: Text('Cancel')),
-                                    );
-                                  },
-                                  child: Container(
-                                    // height: 20,
-                                    // width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xffffffff),
-                                      borderRadius: BorderRadius.circular(15),
-                                      border:
-                                          Border.all(color: Color(0xff9DC75B)),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Color(0xffD6EFB4),
-                                        size: 60,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return GestureDetector(
-                                  onTap: () {
-                                    // (pic[index].onApi == 1)
-                                    //     ? popPicApi(pic[index].j_img_name)
-                                    //     : popPicPre(pic[index].j_img_name);
-                                  },
-                                  child: Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(13),
-                                        child: (pic[index].onApi == 1)
-                                            ? Image.network(
-                                                '$pathPic${pic[index].j_img_name}', // this image doesn't exist
-                                                fit: BoxFit.cover,
-                                                height: double.infinity,
-                                                width: double.infinity,
-
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return Center(
-                                                    child: Icon(
-                                                      Icons
-                                                          .error_outline_rounded,
-                                                      size: 40,
-                                                      color: Colors.grey
-                                                          .withOpacity(0.3),
-                                                    ),
-                                                  );
-                                                },
-                                                loadingBuilder:
-                                                    (BuildContext context,
-                                                        Widget child,
-                                                        ImageChunkEvent?
-                                                            loadingProgress) {
-                                                  if (loadingProgress == null) {
-                                                    return child;
-                                                  }
-                                                  return Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      color: Colors.green,
-                                                      value: loadingProgress
-                                                                  .expectedTotalBytes !=
-                                                              null
-                                                          ? loadingProgress
-                                                                  .cumulativeBytesLoaded /
-                                                              loadingProgress
-                                                                  .expectedTotalBytes!
-                                                          : null,
-                                                    ),
-                                                  );
-                                                },
-                                              )
-                                            : Image.file(
-                                                File(pic[index].j_img_name),
-                                                fit: BoxFit.cover,
-                                                height: double.infinity,
-                                                width: double.infinity,
-                                              ),
-                                      ),
-                                      Column(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Text(
+                widget.typeName,
+                style: TextStyle(
+                    color: Color(0xff9DC75B),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: groupSub.length,
+                  padding: EdgeInsets.only(bottom: 20),
+                  itemBuilder: ((context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      child: GestureDetector(
+                          onTap: () {
+                            loading();
+                            API
+                                .getPicLs(widget.jidx, widget.typeId,
+                                    groupSub[index].sub_type_id, widget.group)
+                                .then((response) {
+                              print(response.body);
+                              setState(() {
+                                List list = json.decode(response.body);
+                                pic =
+                                    list.map((m) => Album.fromJson(m)).toList();
+                                if (pic.isEmpty) {
+                                  remark.text = '';
+                                  pass = null;
+                                  _selectedValue = null;
+                                  av.text = '';
+                                } else {
+                                  remark.text = pic[0].remark;
+                                  pass = pic[0].check;
+                                  _selectedValue = pic[0].sub_type_unit;
+                                  av.text = (pic[0].measured_value == null)
+                                      ? ''
+                                      : pic[0].measured_value.toString();
+                                }
+                              });
+                              Navigator.pop(context);
+                              addSheet(groupSub[index].sub_type_name,
+                                  groupSub[index].sub_type_id);
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Container(
+                              height: 70,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                    color: Color(0xff9DC75B), width: 0.5),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    if (pic[index].onApi == 1) {
-                                                      deleteLs.add(
-                                                          pic[index].j_img_id);
-                                                      pic.removeAt(index);
-                                                    } else {
-                                                      pic.removeAt(index);
-                                                    }
-                                                  });
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: Container(
-                                                    height: 25,
-                                                    width: 25,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(200),
-                                                      ),
-                                                      color: Colors.white
-                                                          .withOpacity(0.7),
-                                                    ),
-                                                    child: Center(
-                                                        child: Icon(
-                                                      Icons.close_rounded,
-                                                      size: 20,
-                                                      color: Colors.grey,
-                                                    )),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                          Text(
+                                            groupSub[index].sub_type_name,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: Color(0xff57A946),
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15),
                                           ),
-                                          // Text(index.toString()),
-                                          // Text('${pic[index].j_img_id}')
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            'รูปทั้งหมด  ${groupSub[index].amount_pic}',
+                                            style: TextStyle(
+                                                color: Color(0xff9DC75B),
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12),
+                                          ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            })),
-                  Row(
-                    children: [
-                      Text('หมายเหตุ',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 15,
-                              color: Color(0xff9DC75B))),
-                    ],
-                  ),
-                  Container(
-                    // height: 100,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Color(0xffAED76E)),
-                    ),
-                    child: TextField(
-                      controller: remark,
-                      // textInputAction: TextInputAction.done,
-                      readOnly: (widget.status == 3) ? true : false,
-                      keyboardType: TextInputType.multiline,
-                      minLines: 2,
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                        hintStyle: TextStyle(
-                            color: Color(0xffAED76E),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10),
-                      ),
-                    ),
-                  )
-                ],
-              )
-            : ListView.builder(
-                itemCount: groupSub.length,
-                itemBuilder: ((context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: GestureDetector(
-                        onTap: () {
-                          loading();
-                          API
-                              .getPicLs(widget.jidx, widget.typeId,
-                                  groupSub[index].sub_type_id)
-                              .then((response) {
-                            // print(response.body);
-                            setState(() {
-                              List list = json.decode(response.body);
-                              pic = list.map((m) => Album.fromJson(m)).toList();
-                              if (pic.isEmpty) {
-                                remark.text = '';
-                              } else {
-                                remark.text = pic[0].remark;
-                              }
-                            });
-                            Navigator.pop(context);
-                            addSheet(groupSub[index].sub_type_name,
-                                groupSub[index].sub_type_id);
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Container(
-                            height: 70,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                  color: Color(0xff9DC75B), width: 0.5),
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          groupSub[index].sub_type_name,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              color: Color(0xff57A946),
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 15),
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          'รูปทั้งหมด  ${groupSub[index].amount_pic}',
-                                          style: TextStyle(
-                                              color: Color(0xff9DC75B),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12),
-                                        ),
-                                      ],
                                     ),
-                                  ),
-                                  Icon(
-                                    EvaIcons.checkmarkCircle2,
-                                    size: 30,
-                                    color: (groupSub[index].amount_pic > 0)
-                                        ? Color(0xffABD06F)
-                                        : Color.fromARGB(255, 211, 211, 211),
-                                  ),
-                                ],
+                                    Icon(
+                                      EvaIcons.checkmarkCircle2,
+                                      size: 30,
+                                      color: (groupSub[index].amount_pic > 0)
+                                          ? Color(0xffABD06F)
+                                          : Color.fromARGB(255, 211, 211, 211),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        )),
-                  );
-                })));
+                          )),
+                    );
+                  })),
+            ),
+          ],
+        ));
   }
 
   void addSheet(title, subb) {
@@ -770,17 +564,228 @@ class _groupresearchState extends State<groupresearch> {
                   child: SingleChildScrollView(
                     reverse: true,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        Text(title,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Color(0xff149C32))),
+                        SizedBox(
+                          height: 10,
+                        ),
                         Row(
                           children: [
-                            Text(title,
+                            Text('ระบุ A/V',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 15,
-                                    color: Color(0xff149C32))),
+                                    color: Color(0xff9DC75B))),
                           ],
                         ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                height: 50,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Color(0xffffffff),
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                ),
+                                child: TextField(
+                                  // textInputAction: TextInputAction.done,
+                                  controller: av,
+                                  readOnly: (widget.status == 3) ? true : false,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                    decimal: true,
+                                    signed: false,
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^[0-9]+.?[0-9]*'))
+                                  ],
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(fontSize: 14),
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.all(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Container(
+                              height: 50,
+                              width: 90,
+                              padding: EdgeInsets.only(left: 10, right: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Color(0xffAED76E)),
+                              ),
+                              child: (widget.status == 3)
+                                  ? Center(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 5),
+                                        child: Text(
+                                          '$_selectedValue',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: Color(0xff9DC75B)),
+                                        ),
+                                      ),
+                                    )
+                                  : DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        alignment: AlignmentDirectional.center,
+                                        hint: Text(
+                                          "หน่วย",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: Color(0xff9DC75B)),
+                                        ),
+                                        icon: Icon(
+                                            Icons.keyboard_arrow_down_rounded,
+                                            size: 20,
+                                            color: Color(0xff9DC75B)),
+                                        items: brandls.map((value) {
+                                          return DropdownMenuItem(
+                                            value: value,
+                                            child: Text(
+                                              value,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9DC75B)),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (newvalue) {
+                                          mystate(() {
+                                            _selectedValue =
+                                                newvalue.toString();
+                                          });
+                                        },
+                                        value: _selectedValue,
+                                      ),
+                                    ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        GestureDetector(
+                          onTap: (widget.status == 3)
+                              ? null
+                              : () {
+                                  mystate(() {
+                                    pass = 0;
+                                  });
+                                },
+                          child: Row(
+                            children: [
+                              Icon(
+                                (pass == 0)
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                color: Color(0xff9DC75B),
+                                size: 25,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Text('ผ่าน',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: Color(0xff464646))),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        GestureDetector(
+                          onTap: (widget.status == 3)
+                              ? null
+                              : () {
+                                  mystate(() {
+                                    pass = 1;
+                                  });
+                                },
+                          child: Row(
+                            children: [
+                              Icon(
+                                (pass == 1)
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_off,
+                                color: Color(0xff9DC75B),
+                                size: 25,
+                              ),
+                              SizedBox(
+                                width: 15,
+                              ),
+                              Text('ไม่ผ่าน',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: Color(0xff464646))),
+                            ],
+                          ),
+                        ),
+                        (subb == 45 ||
+                                subb == 46 ||
+                                subb == 47 ||
+                                subb == 48 ||
+                                subb == 49 ||
+                                subb == 50 ||
+                                subb == 71 ||
+                                subb == 72 ||
+                                subb == 73)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    mystate(() {
+                                      pass = 2;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        (pass == 2)
+                                            ? Icons.radio_button_checked
+                                            : Icons.radio_button_off,
+                                        color: Color(0xff9DC75B),
+                                        size: 25,
+                                      ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text('ไม่มี',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 15,
+                                              color: Color(0xff464646))),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text('เพิ่มรูปภาพ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                                color: Color(0xff464646))),
                         Padding(
                             padding: const EdgeInsets.only(top: 10, bottom: 10),
                             child: GridView.count(
@@ -1005,7 +1010,7 @@ class _groupresearchState extends State<groupresearch> {
                                                                     1) {
                                                                   deleteLs.add(pic[
                                                                           index]
-                                                                      .j_img_id);
+                                                                      .j_img_check_id);
                                                                   pic.removeAt(
                                                                       index);
                                                                 } else {
@@ -1153,20 +1158,27 @@ class _groupresearchState extends State<groupresearch> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // Navigator.pop(context);
-                                      loading();
-                                      loopdelete().then((value) {
-                                        loopupload(subb).then((value) {
-                                          updateRemark(
-                                                  widget.jidx,
-                                                  widget.typeId,
-                                                  subb,
-                                                  remark.text)
-                                              .then((value) {
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
+                                      if (av.text == '' ||
+                                          _selectedValue == null ||
+                                          pass == null ||
+                                          pic.isEmpty) {
+                                        pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
+                                      } else {
+                                        loading();
+                                        loopdelete().then((value) {
+                                          loopupload(subb).then((value) {
+                                            updateRemark(
+                                                    widget.jidx,
+                                                    widget.typeId,
+                                                    subb,
+                                                    remark.text)
+                                                .then((value) {
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                            });
                                           });
                                         });
-                                      });
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,
@@ -1194,7 +1206,7 @@ class _groupresearchState extends State<groupresearch> {
           });
         }).then((value) {
       setState(() {
-        API.getSubLs(widget.jidx, widget.typeId).then((response) {
+        API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
           setState(() {
             List list = json.decode(response.body);
             groupSub = list.map((m) => SubLs.fromJson(m)).toList();
@@ -1208,30 +1220,31 @@ class _groupresearchState extends State<groupresearch> {
 
 //api
 class API {
-  static Future getSubLs(idd, type) async {
+  static Future getSubLs(idd, type, group) async {
     final response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupSurveyImageLs'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupAuditImageLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
-      body: jsonEncode(<dynamic, dynamic>{'jidx': idd, 'typeId': type}),
+      body: jsonEncode(
+          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'groupNo': group}),
     );
     return response;
   }
 
-  static Future getPicLs(idd, type, sub) async {
+  static Future getPicLs(idd, type, sub, group) async {
     final response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(<dynamic, dynamic>{
         'jidx': idd,
-        'groupNo': 1,
+        'groupNo': group,
         'imgType': 0,
         'typeId': type,
         'subTypeId': sub
@@ -1262,26 +1275,34 @@ class SubLs {
 }
 
 class Album {
-  final int j_img_id;
+  final int j_img_check_id;
   final String j_img_name;
   final int onApi;
   final String remark;
+  final int? check;
+  final double? measured_value;
+  final String? sub_type_unit;
 
   const Album(
-      {required this.j_img_id,
+      {required this.j_img_check_id,
       required this.j_img_name,
       required this.onApi,
-      required this.remark});
+      required this.remark,
+      required this.check,
+      required this.measured_value,
+      required this.sub_type_unit});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_img_id: json['j_img_id'],
-      j_img_name:
-          (json['j_img_name'].toString() == 'null') ? "" : json['j_img_name'],
-      onApi: 1,
-      remark: (json['j_img_remark'].toString() == 'null')
-          ? ""
-          : json['j_img_remark'],
-    );
+        j_img_check_id: json['j_img_check_id'],
+        j_img_name:
+            (json['j_img_name'].toString() == 'null') ? "" : json['j_img_name'],
+        onApi: 1,
+        remark: (json['j_img_remark'].toString() == 'null')
+            ? ""
+            : json['j_img_remark'],
+        check: json['check'],
+        measured_value: json['measured_value'],
+        sub_type_unit: json['sub_type_unit']);
   }
 }

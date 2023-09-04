@@ -2608,7 +2608,7 @@ class _repairState extends State<repair> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 19,
-                                    color: Color(0xff57A946))),
+                                    color: Color(0xffAED76E))),
                           ],
                         ),
                       ),
@@ -2621,7 +2621,7 @@ class _repairState extends State<repair> {
                         decoration: BoxDecoration(
                           color: Color(0xffF8F8F8),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Color(0xff57A946)),
+                          border: Border.all(color: Color(0xffAED76E)),
                         ),
                         child: TextField(
                           controller: putname,
@@ -2664,7 +2664,8 @@ class _repairState extends State<repair> {
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: Color(0xff57A946),
+                              shadowColor: Colors.white,
+                              backgroundColor: Color(0xffAED76E),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -2672,7 +2673,9 @@ class _repairState extends State<repair> {
                             child: Text(
                               'บันทึก',
                               style: TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w600),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xff2A302C)),
                             ),
                           ),
                         ),

@@ -53,9 +53,9 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Need to upload image</string>
+	<string>EGP+ need access to your photo library to select photo for upload picture.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Need to upload image</string>
+	<string>EGP+ need access to your camera to select photo for upload picture.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need to upload image</string>
 </dict>

@@ -35,7 +35,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
   bool nothavedevice = false;
   bool nothavedevice_f = false;
   String detail = '';
-  String _selectedValue = 'กรุณาเลือก';
+  String? _selectedValue;
   String gg = '';
   var before_note = TextEditingController();
   var after_note = TextEditingController();
@@ -47,6 +47,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
   String userName = "Loading...";
   int? iduser;
   bool lsloading = true;
+  List? brandls;
 
   openCamera() async {
     try {
@@ -75,6 +76,26 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
       }
     } catch (e) {
       print("error while picking file.");
+    }
+  }
+
+  getBrandLs() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{}),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      setState(() {
+        brandls = jsonResponse;
+      });
+      print(jsonResponse);
+      return jsonResponse;
     }
   }
 
@@ -281,10 +302,51 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
     }
   }
 
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
     getUser();
+    getBrandLs();
     setState(() {
       typeName = (widget.type_id == 1)
           ? 'PV (แผงโซล่าเซลล์)'
@@ -642,7 +704,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
           // beforeSheet(null);
           loading();
           setState(() {
-            _selectedValue = 'กรุณาเลือก';
+            _selectedValue = null;
             detail = '';
             before_note.text = '';
             after_note.text = '';
@@ -740,7 +802,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
       onTap: () {
         loading();
         setState(() {
-          _selectedValue = 'กรุณาเลือก';
+          _selectedValue = null;
           detail = '';
           before_note.text = '';
           after_note.text = '';
@@ -1086,27 +1148,6 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
           ),
         ),
         builder: (BuildContext context) {
-          // bool nothavedevice = false;
-          // // String detail = 'แผงแตก';
-          // String _selectedValue = 'Solar Edga';
-          List<DropdownMenuItem<String>> items = [
-            'กรุณาเลือก',
-            'Solar Edga',
-            'Huawei',
-            'SMA',
-          ].map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xff9DC75B)),
-              ),
-            );
-          }).toList();
-
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter mystate) {
             return SafeArea(
@@ -1177,15 +1218,36 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                           ),
                                           child: DropdownButtonHideUnderline(
                                             child: DropdownButton(
+                                              hint: Text(
+                                                "เลือกแบรนด์",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                    color: Color(0xff9DC75B)),
+                                              ),
                                               icon: Icon(
                                                   Icons
                                                       .keyboard_arrow_down_rounded,
                                                   size: 20,
                                                   color: Color(0xff9DC75B)),
-                                              items: items,
-                                              onChanged: (value) {
+                                              items: brandls?.map((value) {
+                                                return DropdownMenuItem(
+                                                  value:
+                                                      value['brand'].toString(),
+                                                  child: Text(
+                                                    value['brand'].toString(),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff9DC75B)),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (newvalue) {
                                                 mystate(() {
-                                                  _selectedValue = value!;
+                                                  _selectedValue = newvalue;
                                                 });
                                               },
                                               value: _selectedValue,
@@ -1892,166 +1954,391 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                             crossAxisCount: 2,
-                            children: List.generate(
-                                (desLs_after.last.j_img_name.isNotEmpty)
-                                    ? desLs_after.length + 1
-                                    : desLs_after.length, (index) {
-                              if (index > desLs_after.length - 1 &&
-                                  desLs_after.last.j_img_name.isNotEmpty) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    (nothavedevice == true)
-                                        ? null
-                                        : showAdaptiveActionSheet(
-                                            context: context,
-                                            // title: const Text('Title'),
-                                            actions: <BottomSheetAction>[
-                                              BottomSheetAction(
-                                                title: Text('Camera'),
-                                                onPressed: (context) {
-                                                  openCamera().then((value) {
-                                                    mystate(() {
-                                                      desLs_after.add(Descript(
-                                                          j_img_id: 0,
-                                                          j_img_name:
-                                                              value.path,
-                                                          onApi: 0,
-                                                          group_no: null,
-                                                          img_des_id: 8,
-                                                          img_description:
-                                                              'ภาพจุดแก้ไข',
-                                                          j_img_accessories:
-                                                              null,
-                                                          j_img_remark: '',
-                                                          j_img_type: 1,
-                                                          type_id: null));
-                                                    });
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
+                            children: (widget.status == 3)
+                                ? List.generate(desLs_after.length, (index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        (widget.status == 3)
+                                            ? null
+                                            : (nothavedevice == true)
+                                                ? null
+                                                : (desLs_after[index]
+                                                        .j_img_name
+                                                        .isEmpty)
+                                                    ? showAdaptiveActionSheet(
+                                                        context: context,
+                                                        // title: const Text('Title'),
+                                                        actions: <BottomSheetAction>[
+                                                          BottomSheetAction(
+                                                            title:
+                                                                Text('Camera'),
+                                                            onPressed:
+                                                                (context) {
+                                                              openCamera().then(
+                                                                  (value) {
+                                                                mystate(() {
+                                                                  desLs_after.add(Descript(
+                                                                      j_img_id:
+                                                                          0,
+                                                                      j_img_name:
+                                                                          value
+                                                                              .path,
+                                                                      onApi: 0,
+                                                                      group_no:
+                                                                          null,
+                                                                      img_des_id:
+                                                                          8,
+                                                                      img_description:
+                                                                          'ภาพจุดที่แก้ไข',
+                                                                      j_img_accessories:
+                                                                          null,
+                                                                      j_img_remark:
+                                                                          '',
+                                                                      j_img_type:
+                                                                          1,
+                                                                      type_id:
+                                                                          null));
+                                                                });
+                                                              });
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ),
+                                                          BottomSheetAction(
+                                                              title: Text(
+                                                                  'Photos'),
+                                                              onPressed:
+                                                                  (context) {
+                                                                openPhoto().then(
+                                                                    (value) {
+                                                                  mystate(() {
+                                                                    desLs_after.insert(
+                                                                        0,
+                                                                        Descript(
+                                                                            j_img_id:
+                                                                                0,
+                                                                            j_img_name: value
+                                                                                .path,
+                                                                            onApi:
+                                                                                0,
+                                                                            group_no:
+                                                                                null,
+                                                                            img_des_id:
+                                                                                8,
+                                                                            img_description:
+                                                                                'ภาพจุดที่แก้ไข',
+                                                                            j_img_accessories:
+                                                                                null,
+                                                                            j_img_remark:
+                                                                                '',
+                                                                            j_img_type:
+                                                                                1,
+                                                                            type_id:
+                                                                                null));
+                                                                  });
+                                                                });
+
+                                                                Navigator.pop(
+                                                                    context);
+                                                              }),
+                                                        ],
+                                                        cancelAction:
+                                                            CancelAction(
+                                                                title: Text(
+                                                                    'Cancel')),
+                                                      )
+                                                    : null;
+                                      },
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                            child: Container(
+                                              decoration: (nothavedevice ==
+                                                      true)
+                                                  ? BoxDecoration(
+                                                      color: Color(0xffffffff),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      border: Border.all(
+                                                          color: Color(
+                                                              0xffD3D3D3)),
+                                                    )
+                                                  : BoxDecoration(
+                                                      color: Color(0xffffffff),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                      border: Border.all(
+                                                          color: (desLs_after[
+                                                                      index]
+                                                                  .j_img_name
+                                                                  .isNotEmpty)
+                                                              ? Colors
+                                                                  .transparent
+                                                              : Color(
+                                                                  0xffAED76E)),
+                                                    ),
+                                              child: Stack(
+                                                children: [
+                                                  ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              13),
+                                                      child:
+                                                          // (pic[index].onApi == 1)
+                                                          //     ?
+                                                          (desLs_after[index]
+                                                                  .j_img_name
+                                                                  .isNotEmpty)
+                                                              ? (desLs_after[index]
+                                                                          .onApi ==
+                                                                      1)
+                                                                  ? Image
+                                                                      .network(
+                                                                      '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      height: double
+                                                                          .infinity,
+                                                                      width: double
+                                                                          .infinity,
+
+                                                                      errorBuilder: (context,
+                                                                          error,
+                                                                          stackTrace) {
+                                                                        return Center(
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.error_outline_rounded,
+                                                                            size:
+                                                                                40,
+                                                                            color:
+                                                                                Colors.grey.withOpacity(0.3),
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                      loadingBuilder: (BuildContext context,
+                                                                          Widget
+                                                                              child,
+                                                                          ImageChunkEvent?
+                                                                              loadingProgress) {
+                                                                        if (loadingProgress ==
+                                                                            null) {
+                                                                          return child;
+                                                                        }
+                                                                        return Center(
+                                                                          child:
+                                                                              CircularProgressIndicator(
+                                                                            color:
+                                                                                Colors.green,
+                                                                            value: loadingProgress.expectedTotalBytes != null
+                                                                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                                                : null,
+                                                                          ),
+                                                                        );
+                                                                      },
+                                                                    )
+                                                                  : Image.file(
+                                                                      File(desLs_after[
+                                                                              index]
+                                                                          .j_img_name),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      height: double
+                                                                          .infinity,
+                                                                      width: double
+                                                                          .infinity,
+                                                                    )
+                                                              : Container()),
+                                                  (desLs_after[index]
+                                                          .j_img_name
+                                                          .isNotEmpty)
+                                                      ? Container()
+                                                      : Center(
+                                                          child: Icon(
+                                                            Icons.add,
+                                                            color: (nothavedevice ==
+                                                                    true)
+                                                                ? Color(
+                                                                    0xffD3D3D3)
+                                                                : Color(
+                                                                    0xffD6EFB4),
+                                                            size: 50,
+                                                          ),
+                                                        ),
+                                                ],
                                               ),
-                                              BottomSheetAction(
-                                                  title: Text('Photos'),
-                                                  onPressed: (context) {
-                                                    openPhoto().then((value) {
-                                                      mystate(() {
-                                                        desLs_after.add(Descript(
-                                                            j_img_id: 0,
-                                                            j_img_name:
-                                                                value.path,
-                                                            onApi: 0,
-                                                            group_no: null,
-                                                            img_des_id: 8,
-                                                            img_description:
-                                                                'ภาพจุดแก้ไข',
-                                                            j_img_accessories:
-                                                                null,
-                                                            j_img_remark: '',
-                                                            j_img_type: 1,
-                                                            type_id: null));
-
-                                                        // desLs_before[index]
-                                                        //         .j_img_name =
-                                                        //     value.path;
-                                                        // desLs_before[index]
-                                                        //     .onApi = 0;
-                                                      });
-                                                    });
-
-                                                    Navigator.pop(context);
-                                                  }),
-                                            ],
-                                            cancelAction: CancelAction(
-                                                title: Text('Cancel')),
-                                          );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          decoration: (nothavedevice == true)
-                                              ? BoxDecoration(
-                                                  color: Color(0xffffffff),
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  border: Border.all(
-                                                      color: Color(0xffD3D3D3)),
-                                                )
-                                              : BoxDecoration(
-                                                  color: Color(0xffffffff),
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  border: Border.all(
-                                                      color: Color(0xffAED76E)),
-                                                ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.add,
-                                              color: (nothavedevice == true)
-                                                  ? Color(0xffD3D3D3)
-                                                  : Color(0xffD6EFB4),
-                                              size: 50,
                                             ),
                                           ),
-                                        ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5),
+                                            child: Text(
+                                                desLs_after[index]
+                                                    .img_description,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 10,
+                                                    color: Color(0xff464646))),
+                                          ),
+                                        ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text('ภาพจุดแก้ไข',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 10,
-                                                color: Color(0xff464646))),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return GestureDetector(
-                                  onTap: () {
-                                    (nothavedevice == true)
-                                        ? null
-                                        : (desLs_after[index]
-                                                .j_img_name
-                                                .isEmpty)
-                                            ? showAdaptiveActionSheet(
-                                                context: context,
-                                                // title: const Text('Title'),
-                                                actions: <BottomSheetAction>[
-                                                  BottomSheetAction(
-                                                    title: Text('Camera'),
-                                                    onPressed: (context) {
-                                                      openCamera()
-                                                          .then((value) {
-                                                        mystate(() {
-                                                          desLs_after.add(Descript(
-                                                              j_img_id: 0,
-                                                              j_img_name:
-                                                                  value.path,
-                                                              onApi: 0,
-                                                              group_no: null,
-                                                              img_des_id: 8,
-                                                              img_description:
-                                                                  'ภาพจุดที่แก้ไข',
-                                                              j_img_accessories:
-                                                                  null,
-                                                              j_img_remark: '',
-                                                              j_img_type: 1,
-                                                              type_id: null));
-                                                        });
-                                                      });
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                  BottomSheetAction(
-                                                      title: Text('Photos'),
+                                    );
+                                  })
+                                : List.generate(
+                                    (desLs_after.last.j_img_name.isNotEmpty)
+                                        ? desLs_after.length + 1
+                                        : desLs_after.length, (index) {
+                                    if (index > desLs_after.length - 1 &&
+                                        desLs_after
+                                            .last.j_img_name.isNotEmpty) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          (nothavedevice == true)
+                                              ? null
+                                              : showAdaptiveActionSheet(
+                                                  context: context,
+                                                  // title: const Text('Title'),
+                                                  actions: <BottomSheetAction>[
+                                                    BottomSheetAction(
+                                                      title: Text('Camera'),
                                                       onPressed: (context) {
-                                                        openPhoto()
+                                                        openCamera()
                                                             .then((value) {
                                                           mystate(() {
-                                                            desLs_after.insert(
-                                                                0,
-                                                                Descript(
+                                                            desLs_after.add(Descript(
+                                                                j_img_id: 0,
+                                                                j_img_name:
+                                                                    value.path,
+                                                                onApi: 0,
+                                                                group_no: null,
+                                                                img_des_id: 8,
+                                                                img_description:
+                                                                    'ภาพจุดแก้ไข',
+                                                                j_img_accessories:
+                                                                    null,
+                                                                j_img_remark:
+                                                                    '',
+                                                                j_img_type: 1,
+                                                                type_id: null));
+                                                          });
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    BottomSheetAction(
+                                                        title: Text('Photos'),
+                                                        onPressed: (context) {
+                                                          openPhoto()
+                                                              .then((value) {
+                                                            mystate(() {
+                                                              desLs_after.add(Descript(
+                                                                  j_img_id: 0,
+                                                                  j_img_name:
+                                                                      value
+                                                                          .path,
+                                                                  onApi: 0,
+                                                                  group_no:
+                                                                      null,
+                                                                  img_des_id: 8,
+                                                                  img_description:
+                                                                      'ภาพจุดแก้ไข',
+                                                                  j_img_accessories:
+                                                                      null,
+                                                                  j_img_remark:
+                                                                      '',
+                                                                  j_img_type: 1,
+                                                                  type_id:
+                                                                      null));
+
+                                                              // desLs_before[index]
+                                                              //         .j_img_name =
+                                                              //     value.path;
+                                                              // desLs_before[index]
+                                                              //     .onApi = 0;
+                                                            });
+                                                          });
+
+                                                          Navigator.pop(
+                                                              context);
+                                                        }),
+                                                  ],
+                                                  cancelAction: CancelAction(
+                                                      title: Text('Cancel')),
+                                                );
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                decoration: (nothavedevice ==
+                                                        true)
+                                                    ? BoxDecoration(
+                                                        color:
+                                                            Color(0xffffffff),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        border: Border.all(
+                                                            color: Color(
+                                                                0xffD3D3D3)),
+                                                      )
+                                                    : BoxDecoration(
+                                                        color:
+                                                            Color(0xffffffff),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        border: Border.all(
+                                                            color: Color(
+                                                                0xffAED76E)),
+                                                      ),
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.add,
+                                                    color:
+                                                        (nothavedevice == true)
+                                                            ? Color(0xffD3D3D3)
+                                                            : Color(0xffD6EFB4),
+                                                    size: 50,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Text('ภาพจุดแก้ไข',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 10,
+                                                      color:
+                                                          Color(0xff464646))),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          (nothavedevice == true)
+                                              ? null
+                                              : (desLs_after[index]
+                                                      .j_img_name
+                                                      .isEmpty)
+                                                  ? showAdaptiveActionSheet(
+                                                      context: context,
+                                                      // title: const Text('Title'),
+                                                      actions: <BottomSheetAction>[
+                                                        BottomSheetAction(
+                                                          title: Text('Camera'),
+                                                          onPressed: (context) {
+                                                            openCamera()
+                                                                .then((value) {
+                                                              mystate(() {
+                                                                desLs_after.add(Descript(
                                                                     j_img_id: 0,
                                                                     j_img_name:
                                                                         value
@@ -2071,217 +2358,260 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                         1,
                                                                     type_id:
                                                                         null));
-                                                          });
-                                                        });
-
-                                                        Navigator.pop(context);
-                                                      }),
-                                                ],
-                                                cancelAction: CancelAction(
-                                                    title: Text('Cancel')),
-                                              )
-                                            : null;
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          decoration: (nothavedevice == true)
-                                              ? BoxDecoration(
-                                                  color: Color(0xffffffff),
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  border: Border.all(
-                                                      color: Color(0xffD3D3D3)),
-                                                )
-                                              : BoxDecoration(
-                                                  color: Color(0xffffffff),
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  border: Border.all(
-                                                      color: (desLs_after[index]
-                                                              .j_img_name
-                                                              .isNotEmpty)
-                                                          ? Colors.transparent
-                                                          : Color(0xffAED76E)),
-                                                ),
-                                          child: Stack(
-                                            children: [
-                                              ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(13),
-                                                  child:
-                                                      // (pic[index].onApi == 1)
-                                                      //     ?
-                                                      (desLs_after[index]
-                                                              .j_img_name
-                                                              .isNotEmpty)
-                                                          ? (desLs_after[index]
-                                                                      .onApi ==
-                                                                  1)
-                                                              ? Image.network(
-                                                                  '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  height: double
-                                                                      .infinity,
-                                                                  width: double
-                                                                      .infinity,
-
-                                                                  errorBuilder:
-                                                                      (context,
-                                                                          error,
-                                                                          stackTrace) {
-                                                                    return Center(
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .error_outline_rounded,
-                                                                        size:
-                                                                            40,
-                                                                        color: Colors
-                                                                            .grey
-                                                                            .withOpacity(0.3),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  loadingBuilder: (BuildContext
-                                                                          context,
-                                                                      Widget
-                                                                          child,
-                                                                      ImageChunkEvent?
-                                                                          loadingProgress) {
-                                                                    if (loadingProgress ==
-                                                                        null) {
-                                                                      return child;
-                                                                    }
-                                                                    return Center(
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        color: Colors
-                                                                            .green,
-                                                                        value: loadingProgress.expectedTotalBytes !=
-                                                                                null
-                                                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                                                loadingProgress.expectedTotalBytes!
-                                                                            : null,
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                )
-                                                              : Image.file(
-                                                                  File(desLs_after[
-                                                                          index]
-                                                                      .j_img_name),
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  height: double
-                                                                      .infinity,
-                                                                  width: double
-                                                                      .infinity,
-                                                                )
-                                                          : Container()),
-                                              (desLs_after[index]
-                                                      .j_img_name
-                                                      .isNotEmpty)
-                                                  ? Column(
-                                                      children: [
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                mystate(() {
-                                                                  // if (desLs_after[index].onApi ==
-                                                                  //     1) {
-                                                                  //   deleteLs.add(desLs_after[index].j_img_id);
-                                                                  //   print(deleteLs);
-                                                                  // }
-                                                                  // desLs_after[index].j_img_name =
-                                                                  //     '';
-
-                                                                  if (desLs_after[
-                                                                              index]
-                                                                          .onApi ==
-                                                                      1) {
-                                                                    deleteLs.add(
-                                                                        desLs_after[index]
-                                                                            .j_img_id);
-                                                                    print(
-                                                                        deleteLs);
-                                                                  }
-                                                                  desLs_after
-                                                                      .removeAt(
-                                                                          index);
-                                                                });
-                                                              },
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(5),
-                                                                child:
-                                                                    Container(
-                                                                  height: 20,
-                                                                  width: 20,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .all(
-                                                                      Radius.circular(
-                                                                          200),
-                                                                    ),
-                                                                    color: Colors
-                                                                        .white
-                                                                        .withOpacity(
-                                                                            0.7),
-                                                                  ),
-                                                                  child: Center(
-                                                                      child:
-                                                                          Icon(
-                                                                    Icons
-                                                                        .close_rounded,
-                                                                    size: 15,
-                                                                    color: Colors
-                                                                        .grey,
-                                                                  )),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                              });
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
                                                         ),
+                                                        BottomSheetAction(
+                                                            title:
+                                                                Text('Photos'),
+                                                            onPressed:
+                                                                (context) {
+                                                              openPhoto().then(
+                                                                  (value) {
+                                                                mystate(() {
+                                                                  desLs_after.insert(
+                                                                      0,
+                                                                      Descript(
+                                                                          j_img_id:
+                                                                              0,
+                                                                          j_img_name: value
+                                                                              .path,
+                                                                          onApi:
+                                                                              0,
+                                                                          group_no:
+                                                                              null,
+                                                                          img_des_id:
+                                                                              8,
+                                                                          img_description:
+                                                                              'ภาพจุดที่แก้ไข',
+                                                                          j_img_accessories:
+                                                                              null,
+                                                                          j_img_remark:
+                                                                              '',
+                                                                          j_img_type:
+                                                                              1,
+                                                                          type_id:
+                                                                              null));
+                                                                });
+                                                              });
+
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }),
                                                       ],
+                                                      cancelAction:
+                                                          CancelAction(
+                                                              title: Text(
+                                                                  'Cancel')),
                                                     )
-                                                  : Center(
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        color: (nothavedevice ==
-                                                                true)
-                                                            ? Color(0xffD3D3D3)
-                                                            : Color(0xffD6EFB4),
-                                                        size: 50,
+                                                  : null;
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                decoration: (nothavedevice ==
+                                                        true)
+                                                    ? BoxDecoration(
+                                                        color:
+                                                            Color(0xffffffff),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        border: Border.all(
+                                                            color: Color(
+                                                                0xffD3D3D3)),
+                                                      )
+                                                    : BoxDecoration(
+                                                        color:
+                                                            Color(0xffffffff),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        border: Border.all(
+                                                            color: (desLs_after[
+                                                                        index]
+                                                                    .j_img_name
+                                                                    .isNotEmpty)
+                                                                ? Colors
+                                                                    .transparent
+                                                                : Color(
+                                                                    0xffAED76E)),
                                                       ),
-                                                    ),
-                                            ],
-                                          ),
+                                                child: Stack(
+                                                  children: [
+                                                    ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(13),
+                                                        child:
+                                                            // (pic[index].onApi == 1)
+                                                            //     ?
+                                                            (desLs_after[index]
+                                                                    .j_img_name
+                                                                    .isNotEmpty)
+                                                                ? (desLs_after[index]
+                                                                            .onApi ==
+                                                                        1)
+                                                                    ? Image
+                                                                        .network(
+                                                                        '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        height:
+                                                                            double.infinity,
+                                                                        width: double
+                                                                            .infinity,
+
+                                                                        errorBuilder: (context,
+                                                                            error,
+                                                                            stackTrace) {
+                                                                          return Center(
+                                                                            child:
+                                                                                Icon(
+                                                                              Icons.error_outline_rounded,
+                                                                              size: 40,
+                                                                              color: Colors.grey.withOpacity(0.3),
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                        loadingBuilder: (BuildContext context,
+                                                                            Widget
+                                                                                child,
+                                                                            ImageChunkEvent?
+                                                                                loadingProgress) {
+                                                                          if (loadingProgress ==
+                                                                              null) {
+                                                                            return child;
+                                                                          }
+                                                                          return Center(
+                                                                            child:
+                                                                                CircularProgressIndicator(
+                                                                              color: Colors.green,
+                                                                              value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                      )
+                                                                    : Image
+                                                                        .file(
+                                                                        File(desLs_after[index]
+                                                                            .j_img_name),
+                                                                        fit: BoxFit
+                                                                            .cover,
+                                                                        height:
+                                                                            double.infinity,
+                                                                        width: double
+                                                                            .infinity,
+                                                                      )
+                                                                : Container()),
+                                                    (desLs_after[index]
+                                                            .j_img_name
+                                                            .isNotEmpty)
+                                                        ? Column(
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .end,
+                                                                children: [
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      mystate(
+                                                                          () {
+                                                                        // if (desLs_after[index].onApi ==
+                                                                        //     1) {
+                                                                        //   deleteLs.add(desLs_after[index].j_img_id);
+                                                                        //   print(deleteLs);
+                                                                        // }
+                                                                        // desLs_after[index].j_img_name =
+                                                                        //     '';
+
+                                                                        if (desLs_after[index].onApi ==
+                                                                            1) {
+                                                                          deleteLs
+                                                                              .add(desLs_after[index].j_img_id);
+                                                                          print(
+                                                                              deleteLs);
+                                                                        }
+                                                                        desLs_after
+                                                                            .removeAt(index);
+                                                                      });
+                                                                    },
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              5),
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            20,
+                                                                        width:
+                                                                            20,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          borderRadius:
+                                                                              BorderRadius.all(
+                                                                            Radius.circular(200),
+                                                                          ),
+                                                                          color: Colors
+                                                                              .white
+                                                                              .withOpacity(0.7),
+                                                                        ),
+                                                                        child: Center(
+                                                                            child: Icon(
+                                                                          Icons
+                                                                              .close_rounded,
+                                                                          size:
+                                                                              15,
+                                                                          color:
+                                                                              Colors.grey,
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : Center(
+                                                            child: Icon(
+                                                              Icons.add,
+                                                              color: (nothavedevice ==
+                                                                      true)
+                                                                  ? Color(
+                                                                      0xffD3D3D3)
+                                                                  : Color(
+                                                                      0xffD6EFB4),
+                                                              size: 50,
+                                                            ),
+                                                          ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Text(
+                                                  desLs_after[index]
+                                                      .img_description,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 10,
+                                                      color:
+                                                          Color(0xff464646))),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text(
-                                            desLs_after[index].img_description,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 10,
-                                                color: Color(0xff464646))),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            })),
+                                      );
+                                    }
+                                  })),
                         SizedBox(
                           height: 10,
                         ),
@@ -2330,22 +2660,31 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       loading();
-                                      loopdelete().then((value) {
-                                        loopupload(group).then((value) {
-                                          loopupload_after(group).then((value) {
-                                            updateRemark(gg, 0,
-                                                    '$_selectedValue||$detail||${before_note.text}')
+                                      print(desLs_before.length);
+                                      if (desLs_before.isEmpty ||
+                                          _selectedValue == null ||
+                                          detail == '') {
+                                        Navigator.pop(context);
+                                        pop('กรุณากรอกข้อมูลและอัพโหลดรูปก่อนซ่อม');
+                                      } else {
+                                        loopdelete().then((value) {
+                                          loopupload(group).then((value) {
+                                            loopupload_after(group)
                                                 .then((value) {
-                                              updateRemark(
-                                                      gg, 1, after_note.text)
+                                              updateRemark(gg, 0,
+                                                      '$_selectedValue||$detail||${before_note.text}')
                                                   .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
+                                                updateRemark(
+                                                        gg, 1, after_note.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
                                               });
                                             });
                                           });
                                         });
-                                      });
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       elevation: 0,

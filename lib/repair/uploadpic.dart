@@ -34,7 +34,7 @@ class _uploadPicState extends State<uploadPic> {
   bool nothavedevice = false;
   bool nothavedevice_f = false;
   String detail = '';
-  String _selectedValue = 'กรุณาเลือก';
+  String? _selectedValue;
   String gg = '';
   var before_note = TextEditingController();
   var after_note = TextEditingController();
@@ -46,6 +46,7 @@ class _uploadPicState extends State<uploadPic> {
   String userName = "Loading...";
   int? iduser;
   bool lsloading = true;
+  List? brandls;
 
   openCamera() async {
     try {
@@ -150,6 +151,26 @@ class _uploadPicState extends State<uploadPic> {
     }
   }
 
+  getBrandLs() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{}),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      setState(() {
+        brandls = jsonResponse;
+      });
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
   uploadPic(File image, imgType, img_des_id, group_no) async {
     var request = http.MultipartRequest(
         'POST',
@@ -224,10 +245,21 @@ class _uploadPicState extends State<uploadPic> {
     }
   }
 
+  checkbefore() async {
+    int haveimg = 0;
+    for (var i = 0; i < desLs_before.length; i++) {
+      if (desLs_before[i].j_img_name.isNotEmpty) {
+        haveimg = haveimg + 1;
+      }
+    }
+    return (haveimg == desLs_before.length) ? true : false;
+  }
+
   loopupload(group_no) async {
     for (var i = 0; i < desLs_before.length; i++) {
       if (desLs_before[i].onApi == 0 && desLs_before[i].j_img_name.isNotEmpty) {
         // print(desLs_before[i].j_img_name);
+
         await uploadPic(File(desLs_before[i].j_img_name),
                 desLs_before[i].j_img_type, desLs_before[i].img_des_id, gg)
             .then((value) {
@@ -324,6 +356,46 @@ class _uploadPicState extends State<uploadPic> {
       //   });
       // });
     });
+  }
+
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
   }
 
   @override
@@ -640,7 +712,7 @@ class _uploadPicState extends State<uploadPic> {
           // beforeSheet(null);
           loading();
           setState(() {
-            _selectedValue = 'กรุณาเลือก';
+            _selectedValue = null;
             detail = '';
             before_note.text = '';
             after_note.text = '';
@@ -665,14 +737,16 @@ class _uploadPicState extends State<uploadPic> {
               }
               // print(desLs_before);
             });
-            API
-                .getDescript(widget.jidx, widget.type_id, null, 1)
-                .then((value_after) {
-              setState(() {
-                List list2 = json.decode(value_after.body);
-                desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
-                Navigator.pop(context);
-                beforeSheet('');
+            getBrandLs().then((val) {
+              API
+                  .getDescript(widget.jidx, widget.type_id, null, 1)
+                  .then((value_after) {
+                setState(() {
+                  List list2 = json.decode(value_after.body);
+                  desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
+                  Navigator.pop(context);
+                  beforeSheet('');
+                });
               });
             });
           });
@@ -727,7 +801,7 @@ class _uploadPicState extends State<uploadPic> {
       onTap: () {
         loading();
         setState(() {
-          _selectedValue = 'กรุณาเลือก';
+          _selectedValue = null;
           detail = '';
           before_note.text = '';
           after_note.text = '';
@@ -752,29 +826,31 @@ class _uploadPicState extends State<uploadPic> {
             }
             // print(desLs_before);
           });
-          API
-              .getDescript(widget.jidx, widget.type_id, group, 1)
-              .then((value_after) {
-            setState(() {
-              List list2 = json.decode(value_after.body);
-              desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
-              if (desLs_after[0].j_img_accessories == 1) {
-                setState(() {
-                  nothavedevice_f = true;
-                  nothavedevice = true;
-                });
-              }
-              for (var i = 0; i < desLs_after.length; i++) {
-                if (desLs_after[i].j_img_remark.isNotEmpty) {
+          getBrandLs().then((brand) {
+            API
+                .getDescript(widget.jidx, widget.type_id, group, 1)
+                .then((value_after) {
+              setState(() {
+                List list2 = json.decode(value_after.body);
+                desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
+                if (desLs_after[0].j_img_accessories == 1) {
                   setState(() {
-                    after_note.text = desLs_after[i].j_img_remark.toString();
+                    nothavedevice_f = true;
+                    nothavedevice = true;
                   });
-                  break;
                 }
-              }
+                for (var i = 0; i < desLs_after.length; i++) {
+                  if (desLs_after[i].j_img_remark.isNotEmpty) {
+                    setState(() {
+                      after_note.text = desLs_after[i].j_img_remark.toString();
+                    });
+                    break;
+                  }
+                }
 
-              Navigator.pop(context);
-              beforeSheet(group);
+                Navigator.pop(context);
+                beforeSheet(group);
+              });
             });
           });
         });
@@ -1070,23 +1146,6 @@ class _uploadPicState extends State<uploadPic> {
           // bool nothavedevice = false;
           // // String detail = 'แผงแตก';
           // String _selectedValue = 'Solar Edga';
-          List<DropdownMenuItem<String>> items = [
-            'กรุณาเลือก',
-            'Solar Edga',
-            'Huawei',
-            'SMA',
-          ].map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xff9DC75B)),
-              ),
-            );
-          }).toList();
 
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter mystate) {
@@ -1158,15 +1217,36 @@ class _uploadPicState extends State<uploadPic> {
                                           ),
                                           child: DropdownButtonHideUnderline(
                                             child: DropdownButton(
+                                              hint: Text(
+                                                "เลือกแบรนด์",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                    color: Color(0xff9DC75B)),
+                                              ),
                                               icon: Icon(
                                                   Icons
                                                       .keyboard_arrow_down_rounded,
                                                   size: 20,
                                                   color: Color(0xff9DC75B)),
-                                              items: items,
-                                              onChanged: (value) {
+                                              items: brandls?.map((value) {
+                                                return DropdownMenuItem(
+                                                  value:
+                                                      value['brand'].toString(),
+                                                  child: Text(
+                                                    value['brand'].toString(),
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff9DC75B)),
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (newvalue) {
                                                 mystate(() {
-                                                  _selectedValue = value!;
+                                                  _selectedValue = newvalue;
                                                 });
                                               },
                                               value: _selectedValue,
@@ -1827,68 +1907,68 @@ class _uploadPicState extends State<uploadPic> {
                                             (desLs_after[index]
                                                     .j_img_name
                                                     .isNotEmpty)
-                                                ? Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
+                                                ? (widget.status == 3)
+                                                    ? Container()
+                                                    : Column(
                                                         children: [
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              mystate(() {
-                                                                if (desLs_after[
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  mystate(() {
+                                                                    if (desLs_after[index]
+                                                                            .onApi ==
+                                                                        1) {
+                                                                      deleteLs.add(
+                                                                          desLs_after[index]
+                                                                              .j_img_id);
+                                                                      print(
+                                                                          deleteLs);
+                                                                    }
+                                                                    desLs_after[
                                                                             index]
-                                                                        .onApi ==
-                                                                    1) {
-                                                                  deleteLs.add(
-                                                                      desLs_after[
-                                                                              index]
-                                                                          .j_img_id);
-                                                                  print(
-                                                                      deleteLs);
-                                                                }
-                                                                desLs_after[
-                                                                        index]
-                                                                    .j_img_name = '';
-                                                              });
-                                                            },
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              child: Container(
-                                                                height: 20,
-                                                                width: 20,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .all(
-                                                                    Radius
-                                                                        .circular(
+                                                                        .j_img_name = '';
+                                                                  });
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(5),
+                                                                  child:
+                                                                      Container(
+                                                                    height: 20,
+                                                                    width: 20,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
                                                                             200),
+                                                                      ),
+                                                                      color: Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.7),
+                                                                    ),
+                                                                    child: Center(
+                                                                        child: Icon(
+                                                                      Icons
+                                                                          .close_rounded,
+                                                                      size: 15,
+                                                                      color: Colors
+                                                                          .grey,
+                                                                    )),
                                                                   ),
-                                                                  color: Colors
-                                                                      .white
-                                                                      .withOpacity(
-                                                                          0.7),
                                                                 ),
-                                                                child: Center(
-                                                                    child: Icon(
-                                                                  Icons
-                                                                      .close_rounded,
-                                                                  size: 15,
-                                                                  color: Colors
-                                                                      .grey,
-                                                                )),
                                                               ),
-                                                            ),
+                                                            ],
                                                           ),
                                                         ],
-                                                      ),
-                                                    ],
-                                                  )
+                                                      )
                                                 : Center(
                                                     child: Icon(
                                                       Icons.add,
@@ -1964,22 +2044,38 @@ class _uploadPicState extends State<uploadPic> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       loading();
-                                      loopdelete().then((value) {
-                                        loopupload(group).then((value) {
-                                          loopupload_after(group).then((value) {
-                                            updateRemark(gg, 0,
-                                                    '$_selectedValue||$detail||${before_note.text}')
-                                                .then((value) {
-                                              updateRemark(
-                                                      gg, 1, after_note.text)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
+                                      if (_selectedValue == null ||
+                                          detail == '') {
+                                        Navigator.pop(context);
+                                        pop('กรุณากรอกรายละเอียด');
+                                        print('กรุณากรอกรายละเอียด');
+                                      } else {
+                                        checkbefore().then((va) {
+                                          if (va == false) {
+                                            Navigator.pop(context);
+                                            pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                            print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          } else {
+                                            loopdelete().then((value) {
+                                              loopupload(group).then((value) {
+                                                loopupload_after(group)
+                                                    .then((value) {
+                                                  updateRemark(gg, 0,
+                                                          '$_selectedValue||$detail||${before_note.text}')
+                                                      .then((value) {
+                                                    updateRemark(gg, 1,
+                                                            after_note.text)
+                                                        .then((value) {
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    });
+                                                  });
+                                                });
                                               });
                                             });
-                                          });
+                                          }
                                         });
-                                      });
+                                      }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       elevation: 0,

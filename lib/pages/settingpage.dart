@@ -6,6 +6,7 @@ import 'package:egp_app/pages/editprofile.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
@@ -24,12 +25,14 @@ class _settingPageState extends State<settingPage> {
   bool isLoading = true;
   String userName = "Loading...";
   int? iduser;
-  String tech_fullname = '';
+  String tech_fname = '';
+  String tech_lname = '';
   String tech_position = '';
   String tech_company = '';
   String tech_tel = '';
   String tech_line = '';
   String tech_email = '';
+  String pic = '';
 
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -102,15 +105,17 @@ class _settingPageState extends State<settingPage> {
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
-
+        print(jsonResponse);
         setState(() {
-          tech_fullname =
-              '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
+          tech_fname = jsonResponse[0]['tech_fname'] ?? '';
+          tech_lname = jsonResponse[0]['tech_lname'] ?? '';
+
           tech_position = jsonResponse[0]['tech_position'];
           tech_company = jsonResponse[0]['tech_company'];
           tech_tel = jsonResponse[0]['tech_tel'];
           tech_line = jsonResponse[0]['tech_line'];
           tech_email = jsonResponse[0]['tech_email'];
+          pic = jsonResponse[0]['tech_profile'];
         });
       }
     } catch (error) {
@@ -272,11 +277,31 @@ class _settingPageState extends State<settingPage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      CupertinoIcons.person_alt_circle,
-                                      size: 70,
-                                      color: Color(0xff57A946).withOpacity(0.5),
+                                    SizedBox(
+                                      height: 70,
+                                      width: 70,
+                                      child: (pic.isEmpty)
+                                          ? Icon(
+                                              CupertinoIcons.person_alt_circle,
+                                              size: 70,
+                                              color: Color(0xff57A946)
+                                                  .withOpacity(0.5),
+                                            )
+                                          : ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(50),
+                                              child: Image.network(
+                                                  fit: BoxFit.cover,
+                                                  height: double.infinity,
+                                                  width: double.infinity,
+                                                  'https://backoffice.energygreenplus.co.th/$pic'),
+                                            ),
                                     ),
+                                    // Icon(
+                                    //   CupertinoIcons.person_alt_circle,
+                                    //   size: 70,
+                                    //   color: Color(0xff57A946).withOpacity(0.5),
+                                    // ),
                                     SizedBox(
                                       width: 20,
                                     ),
@@ -287,7 +312,7 @@ class _settingPageState extends State<settingPage> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          tech_fullname,
+                                          '$tech_fname $tech_lname',
                                           style: TextStyle(
                                               fontSize: 22,
                                               fontWeight: FontWeight.w600,
@@ -311,13 +336,15 @@ class _settingPageState extends State<settingPage> {
                                       MaterialPageRoute(
                                           builder: (context) => editprofile(
                                                 id: iduser,
-                                                fullname: tech_fullname,
+                                                fname: tech_fname,
+                                                lname: tech_lname,
                                                 companame: tech_company,
                                                 email: tech_email,
                                                 line: tech_line,
                                                 position: tech_position,
                                                 tel: tech_tel,
                                                 userName: userName,
+                                                pic: pic,
                                               )),
                                     ).then((value) {
                                       setState(() {
@@ -406,9 +433,74 @@ class _settingPageState extends State<settingPage> {
                     // width: 160,
                     child: ElevatedButton(
                       onPressed: () {
-                        messaging.getToken().then((value) {
-                          signOut(iduser, userName, value);
-                        });
+                        showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context) {
+                              return (defaultTargetPlatform ==
+                                      TargetPlatform.android)
+                                  ? AlertDialog(
+                                      actionsPadding: EdgeInsets.all(5),
+                                      // title: Text(
+                                      //     'ต้องการลบข้อมูลหรือไม่'),
+                                      contentPadding:
+                                          EdgeInsets.only(top: 30, bottom: 20),
+                                      content: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text('ต้องการออกจากระบบหรือไม่'),
+                                        ],
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); //close Dialog
+                                          },
+                                          child: Text('ยกเลิก'),
+                                        ),
+                                        TextButton(
+                                            style: TextButton.styleFrom(
+                                              primary: Colors.red, // Text Color
+                                            ),
+                                            onPressed: () {
+                                              messaging
+                                                  .getToken()
+                                                  .then((value) {
+                                                signOut(
+                                                    iduser, userName, value);
+                                              });
+                                            },
+                                            child: Text('ออกจากระบบ')),
+                                      ],
+                                    )
+                                  : CupertinoAlertDialog(
+                                      content: Text('ต้องการออกจากระบบหรือไม่'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); //close Dialog
+                                          },
+                                          child: Text('ยกเลิก'),
+                                        ),
+                                        TextButton(
+                                            style: TextButton.styleFrom(
+                                              primary: Colors.red, // Text Color
+                                            ),
+                                            onPressed: () {
+                                              messaging
+                                                  .getToken()
+                                                  .then((value) {
+                                                signOut(
+                                                    iduser, userName, value);
+                                              });
+                                            },
+                                            child: Text('ออกจากระบบ')),
+                                      ],
+                                    );
+                            });
                       },
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(color: Color(0xff9DC75B)),

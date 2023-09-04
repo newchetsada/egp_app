@@ -34,7 +34,7 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
   bool nothavedevice = false;
   bool nothavedevice_f = false;
   String detail = '';
-  String _selectedValue = 'กรุณาเลือก';
+  String? _selectedValue;
   String gg = '';
   var before_note = TextEditingController();
   var after_note = TextEditingController();
@@ -46,6 +46,7 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
   String userName = "Loading...";
   int? iduser;
   bool lsloading = true;
+  List? brandls;
 
   openCamera() async {
     try {
@@ -145,6 +146,26 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
     );
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
+  getBrandLs() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{}),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      setState(() {
+        brandls = jsonResponse;
+      });
       print(jsonResponse);
       return jsonResponse;
     }
@@ -280,10 +301,51 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
     }
   }
 
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
     getUser();
+    getBrandLs();
     setState(() {
       typeName = (widget.type_id == 1)
           ? 'PV (แผงโซล่าเซลล์)'
@@ -485,7 +547,8 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
                       itemCount: groupLs.length,
                       itemBuilder: ((context, index) {
                         return Padding(
-                            padding: const EdgeInsets.only(left: 30, right: 30),
+                            padding: const EdgeInsets.only(
+                                bottom: 10, left: 30, right: 30),
                             child: Slidable(
                                 endActionPane: ActionPane(
                                   extentRatio: 0.2,
@@ -622,7 +685,7 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
           // beforeSheet(null);
           loading();
           setState(() {
-            _selectedValue = 'กรุณาเลือก';
+            _selectedValue = null;
             detail = '';
             before_note.text = '';
             after_note.text = '';
@@ -720,7 +783,7 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
       onTap: () {
         loading();
         setState(() {
-          _selectedValue = 'กรุณาเลือก';
+          _selectedValue = null;
           detail = '';
           before_note.text = '';
           after_note.text = '';
@@ -989,27 +1052,6 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
           ),
         ),
         builder: (BuildContext context) {
-          // bool nothavedevice = false;
-          // // String detail = 'แผงแตก';
-          // String _selectedValue = 'Solar Edga';
-          List<DropdownMenuItem<String>> items = [
-            'กรุณาเลือก',
-            'Solar Edga',
-            'Huawei',
-            'SMA',
-          ].map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xff9DC75B)),
-              ),
-            );
-          }).toList();
-
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter mystate) {
             return SafeArea(
@@ -1072,14 +1114,32 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
                                     ),
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton(
+                                        hint: Text(
+                                          "เลือกแบรนด์",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: Color(0xff9DC75B)),
+                                        ),
                                         icon: Icon(
                                             Icons.keyboard_arrow_down_rounded,
                                             size: 20,
                                             color: Color(0xff9DC75B)),
-                                        items: items,
-                                        onChanged: (value) {
+                                        items: brandls?.map((value) {
+                                          return DropdownMenuItem(
+                                            value: value['brand'].toString(),
+                                            child: Text(
+                                              value['brand'].toString(),
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9DC75B)),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (newvalue) {
                                           mystate(() {
-                                            _selectedValue = value!;
+                                            _selectedValue = newvalue;
                                           });
                                         },
                                         value: _selectedValue,
@@ -1573,21 +1633,28 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
                             child: ElevatedButton(
                               onPressed: () {
                                 loading();
-                                loopdelete().then((value) {
-                                  loopupload(group).then((value) {
-                                    loopupload_after(group).then((value) {
-                                      updateRemark(gg, 0,
-                                              '$_selectedValue||$detail||${before_note.text}')
-                                          .then((value) {
-                                        updateRemark(gg, 1, after_note.text)
+                                if (desLs_before.isEmpty ||
+                                    _selectedValue == null ||
+                                    detail == '') {
+                                  Navigator.pop(context);
+                                  pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
+                                } else {
+                                  loopdelete().then((value) {
+                                    loopupload(group).then((value) {
+                                      loopupload_after(group).then((value) {
+                                        updateRemark(gg, 0,
+                                                '$_selectedValue||$detail||${before_note.text}')
                                             .then((value) {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
+                                          updateRemark(gg, 1, after_note.text)
+                                              .then((value) {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          });
                                         });
                                       });
                                     });
                                   });
-                                });
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
