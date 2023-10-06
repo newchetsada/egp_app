@@ -341,14 +341,7 @@ class _groupresearchState extends State<groupresearch> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
                               topRight: Radius.circular(25)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffE1F5DC),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: Offset(0, -3), // Shadow position
-                            ),
-                          ],
+                          //
                         ),
                         child: Padding(
                           padding: const EdgeInsets.only(

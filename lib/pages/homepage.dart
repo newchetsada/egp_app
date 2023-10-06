@@ -33,6 +33,8 @@ class _homePageState extends State<homePage> {
     API.getWorkLs(idd).then((response) {
       setState(() {
         List list = json.decode(response.body);
+        print(list);
+
         works = list.map((m) => Album.fromJson(m)).toList();
         datetime = DateTime.now();
 
@@ -313,7 +315,7 @@ class _homePageState extends State<homePage> {
                         : cardWork(
                             works[index].type_id,
                             works[index].j_status,
-                            works[index].startdate,
+                            works[index].senddate,
                             works[index].cus_name,
                             works[index].jidx);
                   },
@@ -331,7 +333,7 @@ class _homePageState extends State<homePage> {
                         ? cardWork(
                             works[index].type_id,
                             works[index].j_status,
-                            works[index].startdate,
+                            works[index].senddate,
                             works[index].cus_name,
                             works[index].jidx)
                         : Container();
@@ -386,6 +388,8 @@ class _homePageState extends State<homePage> {
           int j_status = 0;
           int ppe_flag = 0;
           String j_remark_complete = '';
+          int sid = 0;
+          String site_layout = '';
 
           //
           showDialog(
@@ -448,6 +452,8 @@ class _homePageState extends State<homePage> {
               j_remark_complete = (jsonResponse[0]['j_remark_complete'] == null)
                   ? ''
                   : jsonResponse[0]['j_remark_complete'];
+              sid = jsonResponse[0]['sid'];
+              site_layout = jsonResponse[0]['site_layout'] ?? '';
             });
           }).then((value) {
             Navigator.pop(context);
@@ -456,74 +462,83 @@ class _homePageState extends State<homePage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => cleansolar(
-                            jid: id,
-                            j_start_date: j_start_date,
-                            j_send_date: j_send_date,
-                            cus_name: cus_name,
-                            cus_address: cus_address,
-                            install_date: install_date,
-                            warranty_expire: warranty_expire,
-                            power_peak: power_peak,
-                            j_detail: j_detail,
-                            remark_tech: remark_tech,
-                            lat: lat,
-                            lon: lon,
-                            site_name: site_name,
-                            fullname: fullname,
-                            position: position,
-                            tel: tel,
-                            j_status: j_status,
-                            ppe_flag: ppe_flag,
-                            j_remark_complete: j_remark_complete)),
+                              jid: id,
+                              j_start_date: j_start_date,
+                              j_send_date: j_send_date,
+                              cus_name: cus_name,
+                              cus_address: cus_address,
+                              install_date: install_date,
+                              warranty_expire: warranty_expire,
+                              power_peak: power_peak,
+                              j_detail: j_detail,
+                              remark_tech: remark_tech,
+                              lat: lat,
+                              lon: lon,
+                              site_name: site_name,
+                              fullname: fullname,
+                              position: position,
+                              tel: tel,
+                              j_status: j_status,
+                              ppe_flag: ppe_flag,
+                              j_remark_complete: j_remark_complete,
+                              sid: sid,
+                              pic: site_layout,
+                            )),
                   )
                 : (type == 1 || type == 2)
                     ? Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => repair(
-                                jid: id,
-                                j_start_date: j_start_date,
-                                j_send_date: j_send_date,
-                                cus_name: cus_name,
-                                cus_address: cus_address,
-                                install_date: install_date,
-                                warranty_expire: warranty_expire,
-                                power_peak: power_peak,
-                                j_detail: j_detail,
-                                remark_tech: remark_tech,
-                                lat: lat,
-                                lon: lon,
-                                site_name: site_name,
-                                fullname: fullname,
-                                position: position,
-                                tel: tel,
-                                j_status: j_status,
-                                ppe_flag: ppe_flag,
-                                j_remark_complete: j_remark_complete)))
+                                  jid: id,
+                                  j_start_date: j_start_date,
+                                  j_send_date: j_send_date,
+                                  cus_name: cus_name,
+                                  cus_address: cus_address,
+                                  install_date: install_date,
+                                  warranty_expire: warranty_expire,
+                                  power_peak: power_peak,
+                                  j_detail: j_detail,
+                                  remark_tech: remark_tech,
+                                  lat: lat,
+                                  lon: lon,
+                                  site_name: site_name,
+                                  fullname: fullname,
+                                  position: position,
+                                  tel: tel,
+                                  j_status: j_status,
+                                  ppe_flag: ppe_flag,
+                                  j_remark_complete: j_remark_complete,
+                                  pic: site_layout,
+                                  sid: sid,
+                                )))
                     : Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => research(
-                                jid: id,
-                                j_start_date: j_start_date,
-                                j_send_date: j_send_date,
-                                cus_name: cus_name,
-                                cus_address: cus_address,
-                                install_date: install_date,
-                                warranty_expire: warranty_expire,
-                                power_peak: power_peak,
-                                j_detail: j_detail,
-                                remark_tech: remark_tech,
-                                lat: lat,
-                                lon: lon,
-                                site_name: site_name,
-                                fullname: fullname,
-                                position: position,
-                                tel: tel,
-                                j_status: j_status,
-                                ppe_flag: ppe_flag,
-                                j_remark_complete: j_remark_complete,
-                                type: type)),
+                                  jid: id,
+                                  j_start_date: j_start_date,
+                                  j_send_date: j_send_date,
+                                  cus_name: cus_name,
+                                  cus_address: cus_address,
+                                  install_date: install_date,
+                                  warranty_expire: warranty_expire,
+                                  power_peak: power_peak,
+                                  j_detail: j_detail,
+                                  remark_tech: remark_tech,
+                                  lat: lat,
+                                  lon: lon,
+                                  site_name: site_name,
+                                  fullname: fullname,
+                                  position: position,
+                                  tel: tel,
+                                  j_status: j_status,
+                                  ppe_flag: ppe_flag,
+                                  j_remark_complete: j_remark_complete,
+                                  type: type,
+                                  pic: site_layout,
+                                  sid: sid,
+                                )),
                       );
           });
         },
@@ -866,6 +881,7 @@ class Album {
   final String cus_name;
   final int j_status;
   final int type_id;
+  final String senddate;
 
   const Album(
       {required this.jidx,
@@ -873,16 +889,18 @@ class Album {
       required this.startdate,
       required this.cus_name,
       required this.j_status,
-      required this.type_id});
+      required this.type_id,
+      required this.senddate});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      jidx: json['jidx'],
-      j_detail: (json['j_detail'].toString() == 'null') ? "" : json['j_detail'],
-      startdate: json['j_start_date'],
-      cus_name: json['cus_name'],
-      j_status: json['j_status'],
-      type_id: json['type_flag'],
-    );
+        jidx: json['jidx'],
+        j_detail:
+            (json['j_detail'].toString() == 'null') ? "" : json['j_detail'],
+        startdate: json['j_start_date'],
+        cus_name: json['cus_name'],
+        j_status: json['j_status'],
+        type_id: json['type_flag'],
+        senddate: json['j_send_date']);
   }
 }

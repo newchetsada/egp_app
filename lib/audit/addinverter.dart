@@ -23,13 +23,19 @@ class addinverter extends StatefulWidget {
   final String typeName;
   final int status;
   final int group;
+  final int no;
+  final String sn;
+  final int sin;
 
   addinverter(
       {required this.jidx,
       required this.typeId,
       required this.typeName,
       required this.status,
-      required this.group});
+      required this.group,
+      required this.no,
+      required this.sn,
+      required this.sin});
 }
 
 class _addinverterState extends State<addinverter> {
@@ -231,7 +237,7 @@ class _addinverterState extends State<addinverter> {
         });
   }
 
-  uploadPic(File image, sub, subno) async {
+  uploadPic(File? image, sub, subno) async {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
@@ -248,13 +254,17 @@ class _addinverterState extends State<addinverter> {
     request.fields['sign_name'] = '';
     request.fields['measuredValue'] = '';
     request.fields['imgType'] = '0';
+    request.fields['sinsId'] = widget.sin.toString();
 
     request.fields['userName'] = userName;
-    request.fields['filesName'] = image.path.split('/').last;
+    request.fields['filesName'] =
+        (image == null) ? "" : image.path.split('/').last;
 
-    request.files.add(http.MultipartFile.fromBytes(
-        'files', image.readAsBytesSync(),
-        filename: image.path.split('/').last));
+    (image == null)
+        ? null
+        : request.files.add(http.MultipartFile.fromBytes(
+            'files', image.readAsBytesSync(),
+            filename: image.path.split('/').last));
 
     var response = await request.send();
 
@@ -262,7 +272,7 @@ class _addinverterState extends State<addinverter> {
     //   print(value);
     // });
     final respStr = await response.stream.bytesToString();
-    // print(respStr);
+    print('up pic ' + respStr);
 
     // response.stream.transform(utf8.decoder).listen((value) {
     //   // setState(() {
@@ -298,27 +308,27 @@ class _addinverterState extends State<addinverter> {
     }
   }
 
-  deleteSub(subTypeId, subTypeNo) async {
-    var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobSubGroupImageAudit'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-      },
-      body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
-        'subTypeId': subTypeId,
-        'subTypeNo': subTypeNo,
-        'userName': userName,
-      }),
-    );
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse;
-    }
-  }
+  // deleteSub(subTypeId, subTypeNo) async {
+  //   var response = await http.post(
+  //     Uri.parse(
+  //         'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobSubGroupImageAudit'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+  //     },
+  //     body: jsonEncode(<dynamic, dynamic>{
+  //       'jidx': widget.jidx,
+  //       'subTypeId': subTypeId,
+  //       'subTypeNo': subTypeNo,
+  //       'userName': userName,
+  //     }),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     var jsonResponse = json.decode(response.body);
+  //     print(jsonResponse);
+  //     return jsonResponse;
+  //   }
+  // }
 
   updateRemark(id, type, sub, note, ispass) async {
     var response = await http.post(
@@ -339,6 +349,7 @@ class _addinverterState extends State<addinverter> {
         'subTypeUnit': _selectedValue,
         'check': ispass,
         'userName': userName,
+        'sinsId': widget.sin
       }),
     );
     if (response.statusCode == 200) {
@@ -352,22 +363,28 @@ class _addinverterState extends State<addinverter> {
   void initState() {
     super.initState();
     getUser();
-    API.getPicLs(widget.jidx, widget.typeId, 80, widget.group).then((value) {
+    print('jidx:${widget.jidx} typeId:${widget.typeId} sin:${widget.sin}');
+    API
+        .getPicLs(widget.jidx, widget.typeId, 80, null, widget.sin)
+        .then((value) {
       setState(() {
         List headlist = json.decode(value.body);
         print(headlist);
+        var headpicdetail = headlist.map((m) => Album.fromJson(m)).toList();
 
         headpic = headlist.map((m) => Album.fromJson(m)).toList();
-        if (headpic.isEmpty) {
+        headpic =
+            headpic.where((element) => element.j_img_name.isNotEmpty).toList();
+        if (headpicdetail.isEmpty) {
           headremark.text = '';
           headpass = null;
         } else {
-          headremark.text = headpic[0].remark;
-          headpass = headpic[0].check;
+          headremark.text = headpicdetail[0].remark;
+          headpass = headpicdetail[0].check;
         }
       });
     });
-    API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
+    API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
       setState(() {
         List list = json.decode(response.body);
         print(list);
@@ -420,68 +437,68 @@ class _addinverterState extends State<addinverter> {
     }
   }
 
-  Widget addcard() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 20,
-      ),
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedValue = null;
-            remark.text = '';
-            av.text = '';
-            pass = null;
-            pic.clear();
-            deleteLs.clear();
-            subtypeno = '';
-          });
-          addSheet('Inverter String', 81);
-        },
-        child: Container(
-          height: 60,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xffE1F5DC),
-                Color(0xffD6EFB4),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xff149C32).withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 0,
-                offset: Offset(0, 0), // Shadow position
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Inverter String',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Color(0xff2A302C))),
-                Icon(
-                  EvaIcons.plusCircle,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget addcard() {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(
+  //       top: 20,
+  //     ),
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         setState(() {
+  //           _selectedValue = null;
+  //           remark.text = '';
+  //           av.text = '';
+  //           pass = null;
+  //           pic.clear();
+  //           deleteLs.clear();
+  //           subtypeno = '';
+  //         });
+  //         addSheet('Inverter String', 81);
+  //       },
+  //       child: Container(
+  //         height: 60,
+  //         width: double.infinity,
+  //         decoration: BoxDecoration(
+  //           gradient: LinearGradient(
+  //             begin: Alignment.topLeft,
+  //             end: Alignment.bottomRight,
+  //             colors: [
+  //               Color(0xffE1F5DC),
+  //               Color(0xffD6EFB4),
+  //             ],
+  //           ),
+  //           borderRadius: BorderRadius.circular(15),
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Color(0xff149C32).withOpacity(0.1),
+  //               blurRadius: 10,
+  //               spreadRadius: 0,
+  //               offset: Offset(0, 0), // Shadow position
+  //             ),
+  //           ],
+  //         ),
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 30),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text('Inverter String',
+  //                   style: TextStyle(
+  //                       fontWeight: FontWeight.w600,
+  //                       fontSize: 15,
+  //                       color: Color(0xff2A302C))),
+  //               Icon(
+  //                 EvaIcons.plusCircle,
+  //                 color: Colors.white,
+  //                 size: 30,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -515,11 +532,53 @@ class _addinverterState extends State<addinverter> {
                           child: ElevatedButton(
                             onPressed: () {
                               loading();
-                              if (headpass == null || headpic.isEmpty) {
+                              // if (headpass == null || headpic.isEmpty) {
+                              //   Navigator.pop(context);
+
+                              //   pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
+                              // } else {
+                              //   headloopdelete().then((value) {
+                              //     headloopupload("80").then((value) {
+                              //       updateRemark(widget.jidx, widget.typeId, 80,
+                              //               headremark.text, headpass)
+                              //           .then((value) {
+                              //         Navigator.pop(context);
+                              //         Navigator.pop(context);
+                              //       });
+                              //     });
+                              //   });
+                              // }
+
+                              if (headpass == null) {
+                                // || pic.isEmpty
                                 Navigator.pop(context);
 
-                                pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
-                              } else {
+                                pop('กรุณากรอกข้อมูล');
+                              } else if (headpass == 0) {
+                                if (headpic.isNotEmpty) {
+                                  headloopdelete().then((value) {
+                                    headloopupload("80").then((value) {
+                                      updateRemark(widget.jidx, widget.typeId,
+                                              80, headremark.text, headpass)
+                                          .then((value) {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      });
+                                    });
+                                  });
+                                } else {
+                                  headloopdelete().then((value) {
+                                    uploadPic(null, "80", "").then((value) {
+                                      updateRemark(widget.jidx, widget.typeId,
+                                              80, headremark.text, headpass)
+                                          .then((value) {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                      });
+                                    });
+                                  });
+                                }
+                              } else if (headpass == 1 && headpic.isNotEmpty) {
                                 headloopdelete().then((value) {
                                   headloopupload("80").then((value) {
                                     updateRemark(widget.jidx, widget.typeId, 80,
@@ -530,6 +589,10 @@ class _addinverterState extends State<addinverter> {
                                     });
                                   });
                                 });
+                              } else {
+                                Navigator.pop(context);
+
+                                pop('กรุณาอัพโหลดรูปภาพ');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -607,14 +670,7 @@ class _addinverterState extends State<addinverter> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
+                        //
                       ),
                     ),
                     Container(
@@ -642,11 +698,30 @@ class _addinverterState extends State<addinverter> {
           padding: EdgeInsets.symmetric(horizontal: 30),
           children: [
             Text(
-              'ไฟ LED สีเขียวต้องติดค้างไม่กระพริบแสดงว่าทำงานปกติ',
+              'Inverter ${widget.no}',
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   color: Color(0xff9DC75B),
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15),
+            ),
+            Text(
+              'SN ${widget.sn}',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: Color(0xff57A946),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'ไฟ LED สีเขียวต้องติดค้างไม่กระพริบแสดงว่าทำงานปกติ',
+              style: TextStyle(
+                  color: Color(0xff2A302C),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
             ),
             SizedBox(
               height: 10,
@@ -981,10 +1056,10 @@ class _addinverterState extends State<addinverter> {
                 ),
               ),
             ),
-            (widget.status == 3) ? Container() : addcard(),
-            SizedBox(
-              height: 10,
-            ),
+            // (widget.status == 3) ? Container() : addcard(),
+            // SizedBox(
+            //   height: 10,
+            // ),
             ListView.builder(
                 itemCount: groupSub.length,
                 primary: false,
@@ -995,287 +1070,100 @@ class _addinverterState extends State<addinverter> {
                     padding: const EdgeInsets.only(bottom: 10),
                     child: (groupSub[index].sub_type_id == 81 &&
                             groupSub[index].sub_type_no != null)
-                        ? (widget.status == 3)
-                            ? GestureDetector(
-                                onTap: () {
-                                  loading();
-                                  API
-                                      .getPicLs(
-                                          widget.jidx,
-                                          widget.typeId,
-                                          groupSub[index].sub_type_id,
-                                          widget.group)
-                                      .then((response) {
-                                    print(response.body);
-                                    setState(() {
-                                      List list = json.decode(response.body);
-                                      pic = list
-                                          .map((m) => Album.fromJson(m))
-                                          .toList();
-                                      if (pic.isEmpty) {
-                                        remark.text = '';
-                                        pass = null;
-                                        _selectedValue = null;
-                                        av.text = '';
-                                      } else {
-                                        remark.text = pic[0].remark;
-                                        pass = pic[0].check;
-                                        _selectedValue = pic[0].sub_type_unit;
-                                        av.text = (pic[0].measured_value ==
-                                                null)
-                                            ? ''
-                                            : pic[0].measured_value.toString();
-                                        subtypeno =
-                                            pic[0].sub_type_no.toString();
-                                      }
-                                    });
-                                    Navigator.pop(context);
-                                    addSheet(groupSub[index].sub_type_name,
-                                        groupSub[index].sub_type_id);
-                                  });
-                                },
-                                child: Container(
-                                  height: 60,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    border: Border.all(
-                                        color: Color(0xff9DC75B), width: 0.5),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 30),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                '${groupSub[index].sub_type_name} ${index}',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    color: Color(0xff57A946),
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ))
-                            : Slidable(
-                                endActionPane: ActionPane(
-                                  extentRatio: 0.2,
-                                  motion: BehindMotion(),
+                        ? GestureDetector(
+                            onTap: () {
+                              loading();
+                              setState(() {
+                                subtypeno =
+                                    groupSub[index].sub_type_no.toString();
+                                print(groupSub[index].sub_type_no);
+                              });
+                              API
+                                  .getPicLs(
+                                      widget.jidx,
+                                      widget.typeId,
+                                      groupSub[index].sub_type_id,
+                                      groupSub[index].sub_type_no,
+                                      widget.sin)
+                                  .then((response) {
+                                print(response.body);
+                                setState(() {
+                                  List list = json.decode(response.body);
+                                  var picdeail = list
+                                      .map((m) => Album.fromJson(m))
+                                      .toList();
+                                  pic = list
+                                      .map((m) => Album.fromJson(m))
+                                      .toList();
+                                  pic = pic
+                                      .where((element) =>
+                                          element.j_img_name.isNotEmpty)
+                                      .toList();
+                                  if (picdeail.isEmpty) {
+                                    remark.text = '';
+                                    pass = null;
+                                    _selectedValue = null;
+                                    av.text = '';
+                                  } else {
+                                    remark.text = picdeail[0].remark;
+                                    pass = picdeail[0].check;
+                                    _selectedValue = picdeail[0].sub_type_unit;
+                                    av.text = (picdeail[0].measured_value ==
+                                            null)
+                                        ? ''
+                                        : picdeail[0].measured_value.toString();
+                                  }
+                                });
+                                Navigator.pop(context);
+
+                                addSheet(
+                                    '${groupSub[index].sub_type_name} $index',
+                                    groupSub[index].sub_type_id);
+                              });
+                            },
+                            child: Container(
+                              height: 60,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                    color: Color(0xff9DC75B), width: 0.5),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                child: Row(
                                   children: [
-                                    SizedBox(
-                                      width: 10,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${groupSub[index].sub_type_name} ${index}',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: Color(0xff57A946),
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 15),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    SlidableAction(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
-                                      onPressed: ((context) {
-                                        // print(group);
-                                        showDialog(
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (context) {
-                                              return (defaultTargetPlatform ==
-                                                      TargetPlatform.android)
-                                                  ? AlertDialog(
-                                                      actionsPadding:
-                                                          EdgeInsets.all(5),
-                                                      // title: Text(
-                                                      //     'ต้องการลบข้อมูลหรือไม่'),
-                                                      contentPadding:
-                                                          EdgeInsets.only(
-                                                              top: 30,
-                                                              bottom: 20),
-                                                      content: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                              'ต้องการลบข้อมูลหรือไม่'),
-                                                        ],
-                                                      ),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteSub(
-                                                                      groupSub[
-                                                                              index]
-                                                                          .sub_type_id,
-                                                                      groupSub[
-                                                                              index]
-                                                                          .sub_type_no)
-                                                                  .then((val) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    )
-                                                  : CupertinoAlertDialog(
-                                                      content: Text(
-                                                          'ต้องการลบข้อมูลหรือไม่'),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteSub(
-                                                                      groupSub[
-                                                                              index]
-                                                                          .sub_type_id,
-                                                                      groupSub[
-                                                                              index]
-                                                                          .sub_type_no)
-                                                                  .then((val) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    );
-                                            }).then((value) {
-                                          API
-                                              .getSubLs(widget.jidx,
-                                                  widget.typeId, widget.group)
-                                              .then((response) {
-                                            setState(() {
-                                              List list =
-                                                  json.decode(response.body);
-                                              print(list);
-                                              groupSub = list
-                                                  .map((m) => SubLs.fromJson(m))
-                                                  .toList();
-                                              // contactloading = false;
-                                            });
-                                          });
-                                        });
-                                      }),
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
-                                      icon: Icons.delete,
-                                      label: 'ลบ',
+                                    Icon(
+                                      EvaIcons.checkmarkCircle2,
+                                      size: 30,
+                                      color: (groupSub[index].amount_pic > 0)
+                                          ? Color(0xffABD06F)
+                                          : Color.fromARGB(255, 211, 211, 211),
                                     ),
                                   ],
                                 ),
-                                child: GestureDetector(
-                                    onTap: () {
-                                      loading();
-                                      API
-                                          .getPicLs(
-                                              widget.jidx,
-                                              widget.typeId,
-                                              groupSub[index].sub_type_id,
-                                              widget.group)
-                                          .then((response) {
-                                        print(response.body);
-                                        setState(() {
-                                          List list =
-                                              json.decode(response.body);
-                                          pic = list
-                                              .map((m) => Album.fromJson(m))
-                                              .toList();
-                                          if (pic.isEmpty) {
-                                            remark.text = '';
-                                            pass = null;
-                                            _selectedValue = null;
-                                            av.text = '';
-                                          } else {
-                                            remark.text = pic[0].remark;
-                                            pass = pic[0].check;
-                                            _selectedValue =
-                                                pic[0].sub_type_unit;
-                                            av.text =
-                                                (pic[0].measured_value == null)
-                                                    ? ''
-                                                    : pic[0]
-                                                        .measured_value
-                                                        .toString();
-                                            subtypeno =
-                                                pic[0].sub_type_no.toString();
-                                          }
-                                        });
-                                        Navigator.pop(context);
-                                        addSheet(groupSub[index].sub_type_name,
-                                            groupSub[index].sub_type_id);
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 60,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        border: Border.all(
-                                            color: Color(0xff9DC75B),
-                                            width: 0.5),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 30),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    '${groupSub[index].sub_type_name} ${index}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        color:
-                                                            Color(0xff57A946),
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 15),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )))
+                              ),
+                            ))
                         : Container(),
                   );
                 })),
@@ -1902,14 +1790,47 @@ class _addinverterState extends State<addinverter> {
                                   width: double.infinity,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      // Navigator.pop(context);
+                                      loading();
                                       if (av.text == '' ||
                                           _selectedValue == null ||
-                                          pass == null ||
-                                          pic.isEmpty) {
+                                          pass == null) {
+                                        Navigator.pop(context);
                                         pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
-                                      } else {
-                                        loading();
+                                      } else if (pass == 0) {
+                                        if (pic.isNotEmpty) {
+                                          loopdelete().then((value) {
+                                            loopupload(subb).then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text,
+                                                      pass)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        } else {
+                                          loopdelete().then((value) {
+                                            uploadPic(null, subb.toString(),
+                                                    subtypeno)
+                                                .then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text,
+                                                      pass)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        }
+                                      } else if (pass == 1 && pic.isNotEmpty) {
                                         loopdelete().then((value) {
                                           loopupload(subb).then((value) {
                                             updateRemark(
@@ -1924,9 +1845,32 @@ class _addinverterState extends State<addinverter> {
                                             });
                                           });
                                         });
+                                      } else {
+                                        Navigator.pop(context);
+
+                                        pop('กรุณาอัพโหลดรูปภาพ');
                                       }
+
+                                      // {
+                                      //   loading();
+                                      //   loopdelete().then((value) {
+                                      //     loopupload(subb).then((value) {
+                                      //       updateRemark(
+                                      //               widget.jidx,
+                                      //               widget.typeId,
+                                      //               subb,
+                                      //               remark.text,
+                                      //               pass)
+                                      //           .then((value) {
+                                      //         Navigator.pop(context);
+                                      //         Navigator.pop(context);
+                                      //       });
+                                      //     });
+                                      //   });
+                                      // }
                                     },
                                     style: ElevatedButton.styleFrom(
+                                      elevation: 0,
                                       foregroundColor: Colors.white,
                                       backgroundColor: Color(0xffAED76E),
                                       shape: RoundedRectangleBorder(
@@ -1952,7 +1896,7 @@ class _addinverterState extends State<addinverter> {
           });
         }).then((value) {
       setState(() {
-        API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
+        API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
           setState(() {
             List list = json.decode(response.body);
             groupSub = list.map((m) => SubLs.fromJson(m)).toList();
@@ -1966,7 +1910,7 @@ class _addinverterState extends State<addinverter> {
 
 //api
 class API {
-  static Future getSubLs(idd, type, group) async {
+  static Future getSubLs(idd, type, sin) async {
     final response = await http.post(
       Uri.parse(
           'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupAuditImageLs'),
@@ -1975,12 +1919,12 @@ class API {
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(
-          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'groupNo': group}),
+          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'sinsId': sin}),
     );
     return response;
   }
 
-  static Future getPicLs(idd, type, sub, group) async {
+  static Future getPicLs(idd, type, sub, subTypeNo, sinsId) async {
     final response = await http.post(
       Uri.parse(
           'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
@@ -1990,10 +1934,11 @@ class API {
       },
       body: jsonEncode(<dynamic, dynamic>{
         'jidx': idd,
-        'groupNo': group,
+        'subTypeNo': subTypeNo,
         'imgType': 0,
         'typeId': type,
-        'subTypeId': sub
+        'subTypeId': sub,
+        'sinsId': sinsId
       }),
     );
     return response;

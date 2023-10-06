@@ -13,11 +13,23 @@ class report extends StatefulWidget {
   _reportState createState() => _reportState();
 
   final int jid;
-  report({required this.jid});
+  final int sid;
+  final int? ref_jidx;
+  final int cusId;
+  final String username;
+  final int tecId;
+  report(
+      {required this.jid,
+      required this.sid,
+      required this.ref_jidx,
+      required this.cusId,
+      required this.username,
+      required this.tecId});
 }
 
 class _reportState extends State<report> {
   var groupPic = <picLs>[];
+  int? ref;
 
   _getAPI(id) {
     var idd = id;
@@ -29,6 +41,23 @@ class _reportState extends State<report> {
         groupPic = list1.map((m) => picLs.fromJson(m)).toList();
       });
     });
+    return 'true';
+  }
+
+  Future getWork(idd, jidx) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'techId': idd,
+        'jidx': jidx,
+      }),
+    );
+    return response.body;
   }
 
   @override
@@ -37,8 +66,16 @@ class _reportState extends State<report> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    (widget.ref_jidx == null)
+        ? null
+        : API.getPicLs(widget.ref_jidx).then((value) {
+            setState(() {
+              ref = widget.ref_jidx;
+              List list1 = json.decode(value.body);
 
-    _getAPI(widget.jid);
+              groupPic = list1.map((m) => picLs.fromJson(m)).toList();
+            });
+          });
   }
 
   @override
@@ -133,14 +170,6 @@ class _reportState extends State<report> {
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(25),
                           topRight: Radius.circular(25)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xffE1F5DC),
-                          blurRadius: 20,
-                          spreadRadius: 0,
-                          offset: Offset(0, -3), // Shadow position
-                        ),
-                      ],
                     ),
                     child: Padding(
                       padding:
@@ -251,13 +280,27 @@ class _reportState extends State<report> {
                               builder: (context) => ReportuploadPicMounting(
                                     jidx: widget.jid,
                                     type_id: groupPic[index].type_id,
+                                    sid: widget.sid,
+                                    cusId: widget.cusId,
+                                    ref_jidx: ref,
+                                    username: widget.username,
                                   ))).then((value) {
-                        API.getPicLs(widget.jid).then((value) {
-                          setState(() {
-                            List list1 = json.decode(value.body);
-                            groupPic =
-                                list1.map((m) => picLs.fromJson(m)).toList();
-                          });
+                        getWork(widget.tecId, widget.jid).then((val) {
+                          var jsonResponse = json.decode(val);
+                          print(jsonResponse[0]['ref_jidx']);
+                          if (jsonResponse[0]['ref_jidx'] != null) {
+                            API
+                                .getPicLs(jsonResponse[0]['ref_jidx'])
+                                .then((value) {
+                              setState(() {
+                                ref = jsonResponse[0]['ref_jidx'];
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          }
                         });
                       });
                     } else {
@@ -267,13 +310,27 @@ class _reportState extends State<report> {
                               builder: (context) => ReportuploadPic(
                                     jidx: widget.jid,
                                     type_id: groupPic[index].type_id,
+                                    sid: widget.sid,
+                                    cusId: widget.cusId,
+                                    ref_jidx: widget.ref_jidx,
+                                    username: widget.username,
                                   ))).then((value) {
-                        API.getPicLs(widget.jid).then((value) {
-                          setState(() {
-                            List list1 = json.decode(value.body);
-                            groupPic =
-                                list1.map((m) => picLs.fromJson(m)).toList();
-                          });
+                        getWork(widget.tecId, widget.jid).then((val) {
+                          var jsonResponse = json.decode(val);
+                          print(jsonResponse[0]['ref_jidx']);
+                          if (jsonResponse[0]['ref_jidx'] != null) {
+                            API
+                                .getPicLs(jsonResponse[0]['ref_jidx'])
+                                .then((value) {
+                              setState(() {
+                                ref = jsonResponse[0]['ref_jidx'];
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          }
                         });
                       });
                     }
@@ -308,12 +365,27 @@ class _reportState extends State<report> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top: 10),
-                            child: Text(groupPic[index].type_name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(
+                                  EvaIcons.plusSquare,
                                   color: Color(0xff2A302C),
-                                )),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Expanded(
+                                  child: Text(groupPic[index].type_name,
+                                      // overflow: TextOverflow.clip,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        color: Color(0xff2A302C),
+                                      )),
+                                ),
+                              ],
+                            ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -407,13 +479,27 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 1,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
-                          API.getPicLs(widget.jid).then((value) {
-                            setState(() {
-                              List list1 = json.decode(value.body);
-                              groupPic =
-                                  list1.map((m) => picLs.fromJson(m)).toList();
-                            });
+                          getWork(widget.tecId, widget.jid).then((val) {
+                            var jsonResponse = json.decode(val);
+                            print(jsonResponse[0]['ref_jidx']);
+                            if (jsonResponse[0]['ref_jidx'] != null) {
+                              API
+                                  .getPicLs(jsonResponse[0]['ref_jidx'])
+                                  .then((value) {
+                                setState(() {
+                                  ref = jsonResponse[0]['ref_jidx'];
+                                  List list1 = json.decode(value.body);
+                                  groupPic = list1
+                                      .map((m) => picLs.fromJson(m))
+                                      .toList();
+                                });
+                              });
+                            }
                           });
                         });
                       },
@@ -439,15 +525,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPicMounting(
                                       jidx: widget.jid,
                                       type_id: 2,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -474,15 +573,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 3,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -509,15 +621,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 4,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -526,7 +651,55 @@ class _reportState extends State<report> {
                         height: 50,
                         width: double.infinity,
                         child: Center(
-                          child: Text('ตู้ DC, AC',
+                          child: Text('ตู้ DC',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Color(0xff9DC75B))),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReportuploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 17,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
+                                    ))).then((value) {
+                          setState(() {
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
+                            });
+                          });
+                        });
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('ตู้ AC',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
@@ -544,15 +717,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 5,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -579,15 +765,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 6,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -614,15 +813,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 7,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -649,15 +861,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 8,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });
@@ -684,15 +909,28 @@ class _reportState extends State<report> {
                                 builder: (context) => ReportuploadPic(
                                       jidx: widget.jid,
                                       type_id: 9,
+                                      sid: widget.sid,
+                                      cusId: widget.cusId,
+                                      ref_jidx: ref,
+                                      username: widget.username,
                                     ))).then((value) {
                           setState(() {
-                            API.getPicLs(widget.jid).then((value) {
-                              setState(() {
-                                List list1 = json.decode(value.body);
-                                groupPic = list1
-                                    .map((m) => picLs.fromJson(m))
-                                    .toList();
-                              });
+                            getWork(widget.tecId, widget.jid).then((val) {
+                              var jsonResponse = json.decode(val);
+                              print(jsonResponse[0]['ref_jidx']);
+                              if (jsonResponse[0]['ref_jidx'] != null) {
+                                API
+                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .then((value) {
+                                  setState(() {
+                                    ref = jsonResponse[0]['ref_jidx'];
+                                    List list1 = json.decode(value.body);
+                                    groupPic = list1
+                                        .map((m) => picLs.fromJson(m))
+                                        .toList();
+                                  });
+                                });
+                              }
                             });
                           });
                         });

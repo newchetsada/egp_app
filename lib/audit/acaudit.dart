@@ -21,13 +21,15 @@ class acaudit extends StatefulWidget {
   final String typeName;
   final int status;
   final int group;
+  final int sin;
 
   acaudit(
       {required this.jidx,
       required this.typeId,
       required this.typeName,
       required this.status,
-      required this.group});
+      required this.group,
+      required this.sin});
 }
 
 class _acauditState extends State<acaudit> {
@@ -167,7 +169,7 @@ class _acauditState extends State<acaudit> {
         });
   }
 
-  uploadPic(File image, sub) async {
+  uploadPic(File? image, sub) async {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
@@ -183,13 +185,17 @@ class _acauditState extends State<acaudit> {
     request.fields['sign_name'] = '';
     request.fields['measuredValue'] = '';
     request.fields['imgType'] = '0';
+    request.fields['sinsId'] = widget.sin.toString();
 
     request.fields['userName'] = userName;
-    request.fields['filesName'] = image.path.split('/').last;
+    request.fields['filesName'] =
+        (image == null) ? "" : image.path.split('/').last;
 
-    request.files.add(http.MultipartFile.fromBytes(
-        'files', image.readAsBytesSync(),
-        filename: image.path.split('/').last));
+    (image == null)
+        ? null
+        : request.files.add(http.MultipartFile.fromBytes(
+            'files', image.readAsBytesSync(),
+            filename: image.path.split('/').last));
 
     var response = await request.send();
 
@@ -241,6 +247,7 @@ class _acauditState extends State<acaudit> {
         'subTypeUnit': _selectedValue,
         'check': pass,
         'userName': userName,
+        'sinsId': widget.sin
       }),
     );
     if (response.statusCode == 200) {
@@ -254,7 +261,7 @@ class _acauditState extends State<acaudit> {
   void initState() {
     super.initState();
     getUser();
-    API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
+    API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
       setState(() {
         List list = json.decode(response.body);
         print(list);
@@ -390,14 +397,7 @@ class _acauditState extends State<acaudit> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
+                        //
                       ),
                     ),
                     Container(
@@ -448,26 +448,37 @@ class _acauditState extends State<acaudit> {
                           onTap: () {
                             loading();
                             API
-                                .getPicLs(widget.jidx, widget.typeId,
-                                    groupSub[index].sub_type_id, widget.group)
+                                .getPicLs(
+                                    widget.jidx,
+                                    widget.typeId,
+                                    groupSub[index].sub_type_id,
+                                    groupSub[index].sub_type_no,
+                                    widget.sin)
                                 .then((response) {
                               print(response.body);
                               setState(() {
                                 List list = json.decode(response.body);
+                                var picdetail =
+                                    list.map((m) => Album.fromJson(m)).toList();
                                 pic =
                                     list.map((m) => Album.fromJson(m)).toList();
-                                if (pic.isEmpty) {
+                                pic = pic
+                                    .where((element) =>
+                                        element.j_img_name.isNotEmpty)
+                                    .toList();
+                                if (picdetail.isEmpty) {
                                   remark.text = '';
                                   pass = null;
                                   _selectedValue = null;
                                   av.text = '';
                                 } else {
-                                  remark.text = pic[0].remark;
-                                  pass = pic[0].check;
-                                  _selectedValue = pic[0].sub_type_unit;
-                                  av.text = (pic[0].measured_value == null)
+                                  remark.text = picdetail[0].remark;
+                                  pass = picdetail[0].check;
+                                  _selectedValue = picdetail[0].sub_type_unit;
+                                  av.text = (picdetail[0].measured_value ==
+                                          null)
                                       ? ''
-                                      : pic[0].measured_value.toString();
+                                      : picdetail[0].measured_value.toString();
                                 }
                               });
                               Navigator.pop(context);
@@ -754,6 +765,14 @@ class _acauditState extends State<acaudit> {
                                   onTap: () {
                                     mystate(() {
                                       pass = 2;
+
+                                      deleteLs.clear();
+                                      for (var i = 0; i < pic.length; i++) {
+                                        if (pic[i].onApi == 1) {
+                                          deleteLs.add(pic[i].j_img_check_id);
+                                          print(deleteLs);
+                                        }
+                                      }
                                     });
                                   },
                                   child: Row(
@@ -865,39 +884,50 @@ class _acauditState extends State<acaudit> {
                                       ? List.generate(pic.length + 1, (index) {
                                           if (index > pic.length - 1) {
                                             return GestureDetector(
-                                              onTap: () {
-                                                showAdaptiveActionSheet(
-                                                  context: context,
-                                                  // title: const Text('Title'),
-                                                  actions: <BottomSheetAction>[
-                                                    BottomSheetAction(
-                                                      title: Text('Camera'),
-                                                      onPressed: (context) {
-                                                        openCamera()
-                                                            .then((value) {
-                                                          // imagefiles.add(value);
-                                                          mystate(() {});
-                                                        });
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                    BottomSheetAction(
-                                                        title: Text('Photos'),
-                                                        onPressed: (context) {
-                                                          openImages()
-                                                              .then((value) {
-                                                            // imagefiles
-                                                            //     .addAll(value);
-                                                            mystate(() {});
-                                                          });
-                                                          Navigator.pop(
-                                                              context);
-                                                        }),
-                                                  ],
-                                                  cancelAction: CancelAction(
-                                                      title: Text('Cancel')),
-                                                );
-                                              },
+                                              onTap: (pass == 2)
+                                                  ? null
+                                                  : () {
+                                                      showAdaptiveActionSheet(
+                                                        context: context,
+                                                        // title: const Text('Title'),
+                                                        actions: <BottomSheetAction>[
+                                                          BottomSheetAction(
+                                                            title:
+                                                                Text('Camera'),
+                                                            onPressed:
+                                                                (context) {
+                                                              openCamera().then(
+                                                                  (value) {
+                                                                // imagefiles.add(value);
+                                                                mystate(() {});
+                                                              });
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ),
+                                                          BottomSheetAction(
+                                                              title: Text(
+                                                                  'Photos'),
+                                                              onPressed:
+                                                                  (context) {
+                                                                openImages()
+                                                                    .then(
+                                                                        (value) {
+                                                                  // imagefiles
+                                                                  //     .addAll(value);
+                                                                  mystate(
+                                                                      () {});
+                                                                });
+                                                                Navigator.pop(
+                                                                    context);
+                                                              }),
+                                                        ],
+                                                        cancelAction:
+                                                            CancelAction(
+                                                                title: Text(
+                                                                    'Cancel')),
+                                                      );
+                                                    },
                                               child: Container(
                                                 // height: 20,
                                                 // width: double.infinity,
@@ -906,12 +936,16 @@ class _acauditState extends State<acaudit> {
                                                   borderRadius:
                                                       BorderRadius.circular(15),
                                                   border: Border.all(
-                                                      color: Color(0xff9DC75B)),
+                                                      color: (pass == 2)
+                                                          ? Color(0xffD3D3D3)
+                                                          : Color(0xff9DC75B)),
                                                 ),
                                                 child: Center(
                                                   child: Icon(
                                                     Icons.add,
-                                                    color: Color(0xffD6EFB4),
+                                                    color: (pass == 2)
+                                                        ? Color(0xffD3D3D3)
+                                                        : Color(0xffD6EFB4),
                                                     size: 60,
                                                   ),
                                                 ),
@@ -1064,37 +1098,45 @@ class _acauditState extends State<acaudit> {
                                         })
                                       : <Widget>[
                                           GestureDetector(
-                                            onTap: () {
-                                              showAdaptiveActionSheet(
-                                                context: context,
-                                                // title: const Text('Title'),
-                                                actions: <BottomSheetAction>[
-                                                  BottomSheetAction(
-                                                    title: Text('Camera'),
-                                                    onPressed: (context) {
-                                                      openCamera()
-                                                          .then((value) {
-                                                        // imagefiles.add(value);
-                                                        mystate(() {});
-                                                      });
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                  BottomSheetAction(
-                                                      title: Text('Photos'),
-                                                      onPressed: (context) {
-                                                        openImages()
-                                                            .then((value) {
-                                                          // imagefiles.addAll(value);
-                                                          mystate(() {});
-                                                        });
-                                                        Navigator.pop(context);
-                                                      }),
-                                                ],
-                                                cancelAction: CancelAction(
-                                                    title: Text('Cancel')),
-                                              );
-                                            },
+                                            onTap: (pass == 2)
+                                                ? null
+                                                : () {
+                                                    showAdaptiveActionSheet(
+                                                      context: context,
+                                                      // title: const Text('Title'),
+                                                      actions: <BottomSheetAction>[
+                                                        BottomSheetAction(
+                                                          title: Text('Camera'),
+                                                          onPressed: (context) {
+                                                            openCamera()
+                                                                .then((value) {
+                                                              // imagefiles.add(value);
+                                                              mystate(() {});
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                        ),
+                                                        BottomSheetAction(
+                                                            title:
+                                                                Text('Photos'),
+                                                            onPressed:
+                                                                (context) {
+                                                              openImages().then(
+                                                                  (value) {
+                                                                // imagefiles.addAll(value);
+                                                                mystate(() {});
+                                                              });
+                                                              Navigator.pop(
+                                                                  context);
+                                                            }),
+                                                      ],
+                                                      cancelAction:
+                                                          CancelAction(
+                                                              title: Text(
+                                                                  'Cancel')),
+                                                    );
+                                                  },
                                             child: Container(
                                               // height: 20,
                                               // width: double.infinity,
@@ -1103,12 +1145,16 @@ class _acauditState extends State<acaudit> {
                                                 borderRadius:
                                                     BorderRadius.circular(15),
                                                 border: Border.all(
-                                                    color: Color(0xff9DC75B)),
+                                                    color: (pass == 2)
+                                                        ? Color(0xffD3D3D3)
+                                                        : Color(0xff9DC75B)),
                                               ),
                                               child: Center(
                                                 child: Icon(
                                                   Icons.add,
-                                                  color: Color(0xffD6EFB4),
+                                                  color: (pass == 2)
+                                                      ? Color(0xffD3D3D3)
+                                                      : Color(0xffD6EFB4),
                                                   size: 60,
                                                 ),
                                               ),
@@ -1158,13 +1204,66 @@ class _acauditState extends State<acaudit> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // Navigator.pop(context);
+                                      // if (av.text == '' ||
+                                      //     _selectedValue == null ||
+                                      //     pass == null ||
+                                      //     pic.isEmpty) {
+                                      //   pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
+                                      // } else {
+                                      //   loading();
+                                      //   loopdelete().then((value) {
+                                      //     loopupload(subb).then((value) {
+                                      //       updateRemark(
+                                      //               widget.jidx,
+                                      //               widget.typeId,
+                                      //               subb,
+                                      //               remark.text)
+                                      //           .then((value) {
+                                      //         Navigator.pop(context);
+                                      //         Navigator.pop(context);
+                                      //       });
+                                      //     });
+                                      //   });
+                                      // }
+
+                                      loading();
                                       if (av.text == '' ||
                                           _selectedValue == null ||
-                                          pass == null ||
-                                          pic.isEmpty) {
-                                        pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
-                                      } else {
-                                        loading();
+                                          pass == null) {
+                                        Navigator.pop(context);
+                                        pop('กรุณากรอกข้อมูล');
+                                      } else if (pass == 0) {
+                                        if (pic.isNotEmpty) {
+                                          loopdelete().then((value) {
+                                            loopupload(subb).then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        } else {
+                                          loopdelete().then((value) {
+                                            uploadPic(null, subb.toString())
+                                                .then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        }
+                                      } else if (pass == 1 && pic.isNotEmpty) {
                                         loopdelete().then((value) {
                                           loopupload(subb).then((value) {
                                             updateRemark(
@@ -1178,6 +1277,25 @@ class _acauditState extends State<acaudit> {
                                             });
                                           });
                                         });
+                                      } else if (pass == 2) {
+                                        loopdelete().then((value) {
+                                          uploadPic(null, subb.toString())
+                                              .then((value) {
+                                            updateRemark(
+                                                    widget.jidx,
+                                                    widget.typeId,
+                                                    subb,
+                                                    remark.text)
+                                                .then((value) {
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                            });
+                                          });
+                                        });
+                                      } else {
+                                        Navigator.pop(context);
+
+                                        pop('กรุณาอัพโหลดรูปภาพ');
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -1206,7 +1324,7 @@ class _acauditState extends State<acaudit> {
           });
         }).then((value) {
       setState(() {
-        API.getSubLs(widget.jidx, widget.typeId, widget.group).then((response) {
+        API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
           setState(() {
             List list = json.decode(response.body);
             groupSub = list.map((m) => SubLs.fromJson(m)).toList();
@@ -1220,7 +1338,7 @@ class _acauditState extends State<acaudit> {
 
 //api
 class API {
-  static Future getSubLs(idd, type, group) async {
+  static Future getSubLs(idd, type, sin) async {
     final response = await http.post(
       Uri.parse(
           'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupAuditImageLs'),
@@ -1229,12 +1347,12 @@ class API {
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(
-          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'groupNo': group}),
+          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'sinsId': sin}),
     );
     return response;
   }
 
-  static Future getPicLs(idd, type, sub, group) async {
+  static Future getPicLs(idd, type, sub, subTypeNo, sinsId) async {
     final response = await http.post(
       Uri.parse(
           'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
@@ -1244,10 +1362,11 @@ class API {
       },
       body: jsonEncode(<dynamic, dynamic>{
         'jidx': idd,
-        'groupNo': group,
+        'subTypeNo': subTypeNo,
         'imgType': 0,
         'typeId': type,
-        'subTypeId': sub
+        'subTypeId': sub,
+        'sinsId': sinsId
       }),
     );
     return response;
@@ -1258,18 +1377,20 @@ class SubLs {
   final int sub_type_id;
   final String sub_type_name;
   final int amount_pic;
+  final int? sub_type_no;
 
-  const SubLs({
-    required this.sub_type_id,
-    required this.sub_type_name,
-    required this.amount_pic,
-  });
+  const SubLs(
+      {required this.sub_type_id,
+      required this.sub_type_name,
+      required this.amount_pic,
+      required this.sub_type_no});
 
   factory SubLs.fromJson(Map<String, dynamic> json) {
     return SubLs(
       sub_type_id: json['sub_type_id'],
       sub_type_name: json['sub_type_name'],
       amount_pic: json['amount_pic'],
+      sub_type_no: json['sub_type_no'],
     );
   }
 }

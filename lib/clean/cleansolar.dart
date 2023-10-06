@@ -6,12 +6,15 @@ import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/report/report.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,6 +44,8 @@ class cleansolar extends StatefulWidget {
   final int j_status;
   final int ppe_flag;
   final String j_remark_complete;
+  final int sid;
+  final String pic;
 
   //
 
@@ -63,7 +68,9 @@ class cleansolar extends StatefulWidget {
       required this.tel,
       required this.j_status,
       required this.ppe_flag,
-      required this.j_remark_complete});
+      required this.j_remark_complete,
+      required this.sid,
+      required this.pic});
 }
 
 class _cleansolarState extends State<cleansolar> {
@@ -82,6 +89,7 @@ class _cleansolarState extends State<cleansolar> {
   int before_taken = 0;
   int after_taken = 0;
   int total_taken = 0;
+  int workstatus = 0;
 
   var remarkEnd = TextEditingController();
 
@@ -207,6 +215,22 @@ class _cleansolarState extends State<cleansolar> {
     }
   }
 
+  Future getWork(idd, jidx) async {
+    final response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'techId': idd,
+        'jidx': jidx,
+      }),
+    );
+    return response.body;
+  }
+
   StartWork() async {
     var response = await http.post(
       Uri.parse(
@@ -294,6 +318,9 @@ class _cleansolarState extends State<cleansolar> {
     // getUser().then((value) {
     //   getWorkdetail(iduser, widget.jid).then((value) {});
     // });
+    setState(() {
+      workstatus = widget.j_status;
+    });
     getUser();
     _getAPI(widget.jid);
     getcountphoto(widget.jid);
@@ -522,14 +549,7 @@ class _cleansolarState extends State<cleansolar> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
                               topRight: Radius.circular(25)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffE1F5DC),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: Offset(0, -3), // Shadow position
-                            ),
-                          ],
+                          //
                         ),
                         child: (widget.j_status == 3)
                             ? Padding(
@@ -673,11 +693,14 @@ class _cleansolarState extends State<cleansolar> {
                   // width: 160,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (widget.j_status == 1) {
+                      if (workstatus == 1) {
                         loading();
                         StartWork().then((jsonResponse) {
                           print(jsonResponse);
                           if (jsonResponse['status'] == true) {
+                            setState(() {
+                              workstatus = 2;
+                            });
                             Navigator.pop(context);
                             controller.nextPage(
                                 duration: Duration(milliseconds: 300),
@@ -708,7 +731,7 @@ class _cleansolarState extends State<cleansolar> {
                       ),
                     ),
                     child: Text(
-                      (widget.j_status == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
+                      (workstatus == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -905,28 +928,66 @@ class _cleansolarState extends State<cleansolar> {
                   height: 10,
                 ),
                 (widget.ppe_flag == 1)
-                    ? Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: Color(0xff57A946),
-                            size: 25,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('ชุด PPE',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Color(0xff57A946))),
-                        ],
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text('ชุด PPE',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: Color(0xff57A946))),
+                          ],
+                        ),
                       )
                     : Container(),
+
+                // DottedLine(dashColor: Color(0xffD5D5D5)),
+                Text('แผนผังไซต์งาน',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Color(0xff58A946))),
                 SizedBox(
                   height: 10,
                 ),
-                // DottedLine(dashColor: Color(0xffD5D5D5)),
+                AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: GestureDetector(
+                        onTap: (widget.pic.isEmpty)
+                            ? null
+                            : () {
+                                showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                        elevation: 0,
+                                        backgroundColor: Colors.transparent,
+                                        child: PhotoView(
+                                          tightMode: true,
+                                          minScale: 0.25,
+                                          backgroundDecoration: BoxDecoration(
+                                              color: Colors.transparent),
+                                          imageProvider: NetworkImage(
+                                              '$pathPic${widget.pic}'),
+                                        )));
+                              },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: (widget.pic.isEmpty)
+                              ? Image.asset(
+                                  'assets/nolayer.png',
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network('$pathPic${widget.pic}'),
+                        ))),
                 SizedBox(
                   height: 10,
                 ),
@@ -995,9 +1056,11 @@ class _cleansolarState extends State<cleansolar> {
                             padding:
                                 EdgeInsets.only(left: (index == 0) ? 0 : 10),
                             child: GestureDetector(
-                              onTap: () {
-                                _makePhoneCall(contact[index].j_cont_tel);
-                              },
+                              onTap: (contact[index].j_cont_tel.isEmpty)
+                                  ? null
+                                  : () {
+                                      _makePhoneCall(contact[index].j_cont_tel);
+                                    },
                               child: Container(
                                 width: 150,
                                 decoration: BoxDecoration(
@@ -1022,13 +1085,14 @@ class _cleansolarState extends State<cleansolar> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.person,
+                                        EvaIcons.peopleOutline,
                                         color: Color(0xff2A302C),
                                         size: 22,
                                       ),
                                       Text(contact[index].j_cont_name,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500,
+                                              overflow: TextOverflow.ellipsis,
                                               fontSize: 13,
                                               color: Color(0xff464646))),
                                       Text(
@@ -1094,11 +1158,12 @@ class _cleansolarState extends State<cleansolar> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
-                            Icons.person,
+                            EvaIcons.peopleOutline,
                             color: Color(0xff2A302C),
                             size: 22,
                           ),
                           Text(widget.fullname,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13,
@@ -1154,12 +1219,24 @@ class _cleansolarState extends State<cleansolar> {
                               // width: 160,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            report(jid: widget.jid)),
-                                  );
+                                  getWork(iduser, widget.jid).then((value) {
+                                    var jsonResponse = json.decode(value);
+                                    print(jsonResponse[0]['cus_id']);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => report(
+                                                jid: widget.jid,
+                                                sid: widget.sid,
+                                                username: userName,
+                                                cusId: jsonResponse[0]
+                                                    ['cus_id'],
+                                                ref_jidx: jsonResponse[0]
+                                                    ['ref_jidx'],
+                                                tecId: iduser ?? 0,
+                                              )),
+                                    );
+                                  });
                                 },
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -1310,9 +1387,9 @@ class _cleansolarState extends State<cleansolar> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Image.asset(
-                                            'assets/clean.png',
-                                            width: 30,
+                                          Icon(
+                                            EvaIcons.image2,
+                                            color: Color(0xff2A302C),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -1442,9 +1519,9 @@ class _cleansolarState extends State<cleansolar> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Image.asset(
-                                            'assets/clean.png',
-                                            width: 30,
+                                          Icon(
+                                            EvaIcons.image2,
+                                            color: Color(0xff2A302C),
                                           ),
                                           SizedBox(
                                             height: 5,
@@ -1600,7 +1677,7 @@ class _cleansolarState extends State<cleansolar> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(Icons.person,
+                                child: Icon(EvaIcons.peopleOutline,
                                     size: 20,
                                     color: (sign_name_1.isNotEmpty)
                                         ? Color(0xff9CC75B)
@@ -1675,7 +1752,7 @@ class _cleansolarState extends State<cleansolar> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(Icons.person,
+                                child: Icon(EvaIcons.peopleOutline,
                                     size: 20,
                                     color: (sign_name_2.isNotEmpty)
                                         ? Color(0xff9CC75B)
@@ -2206,7 +2283,7 @@ class _cleansolarState extends State<cleansolar> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(Icons.person,
+                            child: Icon(EvaIcons.peopleOutline,
                                 size: 20,
                                 color: (sign_name_1.isNotEmpty)
                                     ? Color(0xff9CC75B)
@@ -2281,7 +2358,7 @@ class _cleansolarState extends State<cleansolar> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(Icons.person,
+                            child: Icon(EvaIcons.peopleOutline,
                                 size: 20,
                                 color: (sign_name_2.isNotEmpty)
                                     ? Color(0xff9CC75B)
@@ -2508,7 +2585,8 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_cont_name: '${json['j_cont_fname']} ${json['j_cont_lname']}',
+      j_cont_name:
+          '${json['j_cont_fname'] ?? ''} ${json['j_cont_lname'] ?? ''}',
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
     );

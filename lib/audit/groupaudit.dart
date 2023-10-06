@@ -159,7 +159,7 @@ class _groupauditState extends State<groupaudit> {
         });
   }
 
-  uploadPic(File image, sub) async {
+  uploadPic(File? image, sub) async {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
@@ -177,11 +177,14 @@ class _groupauditState extends State<groupaudit> {
     request.fields['imgType'] = '0';
 
     request.fields['userName'] = userName;
-    request.fields['filesName'] = image.path.split('/').last;
+    request.fields['filesName'] =
+        (image == null) ? "" : image.path.split('/').last;
 
-    request.files.add(http.MultipartFile.fromBytes(
-        'files', image.readAsBytesSync(),
-        filename: image.path.split('/').last));
+    (image == null)
+        ? null
+        : request.files.add(http.MultipartFile.fromBytes(
+            'files', image.readAsBytesSync(),
+            filename: image.path.split('/').last));
 
     var response = await request.send();
 
@@ -260,14 +263,15 @@ class _groupauditState extends State<groupaudit> {
         setState(() {
           List list = json.decode(response.body);
           print(list);
-
+          var picdetail = list.map((m) => Album.fromJson(m)).toList();
           pic = list.map((m) => Album.fromJson(m)).toList();
-          if (pic.isEmpty) {
+          pic = pic.where((element) => element.j_img_name.isNotEmpty).toList();
+          if (picdetail.isEmpty) {
             remark.text = '';
             pass = null;
           } else {
-            remark.text = pic[0].remark;
-            pass = pic[0].check;
+            remark.text = picdetail[0].remark;
+            pass = picdetail[0].check;
           }
         });
       });
@@ -325,11 +329,36 @@ class _groupauditState extends State<groupaudit> {
                             onPressed: () {
                               if (widget.choice == 1) {
                                 loading();
-                                if (pass == null || pic.isEmpty) {
+                                if (pass == null) {
+                                  // || pic.isEmpty
                                   Navigator.pop(context);
 
-                                  pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
-                                } else {
+                                  pop('กรุณากรอกข้อมูล');
+                                } else if (pass == 0) {
+                                  if (pic.isNotEmpty) {
+                                    loopdelete().then((value) {
+                                      loopupload("").then((value) {
+                                        updateRemark(widget.jidx, widget.typeId,
+                                                null, remark.text)
+                                            .then((value) {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        });
+                                      });
+                                    });
+                                  } else {
+                                    loopdelete().then((value) {
+                                      uploadPic(null, "").then((value) {
+                                        updateRemark(widget.jidx, widget.typeId,
+                                                null, remark.text)
+                                            .then((value) {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        });
+                                      });
+                                    });
+                                  }
+                                } else if (pass == 1 && pic.isNotEmpty) {
                                   loopdelete().then((value) {
                                     loopupload("").then((value) {
                                       updateRemark(widget.jidx, widget.typeId,
@@ -340,6 +369,10 @@ class _groupauditState extends State<groupaudit> {
                                       });
                                     });
                                   });
+                                } else {
+                                  Navigator.pop(context);
+
+                                  pop('กรุณาอัพโหลดรูปภาพ');
                                 }
                               } else {
                                 Navigator.pop(context);
@@ -420,14 +453,7 @@ class _groupauditState extends State<groupaudit> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
+                        //
                       ),
                     ),
                     Container(
@@ -886,15 +912,22 @@ class _groupauditState extends State<groupaudit> {
                                     print(response.body);
                                     setState(() {
                                       List list = json.decode(response.body);
+                                      var picdetail = list
+                                          .map((m) => Album.fromJson(m))
+                                          .toList();
                                       pic = list
                                           .map((m) => Album.fromJson(m))
                                           .toList();
-                                      if (pic.isEmpty) {
+                                      pic = pic
+                                          .where((element) =>
+                                              element.j_img_name.isNotEmpty)
+                                          .toList();
+                                      if (picdetail.isEmpty) {
                                         remark.text = '';
                                         pass = null;
                                       } else {
-                                        remark.text = pic[0].remark;
-                                        pass = pic[0].check;
+                                        remark.text = picdetail[0].remark;
+                                        pass = picdetail[0].check;
                                       }
                                     });
                                     Navigator.pop(context);
@@ -1486,10 +1519,45 @@ class _groupauditState extends State<groupaudit> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // Navigator.pop(context);
-                                      if (pass == null || pic.isEmpty) {
-                                        pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
-                                      } else {
-                                        loading();
+
+                                      loading();
+                                      if (pass == null) {
+                                        // || pic.isEmpty
+                                        Navigator.pop(context);
+
+                                        pop('กรุณากรอกข้อมูล');
+                                      } else if (pass == 0) {
+                                        if (pic.isNotEmpty) {
+                                          loopdelete().then((value) {
+                                            loopupload(subb).then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        } else {
+                                          loopdelete().then((value) {
+                                            uploadPic(null, subb.toString())
+                                                .then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        }
+                                      } else if (pass == 1 && pic.isNotEmpty) {
                                         loopdelete().then((value) {
                                           loopupload(subb).then((value) {
                                             updateRemark(
@@ -1503,7 +1571,30 @@ class _groupauditState extends State<groupaudit> {
                                             });
                                           });
                                         });
+                                      } else {
+                                        Navigator.pop(context);
+
+                                        pop('กรุณาอัพโหลดรูปภาพ');
                                       }
+
+                                      // if (pass == null || pic.isEmpty) {
+                                      //   pop('กรุณากรอกข้อมูลและอัพโหลดรูป');
+                                      // } else {
+                                      //   loading();
+                                      //   loopdelete().then((value) {
+                                      //     loopupload(subb).then((value) {
+                                      //       updateRemark(
+                                      //               widget.jidx,
+                                      //               widget.typeId,
+                                      //               subb,
+                                      //               remark.text)
+                                      //           .then((value) {
+                                      //         Navigator.pop(context);
+                                      //         Navigator.pop(context);
+                                      //       });
+                                      //     });
+                                      //   });
+                                      // }
                                     },
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: Colors.white,

@@ -23,13 +23,15 @@ class addaudit extends StatefulWidget {
   final String typeName;
   final int status;
   final int? choice;
+  final int sid;
 
   addaudit(
       {required this.jidx,
       required this.typeId,
       required this.typeName,
       required this.status,
-      required this.choice});
+      required this.choice,
+      required this.sid});
 }
 
 class _addauditState extends State<addaudit> {
@@ -114,75 +116,75 @@ class _addauditState extends State<addaudit> {
         });
   }
 
-  deletePic(id) async {
-    var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteImageChecklist'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-      },
-      body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
-        'jImgCheckId': id,
-        'typeId': widget.typeId,
-        'userName': userName,
-      }),
-    );
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse;
-    }
-  }
+  // deletePic(id) async {
+  //   var response = await http.post(
+  //     Uri.parse(
+  //         'https://backoffice.energygreenplus.co.th/api/mobile/deleteImageChecklist'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+  //     },
+  //     body: jsonEncode(<dynamic, dynamic>{
+  //       'jidx': widget.jidx,
+  //       'jImgCheckId': id,
+  //       'typeId': widget.typeId,
+  //       'userName': userName,
+  //     }),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     var jsonResponse = json.decode(response.body);
+  //     print(jsonResponse);
+  //     return jsonResponse;
+  //   }
+  // }
 
-  deleteGroup(groupNo) async {
-    var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobGroupImageAudit'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-      },
-      body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
-        'groupNo': groupNo,
-        'typeId': widget.typeId,
-        'userName': userName,
-      }),
-    );
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse;
-    }
-  }
+  // deleteGroup(groupNo) async {
+  //   var response = await http.post(
+  //     Uri.parse(
+  //         'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobGroupImageAudit'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+  //     },
+  //     body: jsonEncode(<dynamic, dynamic>{
+  //       'jidx': widget.jidx,
+  //       'groupNo': groupNo,
+  //       'typeId': widget.typeId,
+  //       'userName': userName,
+  //     }),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     var jsonResponse = json.decode(response.body);
+  //     print(jsonResponse);
+  //     return jsonResponse;
+  //   }
+  // }
 
-  addgroup() async {
-    var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/addGroupAudit'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-      },
-      body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
-        'typeId': widget.typeId,
-      }),
-    );
-    if (response.statusCode == 200) {
-      var jsonResponse = json.decode(response.body);
-      print(jsonResponse);
-      return jsonResponse;
-    }
-  }
+  // addgroup() async {
+  //   var response = await http.post(
+  //     Uri.parse(
+  //         'https://backoffice.energygreenplus.co.th/api/mobile/addGroupAudit'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+  //     },
+  //     body: jsonEncode(<dynamic, dynamic>{
+  //       'jidx': widget.jidx,
+  //       'typeId': widget.typeId,
+  //     }),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     var jsonResponse = json.decode(response.body);
+  //     print(jsonResponse);
+  //     return jsonResponse;
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     getUser();
-    API.getSubLs(widget.jidx, widget.typeId).then((response) {
+    API.getSubLs(widget.sid, widget.jidx, widget.typeId).then((response) {
       setState(() {
         List list = json.decode(response.body);
         print(list);
@@ -192,85 +194,87 @@ class _addauditState extends State<addaudit> {
     });
   }
 
-  Widget addcard() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
-      child: GestureDetector(
-        onTap: () {
-          loading();
-          addgroup().then((value) {
-            Navigator.pop(context);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => (widget.typeId == 31)
-                        ? acaudit(
-                            jidx: widget.jidx,
-                            typeId: widget.typeId,
-                            typeName: widget.typeName,
-                            status: widget.status,
-                            group: value['newGroupNo'])
-                        : addinverter(
-                            jidx: widget.jidx,
-                            typeId: widget.typeId,
-                            typeName: widget.typeName,
-                            status: widget.status,
-                            group: value['newGroupNo']))).then((value) {
-              API.getSubLs(widget.jidx, widget.typeId).then((response) {
-                setState(() {
-                  List list = json.decode(response.body);
-                  print(list);
-                  groupSub = list.map((m) => SubLs.fromJson(m)).toList();
-                  // contactloading = false;
-                });
-              });
-            });
-          });
-        },
-        child: Container(
-          height: 60,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xffE1F5DC),
-                Color(0xffD6EFB4),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Color(0xff149C32).withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 0,
-                offset: Offset(0, 0), // Shadow position
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(widget.typeName,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 17,
-                        color: Color(0xff2A302C))),
-                Icon(
-                  EvaIcons.plusCircle,
-                  color: Colors.white,
-                  size: 30,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget addcard() {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(top: 30, left: 30, right: 30),
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         loading();
+  //         addgroup().then((value) {
+  //           Navigator.pop(context);
+  //           Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) => (widget.typeId == 31)
+  //                       ? acaudit(
+  //                           jidx: widget.jidx,
+  //                           typeId: widget.typeId,
+  //                           typeName: widget.typeName,
+  //                           status: widget.status,
+  //                           group: value['newGroupNo'])
+  //                       : addinverter(
+  //                           jidx: widget.jidx,
+  //                           typeId: widget.typeId,
+  //                           typeName: widget.typeName,
+  //                           status: widget.status,
+  //                           group: value['newGroupNo']))).then((value) {
+  //             API
+  //                 .getSubLs(widget.sid, widget.jidx, widget.typeId)
+  //                 .then((response) {
+  //               setState(() {
+  //                 List list = json.decode(response.body);
+  //                 print(list);
+  //                 groupSub = list.map((m) => SubLs.fromJson(m)).toList();
+  //                 // contactloading = false;
+  //               });
+  //             });
+  //           });
+  //         });
+  //       },
+  //       child: Container(
+  //         height: 60,
+  //         width: double.infinity,
+  //         decoration: BoxDecoration(
+  //           gradient: LinearGradient(
+  //             begin: Alignment.topLeft,
+  //             end: Alignment.bottomRight,
+  //             colors: [
+  //               Color(0xffE1F5DC),
+  //               Color(0xffD6EFB4),
+  //             ],
+  //           ),
+  //           borderRadius: BorderRadius.circular(15),
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Color(0xff149C32).withOpacity(0.1),
+  //               blurRadius: 10,
+  //               spreadRadius: 0,
+  //               offset: Offset(0, 0), // Shadow position
+  //             ),
+  //           ],
+  //         ),
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 20),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //             children: [
+  //               Text(widget.typeName,
+  //                   style: TextStyle(
+  //                       fontWeight: FontWeight.w600,
+  //                       fontSize: 17,
+  //                       color: Color(0xff2A302C))),
+  //               Icon(
+  //                 EvaIcons.plusCircle,
+  //                 color: Colors.white,
+  //                 size: 30,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -329,7 +333,7 @@ class _addauditState extends State<addaudit> {
               ),
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: (widget.status == 3) ? 70 : 140,
+          toolbarHeight: 70,
           backgroundColor: Color(0xffF8FFF6),
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
@@ -373,40 +377,27 @@ class _addauditState extends State<addaudit> {
                 ),
                 Column(
                   children: [
-                    (widget.status == 3)
-                        ? Container(
-                            height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(25),
-                                  topRight: Radius.circular(25)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffE1F5DC),
-                                  blurRadius: 20,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, -3), // Shadow position
-                                ),
-                              ],
-                            ))
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(25),
-                                  topRight: Radius.circular(25)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffE1F5DC),
-                                  blurRadius: 20,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, -3), // Shadow position
-                                ),
-                              ],
-                            ),
-                            child: addcard(),
-                          ),
+                    // (widget.status == 3)
+                    //     ?
+                    Container(
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                          //
+                        )),
+                    // : Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.only(
+                    //           topLeft: Radius.circular(25),
+                    //           topRight: Radius.circular(25)),
+                    //       //
+                    //     ),
+                    //     child: addcard(),
+                    //   ),
                     Container(
                       height: 15,
                       decoration: BoxDecoration(
@@ -439,295 +430,331 @@ class _addauditState extends State<addaudit> {
                     return Padding(
                       padding: const EdgeInsets.only(left: 30, right: 30),
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: (widget.status == 3)
-                            ? GestureDetector(
-                                onTap: () {
-                                  // loading();
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              (widget.typeId == 31)
-                                                  ? acaudit(
-                                                      jidx: widget.jidx,
-                                                      typeId: widget.typeId,
-                                                      typeName: widget.typeName,
-                                                      status: widget.status,
-                                                      group: groupSub[index]
-                                                          .group_no)
-                                                  : addinverter(
-                                                      jidx: widget.jidx,
-                                                      typeId: widget.typeId,
-                                                      typeName: widget.typeName,
-                                                      status: widget.status,
-                                                      group: groupSub[index]
-                                                          .group_no))).then(
-                                      (value) {
-                                    API
-                                        .getSubLs(widget.jidx, widget.typeId)
-                                        .then((response) {
-                                      setState(() {
-                                        List list = json.decode(response.body);
-                                        print(list);
-                                        groupSub = list
-                                            .map((m) => SubLs.fromJson(m))
-                                            .toList();
-                                        // contactloading = false;
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child:
+                              //  (widget.status == 3)
+                              //     ?
+                              GestureDetector(
+                                  onTap: () {
+                                    // loading();
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => (widget
+                                                        .typeId ==
+                                                    32)
+                                                ? addinverter(
+                                                    jidx: widget.jidx,
+                                                    typeId: widget.typeId,
+                                                    typeName: widget.typeName,
+                                                    status: widget.status,
+                                                    group: 0,
+                                                    no: index + 1,
+                                                    sn: groupSub[index].sn,
+                                                    sin:
+                                                        groupSub[index].sins_id,
+                                                  )
+                                                : acaudit(
+                                                    jidx: widget.jidx,
+                                                    typeId: widget.typeId,
+                                                    typeName: widget.typeName,
+                                                    status: widget.status,
+                                                    group: 0,
+                                                    sin:
+                                                        groupSub[index].sins_id,
+                                                  ))).then((value) {
+                                      API
+                                          .getSubLs(widget.sid, widget.jidx,
+                                              widget.typeId)
+                                          .then((response) {
+                                        setState(() {
+                                          List list =
+                                              json.decode(response.body);
+                                          print(list);
+                                          groupSub = list
+                                              .map((m) => SubLs.fromJson(m))
+                                              .toList();
+                                          // contactloading = false;
+                                        });
                                       });
                                     });
-                                  });
-                                },
-                                child: Container(
-                                  height: 60,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
-                                    border: Border.all(
-                                        color: Color(0xff9DC75B), width: 0.5),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            '${widget.typeName} ${index + 1}',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                color: Color(0xff9DC75B),
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15),
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(
+                                          color: Color(0xff9DC75B), width: 0.5),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  (widget.typeId == 32)
+                                                      ? 'Inverter ${index + 1}'
+                                                      : (widget.typeId == 30)
+                                                          ? 'ตู้แผงไฟฟ้า AC ${index + 1}'
+                                                          : (widget.typeId ==
+                                                                  37)
+                                                              ? 'ตู้แผงไฟฟ้า DC ${index + 1}'
+                                                              : '${widget.typeName} ${index + 1}',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      color: Color(0xff9DC75B),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 15),
+                                                ),
+                                                (widget.typeId == 32 ||
+                                                        widget.typeId == 37 ||
+                                                        widget.typeId == 29)
+                                                    ? Text(
+                                                        'SN ${groupSub[index].sn}',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xff57A946),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 12),
+                                                      )
+                                                    : Container()
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        Icon(
-                                          EvaIcons.checkmarkCircle2,
-                                          size: 30,
-                                          color: (groupSub[index].type_id == 32)
-                                              ? (groupSub[index].status_sub80 ==
-                                                      true)
-                                                  ? Color(0xffABD06F)
-                                                  : Color.fromARGB(
-                                                      255, 211, 211, 211)
-                                              : (groupSub[index].amount_true ==
-                                                      groupSub[index]
-                                                          .amount_all)
-                                                  ? Color(0xffABD06F)
-                                                  : Color.fromARGB(
-                                                      255, 211, 211, 211),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ))
-                            : Slidable(
-                                endActionPane: ActionPane(
-                                  extentRatio: 0.2,
-                                  motion: BehindMotion(),
-                                  children: [
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    SlidableAction(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
-                                      onPressed: ((context) {
-                                        // print(group);
-                                        showDialog(
-                                            barrierDismissible: false,
-                                            context: context,
-                                            builder: (context) {
-                                              return (defaultTargetPlatform ==
-                                                      TargetPlatform.android)
-                                                  ? AlertDialog(
-                                                      actionsPadding:
-                                                          EdgeInsets.all(5),
-                                                      // title: Text(
-                                                      //     'ต้องการลบข้อมูลหรือไม่'),
-                                                      contentPadding:
-                                                          EdgeInsets.only(
-                                                              top: 30,
-                                                              bottom: 20),
-                                                      content: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                              'ต้องการลบข้อมูลหรือไม่'),
-                                                        ],
-                                                      ),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteGroup(groupSub[
-                                                                          index]
-                                                                      .group_no)
-                                                                  .then((val) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    )
-                                                  : CupertinoAlertDialog(
-                                                      content: Text(
-                                                          'ต้องการลบข้อมูลหรือไม่'),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context); //close Dialog
-                                                          },
-                                                          child: Text('ยกเลิก'),
-                                                        ),
-                                                        TextButton(
-                                                            style: TextButton
-                                                                .styleFrom(
-                                                              primary: Colors
-                                                                  .red, // Text Color
-                                                            ),
-                                                            onPressed: () {
-                                                              deleteGroup(groupSub[
-                                                                          index]
-                                                                      .group_no)
-                                                                  .then((val) {
-                                                                Navigator.pop(
-                                                                    context);
-                                                              });
-                                                            },
-                                                            child: Text('ลบ')),
-                                                      ],
-                                                    );
-                                            }).then((value) {
-                                          API
-                                              .getSubLs(
-                                                  widget.jidx, widget.typeId)
-                                              .then((response) {
-                                            setState(() {
-                                              List list =
-                                                  json.decode(response.body);
-                                              print(list);
-                                              groupSub = list
-                                                  .map((m) => SubLs.fromJson(m))
-                                                  .toList();
-                                              // contactloading = false;
-                                            });
-                                          });
-                                        });
-                                      }),
-                                      backgroundColor: Colors.red,
-                                      foregroundColor: Colors.white,
-                                      icon: Icons.delete,
-                                      label: 'ลบ',
-                                    ),
-                                  ],
-                                ),
-                                child: GestureDetector(
-                                    onTap: () {
-                                      // loading();
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => (widget
-                                                          .typeId ==
-                                                      31)
-                                                  ? acaudit(
-                                                      jidx: widget.jidx,
-                                                      typeId: widget.typeId,
-                                                      typeName: widget.typeName,
-                                                      status: widget.status,
-                                                      group: groupSub[index]
-                                                          .group_no)
-                                                  : addinverter(
-                                                      jidx: widget.jidx,
-                                                      typeId: widget.typeId,
-                                                      typeName: widget.typeName,
-                                                      status: widget.status,
-                                                      group: groupSub[index]
-                                                          .group_no))).then(
-                                          (value) {
-                                        API
-                                            .getSubLs(
-                                                widget.jidx, widget.typeId)
-                                            .then((response) {
-                                          setState(() {
-                                            List list =
-                                                json.decode(response.body);
-                                            print(list);
-                                            groupSub = list
-                                                .map((m) => SubLs.fromJson(m))
-                                                .toList();
-                                            // contactloading = false;
-                                          });
-                                        });
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 60,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                        border: Border.all(
-                                            color: Color(0xff9DC75B),
-                                            width: 0.5),
+                                          Icon(
+                                            EvaIcons.checkmarkCircle2,
+                                            size: 30,
+                                            color: (groupSub[index]
+                                                        .amount_true ==
+                                                    groupSub[index].amount_all)
+                                                ? Color(0xffABD06F)
+                                                : Color.fromARGB(
+                                                    255, 211, 211, 211),
+                                          ),
+                                        ],
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                '${widget.typeName} ${index + 1}',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                    color: Color(0xff9DC75B),
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 15),
-                                              ),
-                                            ),
-                                            Icon(
-                                              EvaIcons.checkmarkCircle2,
-                                              size: 30,
-                                              color: (groupSub[index].type_id ==
-                                                      32)
-                                                  ? (groupSub[index]
-                                                              .status_sub80 ==
-                                                          true)
-                                                      ? Color(0xffABD06F)
-                                                      : Color.fromARGB(
-                                                          255, 211, 211, 211)
-                                                  : (groupSub[index]
-                                                              .amount_true ==
-                                                          groupSub[index]
-                                                              .amount_all)
-                                                      ? Color(0xffABD06F)
-                                                      : Color.fromARGB(
-                                                          255, 211, 211, 211),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                      ),
+                                    ),
+                                  ))
+                          // : Slidable(
+                          //     endActionPane: ActionPane(
+                          //       extentRatio: 0.2,
+                          //       motion: BehindMotion(),
+                          //       children: [
+                          //         SizedBox(
+                          //           width: 10,
+                          //         ),
+                          //         SlidableAction(
+                          //           borderRadius:
+                          //               BorderRadius.all(Radius.circular(15)),
+                          //           onPressed: ((context) {
+                          //             // print(group);
+                          //             showDialog(
+                          //                 barrierDismissible: false,
+                          //                 context: context,
+                          //                 builder: (context) {
+                          //                   return (defaultTargetPlatform ==
+                          //                           TargetPlatform.android)
+                          //                       ? AlertDialog(
+                          //                           actionsPadding:
+                          //                               EdgeInsets.all(5),
+                          //                           // title: Text(
+                          //                           //     'ต้องการลบข้อมูลหรือไม่'),
+                          //                           contentPadding:
+                          //                               EdgeInsets.only(
+                          //                                   top: 30,
+                          //                                   bottom: 20),
+                          //                           content: Row(
+                          //                             mainAxisAlignment:
+                          //                                 MainAxisAlignment
+                          //                                     .center,
+                          //                             children: [
+                          //                               Text(
+                          //                                   'ต้องการลบข้อมูลหรือไม่'),
+                          //                             ],
+                          //                           ),
+                          //                           actions: <Widget>[
+                          //                             TextButton(
+                          //                               onPressed: () {
+                          //                                 Navigator.pop(
+                          //                                     context); //close Dialog
+                          //                               },
+                          //                               child: Text('ยกเลิก'),
+                          //                             ),
+                          //                             TextButton(
+                          //                                 style: TextButton
+                          //                                     .styleFrom(
+                          //                                   primary: Colors
+                          //                                       .red, // Text Color
+                          //                                 ),
+                          //                                 onPressed: () {
+                          //                                   deleteGroup(groupSub[
+                          //                                               index]
+                          //                                           .group_no)
+                          //                                       .then((val) {
+                          //                                     Navigator.pop(
+                          //                                         context);
+                          //                                   });
+                          //                                 },
+                          //                                 child: Text('ลบ')),
+                          //                           ],
+                          //                         )
+                          //                       : CupertinoAlertDialog(
+                          //                           content: Text(
+                          //                               'ต้องการลบข้อมูลหรือไม่'),
+                          //                           actions: <Widget>[
+                          //                             TextButton(
+                          //                               onPressed: () {
+                          //                                 Navigator.pop(
+                          //                                     context); //close Dialog
+                          //                               },
+                          //                               child: Text('ยกเลิก'),
+                          //                             ),
+                          //                             TextButton(
+                          //                                 style: TextButton
+                          //                                     .styleFrom(
+                          //                                   primary: Colors
+                          //                                       .red, // Text Color
+                          //                                 ),
+                          //                                 onPressed: () {
+                          //                                   deleteGroup(groupSub[
+                          //                                               index]
+                          //                                           .group_no)
+                          //                                       .then((val) {
+                          //                                     Navigator.pop(
+                          //                                         context);
+                          //                                   });
+                          //                                 },
+                          //                                 child: Text('ลบ')),
+                          //                           ],
+                          //                         );
+                          //                 }).then((value) {
+                          //               API
+                          //                   .getSubLs(widget.sid, widget.jidx,
+                          //                       widget.typeId)
+                          //                   .then((response) {
+                          //                 setState(() {
+                          //                   List list =
+                          //                       json.decode(response.body);
+                          //                   print(list);
+                          //                   groupSub = list
+                          //                       .map((m) => SubLs.fromJson(m))
+                          //                       .toList();
+                          //                   // contactloading = false;
+                          //                 });
+                          //               });
+                          //             });
+                          //           }),
+                          //           backgroundColor: Colors.red,
+                          //           foregroundColor: Colors.white,
+                          //           icon: Icons.delete,
+                          //           label: 'ลบ',
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     child: GestureDetector(
+                          //         onTap: () {
+                          //           // loading();
+                          //           Navigator.push(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                   builder: (context) => (widget
+                          //                               .typeId ==
+                          //                           31)
+                          //                       ? acaudit(
+                          //                           jidx: widget.jidx,
+                          //                           typeId: widget.typeId,
+                          //                           typeName: widget.typeName,
+                          //                           status: widget.status,
+                          //                           group: groupSub[index]
+                          //                               .group_no)
+                          //                       : addinverter(
+                          //                           jidx: widget.jidx,
+                          //                           typeId: widget.typeId,
+                          //                           typeName: widget.typeName,
+                          //                           status: widget.status,
+                          //                           group: groupSub[index]
+                          //                               .group_no))).then(
+                          //               (value) {
+                          //             API
+                          //                 .getSubLs(widget.sid, widget.jidx,
+                          //                     widget.typeId)
+                          //                 .then((response) {
+                          //               setState(() {
+                          //                 List list =
+                          //                     json.decode(response.body);
+                          //                 print(list);
+                          //                 groupSub = list
+                          //                     .map((m) => SubLs.fromJson(m))
+                          //                     .toList();
+                          //                 // contactloading = false;
+                          //               });
+                          //             });
+                          //           });
+                          //         },
+                          //         child: Container(
+                          //           height: 60,
+                          //           width: double.infinity,
+                          //           decoration: BoxDecoration(
+                          //             color: Colors.white,
+                          //             borderRadius: BorderRadius.circular(15),
+                          //             border: Border.all(
+                          //                 color: Color(0xff9DC75B),
+                          //                 width: 0.5),
+                          //           ),
+                          //           child: Padding(
+                          //             padding: const EdgeInsets.symmetric(
+                          //                 horizontal: 20),
+                          //             child: Row(
+                          //               children: [
+                          //                 Expanded(
+                          //                   child: Text(
+                          //                     '${widget.typeName} ${index + 1}',
+                          //                     overflow: TextOverflow.ellipsis,
+                          //                     style: TextStyle(
+                          //                         color: Color(0xff9DC75B),
+                          //                         fontWeight: FontWeight.w600,
+                          //                         fontSize: 15),
+                          //                   ),
+                          //                 ),
+                          //                 Icon(
+                          //                   EvaIcons.checkmarkCircle2,
+                          //                   size: 30,
+                          //                   color: (groupSub[index].type_id ==
+                          //                           32)
+                          //                       ? (groupSub[index]
+                          //                                   .status_sub80 ==
+                          //                               true)
+                          //                           ? Color(0xffABD06F)
+                          //                           : Color.fromARGB(
+                          //                               255, 211, 211, 211)
+                          //                       : (groupSub[index]
+                          //                                   .amount_true ==
+                          //                               groupSub[index]
+                          //                                   .amount_all)
+                          //                           ? Color(0xffABD06F)
+                          //                           : Color.fromARGB(
+                          //                               255, 211, 211, 211),
+                          //                 ),
+                          //               ],
+                          //             ),
+                          //           ),
+                          //         )),
+                          //   ),
+                          ),
                     );
                   })),
             ),
@@ -738,41 +765,66 @@ class _addauditState extends State<addaudit> {
 
 //api
 class API {
-  static Future getSubLs(idd, type) async {
+  static Future getSubLs(idd, jidx, typeId) async {
     final response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getGroupNoAudit'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/getAccessoriesAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(
-          <dynamic, dynamic>{'jidx': idd, 'typeId': type, 'groupNo': null}),
+          <dynamic, dynamic>{'sid': idd, 'jidx': jidx, 'typeId': typeId}),
     );
     return response;
   }
 }
 
 class SubLs {
-  final int group_no;
-  final int amount_true;
-  final int amount_all;
-  final int type_id;
-  final bool status_sub80;
+  final int sins_id;
+  final int sid;
+  final String brand;
+  final String model;
+  final double? size;
+  final String sn;
+  final int acc_type;
+  final String acc_type_name;
+  final int? amount;
+  final String eletric_type;
+  final int? amount_string;
+  final int? amount_true;
+  final int? amount_all;
 
   const SubLs(
-      {required this.group_no,
+      {required this.sins_id,
+      required this.sid,
+      required this.brand,
+      required this.model,
+      required this.size,
+      required this.sn,
+      required this.acc_type,
+      required this.acc_type_name,
+      required this.amount,
+      required this.eletric_type,
+      required this.amount_string,
       required this.amount_true,
-      required this.amount_all,
-      required this.type_id,
-      required this.status_sub80});
+      required this.amount_all});
 
   factory SubLs.fromJson(Map<String, dynamic> json) {
     return SubLs(
-        group_no: json['group_no'],
-        amount_true: json['amount_true'],
-        amount_all: json['amount_all'],
-        type_id: json['type_id'],
-        status_sub80: json['status_sub80']);
+      sins_id: json['sins_id'],
+      sid: json['sid'],
+      brand: json['brand'] ?? '',
+      model: json['model'] ?? '',
+      size: json['size'],
+      sn: json['sn'] ?? '',
+      acc_type: json['acc_type'],
+      acc_type_name: json['acc_type_name'] ?? '',
+      amount: json['amount'],
+      eletric_type: json['eletric_type'] ?? '',
+      amount_string: json['amount_string'],
+      amount_true: json['amount_true'],
+      amount_all: json['amount_all'],
+    );
   }
 }

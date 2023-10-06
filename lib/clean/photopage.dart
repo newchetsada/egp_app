@@ -67,6 +67,7 @@ class _photopageState extends State<photopage> {
       builder: (BuildContext context) {
         return AlertDialog(
           contentPadding: EdgeInsets.all(0),
+          elevation: 0,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
           content: SingleChildScrollView(
@@ -85,26 +86,22 @@ class _photopageState extends State<photopage> {
       context: context,
       // barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        // return Expanded(
-        //   child: PinchZoom(
-        //     child: ClipRRect(
-        //       borderRadius: BorderRadius.circular(30),
-        //       child: Image.file(
-        //         File(file),
-        //       ),
-        //     ),
-        //     resetDuration: const Duration(milliseconds: 100),
-        //     maxScale: 2.5,
-        //     onZoomStart: () {
-        //       print('Start zooming');
-        //     },
-        //     onZoomEnd: () {
-        //       print('Stop zooming');
-        //     },
+        // return PinchZoom(
+        //   child: Image.file(
+        //     File(file),
         //   ),
+        //   resetDuration: const Duration(milliseconds: 100),
+        //   maxScale: 2.5,
+        //   onZoomStart: () {
+        //     print('Start zooming');
+        //   },
+        //   onZoomEnd: () {
+        //     print('Stop zooming');
+        //   },
         // );
         return AlertDialog(
             contentPadding: EdgeInsets.all(0),
+            elevation: 0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             content: SingleChildScrollView(
@@ -481,14 +478,7 @@ class _photopageState extends State<photopage> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
                               topRight: Radius.circular(25)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffE1F5DC),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: Offset(0, -3), // Shadow position
-                            ),
-                          ],
+                          //
                         ),
                         child: Padding(
                           padding: const EdgeInsets.only(

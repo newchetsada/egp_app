@@ -21,7 +21,12 @@ class uploadPic extends StatefulWidget {
   final int jidx;
   final int type_id;
   final int status;
-  uploadPic({required this.jidx, required this.type_id, required this.status});
+  final int sid;
+  uploadPic(
+      {required this.jidx,
+      required this.type_id,
+      required this.status,
+      required this.sid});
 }
 
 class _uploadPicState extends State<uploadPic> {
@@ -36,6 +41,10 @@ class _uploadPicState extends State<uploadPic> {
   String detail = '';
   String? _selectedValue;
   String gg = '';
+  String hint = '';
+
+  String afhint = '';
+
   var before_note = TextEditingController();
   var after_note = TextEditingController();
 
@@ -144,6 +153,8 @@ class _uploadPicState extends State<uploadPic> {
         'userName': userName,
       }),
     );
+    print(idg);
+
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);
@@ -154,12 +165,15 @@ class _uploadPicState extends State<uploadPic> {
   getBrandLs() async {
     var response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/getBrandBysid'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
-      body: jsonEncode(<dynamic, dynamic>{}),
+      body: jsonEncode(<dynamic, dynamic>{
+        'sid': widget.sid,
+        'accType': (widget.type_id == 1) ? 0 : 1,
+      }),
     );
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
@@ -299,7 +313,11 @@ class _uploadPicState extends State<uploadPic> {
         'groupNo': groupNo,
         'typeId': widget.type_id,
         'imgType': imgType,
-        'accessories': (nothavedevice == true) ? 1 : 0,
+        'accessories': (imgType == 0)
+            ? null
+            : (nothavedevice == true)
+                ? 1
+                : 0,
         'remark': note,
         'userName': userName,
       }),
@@ -334,7 +352,9 @@ class _uploadPicState extends State<uploadPic> {
                                       ? 'Optimizer'
                                       : (widget.type_id == 9)
                                           ? 'สายไฟ'
-                                          : 'อื่นๆ';
+                                          : (widget.type_id == 17)
+                                              ? 'ตู้ AC'
+                                              : 'อื่นๆ';
     });
     API.getGroup(widget.jidx, widget.type_id).then((value) {
       setState(() {
@@ -453,14 +473,7 @@ class _uploadPicState extends State<uploadPic> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
+                        //
                       ),
                       child: (widget.status == 3)
                           ? Container(
@@ -569,7 +582,8 @@ class _uploadPicState extends State<uploadPic> {
                                     index + 1,
                                     groupLs[index].before,
                                     groupLs[index].after,
-                                    groupLs[index].max_img)
+                                    groupLs[index].max_img,
+                                    groupLs[index].group_no)
                                 : Slidable(
                                     endActionPane: ActionPane(
                                       extentRatio: 0.2,
@@ -696,7 +710,8 @@ class _uploadPicState extends State<uploadPic> {
                                         index + 1,
                                         groupLs[index].before,
                                         groupLs[index].after,
-                                        groupLs[index].max_img)));
+                                        groupLs[index].max_img,
+                                        groupLs[index].group_no)));
                       })),
                 )
         ],
@@ -716,6 +731,8 @@ class _uploadPicState extends State<uploadPic> {
             detail = '';
             before_note.text = '';
             after_note.text = '';
+            hint = '';
+            afhint = '';
             nothavedevice = false;
             nothavedevice_f = false;
             deleteLs.clear();
@@ -725,6 +742,9 @@ class _uploadPicState extends State<uploadPic> {
             setState(() {
               List list1 = json.decode(value.body);
               desLs_before = list1.map((m) => Descript.fromJson(m)).toList();
+              setState(() {
+                hint = desLs_before[0].hint;
+              });
               for (var i = 0; i < desLs_before.length; i++) {
                 if (desLs_before[i].j_img_remark.isNotEmpty) {
                   var sprit = desLs_before[i].j_img_remark.split('||');
@@ -744,8 +764,12 @@ class _uploadPicState extends State<uploadPic> {
                 setState(() {
                   List list2 = json.decode(value_after.body);
                   desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
+                  print(list2);
+                  setState(() {
+                    afhint = desLs_after[0].hint;
+                  });
                   Navigator.pop(context);
-                  beforeSheet('');
+                  beforeSheet('', 0);
                 });
               });
             });
@@ -796,7 +820,7 @@ class _uploadPicState extends State<uploadPic> {
     );
   }
 
-  Widget items(group, before, after, max) {
+  Widget items(group, before, after, max, realgroup) {
     return GestureDetector(
       onTap: () {
         loading();
@@ -807,13 +831,22 @@ class _uploadPicState extends State<uploadPic> {
           after_note.text = '';
           nothavedevice = false;
           nothavedevice_f = false;
+          hint = '';
+          afhint = '';
+
           deleteLs.clear();
-          gg = group.toString();
+          gg = realgroup.toString();
         });
-        API.getDescript(widget.jidx, widget.type_id, group, 0).then((value) {
+        API
+            .getDescript(widget.jidx, widget.type_id, realgroup, 0)
+            .then((value) {
           setState(() {
             List list1 = json.decode(value.body);
             desLs_before = list1.map((m) => Descript.fromJson(m)).toList();
+            print(list1);
+            setState(() {
+              hint = desLs_before[0].hint;
+            });
             for (var i = 0; i < desLs_before.length; i++) {
               if (desLs_before[i].j_img_remark.isNotEmpty) {
                 var sprit = desLs_before[i].j_img_remark.split('||');
@@ -828,11 +861,16 @@ class _uploadPicState extends State<uploadPic> {
           });
           getBrandLs().then((brand) {
             API
-                .getDescript(widget.jidx, widget.type_id, group, 1)
+                .getDescript(widget.jidx, widget.type_id, realgroup, 1)
                 .then((value_after) {
               setState(() {
                 List list2 = json.decode(value_after.body);
+
                 desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
+
+                setState(() {
+                  afhint = desLs_after[0].hint;
+                });
                 if (desLs_after[0].j_img_accessories == 1) {
                   setState(() {
                     nothavedevice_f = true;
@@ -849,7 +887,7 @@ class _uploadPicState extends State<uploadPic> {
                 }
 
                 Navigator.pop(context);
-                beforeSheet(group);
+                beforeSheet(realgroup, group);
               });
             });
           });
@@ -1129,7 +1167,7 @@ class _uploadPicState extends State<uploadPic> {
   //   );
   // }
 
-  void beforeSheet(group) {
+  void beforeSheet(group, no) {
     showModalBottomSheet(
         constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.92),
@@ -1166,215 +1204,237 @@ class _uploadPicState extends State<uploadPic> {
                             Text(
                                 (group == '')
                                     ? 'เพิ่มชุด $typeName'
-                                    : 'ชุดที่ $group $typeName',
+                                    : 'ชุดที่ $no $typeName',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                     color: Color(0xff2A302C))),
                           ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('ยี่ห้อแผง',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xff9DC75B))),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  (widget.status == 3)
-                                      ? Text('$_selectedValue',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                              color: Color(0xff9DC75B)))
-                                      : Container(
-                                          height: 30,
-                                          width: 150,
-                                          padding: EdgeInsets.only(
-                                              left: 10, right: 5),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            border: Border.all(
-                                                width: 0.5,
-                                                color: Color(0xffD3D3D3)),
-                                          ),
-                                          child: DropdownButtonHideUnderline(
-                                            child: DropdownButton(
-                                              hint: Text(
-                                                "เลือกแบรนด์",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14,
-                                                    color: Color(0xff9DC75B)),
-                                              ),
-                                              icon: Icon(
-                                                  Icons
-                                                      .keyboard_arrow_down_rounded,
-                                                  size: 20,
-                                                  color: Color(0xff9DC75B)),
-                                              items: brandls?.map((value) {
-                                                return DropdownMenuItem(
-                                                  value:
-                                                      value['brand'].toString(),
-                                                  child: Text(
-                                                    value['brand'].toString(),
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 14,
-                                                        color:
-                                                            Color(0xff9DC75B)),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                              onChanged: (newvalue) {
-                                                mystate(() {
-                                                  _selectedValue = newvalue;
-                                                });
-                                              },
-                                              value: _selectedValue,
-                                            ),
-                                          ),
-                                        ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('อาการ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xff9DC75B))),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: (widget.status == 3)
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
+                        (widget.type_id == 1 || widget.type_id == 3)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
                                       child: Row(
                                         children: [
-                                          Text('$detail',
+                                          Text('ยี่ห้อ',
                                               style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
+                                                  fontWeight: FontWeight.w600,
                                                   fontSize: 14,
                                                   color: Color(0xff9DC75B))),
                                         ],
                                       ),
-                                    )
-                                  : Row(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            mystate(() {
-                                              detail = 'แผงแตก';
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    (detail == 'แผงแตก')
-                                                        ? Icons
-                                                            .radio_button_checked
-                                                        : Icons
-                                                            .radio_button_off,
-                                                    color: Color(0xff9DC75B),
-                                                    size: 20,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text('แผงแตก',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 14,
-                                                          color: Color(
-                                                              0xff9DC75B))),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            mystate(() {
-                                              detail = 'แผงดับ';
-                                            });
-                                          },
-                                          child: Container(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    (detail == 'แผงดับ')
-                                                        ? Icons
-                                                            .radio_button_checked
-                                                        : Icons
-                                                            .radio_button_off,
-                                                    color: Color(0xff9DC75B),
-                                                    size: 20,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text('แผงดับ',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 14,
-                                                          color: Color(
-                                                              0xff9DC75B))),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
                                     ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          (widget.status == 3)
+                                              ? Text('$_selectedValue',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 14,
+                                                      color: Color(0xff9DC75B)))
+                                              : Container(
+                                                  height: 30,
+                                                  width: 150,
+                                                  padding: EdgeInsets.only(
+                                                      left: 10, right: 5),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    border: Border.all(
+                                                        width: 0.5,
+                                                        color:
+                                                            Color(0xffD3D3D3)),
+                                                  ),
+                                                  child:
+                                                      DropdownButtonHideUnderline(
+                                                    child: DropdownButton(
+                                                      hint: Text(
+                                                        "เลือกแบรนด์",
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xff9DC75B)),
+                                                      ),
+                                                      icon: Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down_rounded,
+                                                          size: 20,
+                                                          color: Color(
+                                                              0xff9DC75B)),
+                                                      items:
+                                                          brandls?.map((value) {
+                                                        return DropdownMenuItem(
+                                                          value: value['brand']
+                                                              .toString(),
+                                                          child: Text(
+                                                            value['brand']
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize: 14,
+                                                                color: Color(
+                                                                    0xff9DC75B)),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                      onChanged: (newvalue) {
+                                                        mystate(() {
+                                                          _selectedValue =
+                                                              newvalue;
+                                                        });
+                                                      },
+                                                      value: _selectedValue,
+                                                    ),
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        (widget.type_id == 1)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          Text('อาการ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9DC75B))),
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: (widget.status == 3)
+                                          ? Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Row(
+                                                children: [
+                                                  Text('$detail',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 14,
+                                                          color: Color(
+                                                              0xff9DC75B))),
+                                                ],
+                                              ),
+                                            )
+                                          : Row(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    mystate(() {
+                                                      detail = 'แผงแตก';
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 10),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            (detail == 'แผงแตก')
+                                                                ? Icons
+                                                                    .radio_button_checked
+                                                                : Icons
+                                                                    .radio_button_off,
+                                                            color: Color(
+                                                                0xff9DC75B),
+                                                            size: 20,
+                                                          ),
+                                                          SizedBox(
+                                                            width: 5,
+                                                          ),
+                                                          Text('แผงแตก',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 14,
+                                                                  color: Color(
+                                                                      0xff9DC75B))),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    mystate(() {
+                                                      detail = 'แผงดับ';
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 10),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            (detail == 'แผงดับ')
+                                                                ? Icons
+                                                                    .radio_button_checked
+                                                                : Icons
+                                                                    .radio_button_off,
+                                                            color: Color(
+                                                                0xff9DC75B),
+                                                            size: 20,
+                                                          ),
+                                                          SizedBox(
+                                                            width: 5,
+                                                          ),
+                                                          Text('แผงดับ',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 14,
+                                                                  color: Color(
+                                                                      0xff9DC75B))),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
                         SizedBox(
                           height: 10,
                         ),
@@ -1656,7 +1716,9 @@ class _uploadPicState extends State<uploadPic> {
                             minLines: 1,
                             maxLines: 5,
                             decoration: InputDecoration(
-                              hintStyle: TextStyle(fontSize: 14),
+                              hintText: hint,
+                              hintStyle: TextStyle(
+                                  fontSize: 14, color: Colors.grey[300]),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.all(10),
                             ),
@@ -2027,7 +2089,9 @@ class _uploadPicState extends State<uploadPic> {
                             minLines: 1,
                             maxLines: 5,
                             decoration: InputDecoration(
-                              hintStyle: TextStyle(fontSize: 14),
+                              hintText: afhint,
+                              hintStyle: TextStyle(
+                                  fontSize: 14, color: Colors.grey[300]),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.all(10),
                             ),
@@ -2044,11 +2108,71 @@ class _uploadPicState extends State<uploadPic> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       loading();
-                                      if (_selectedValue == null ||
-                                          detail == '') {
-                                        Navigator.pop(context);
-                                        pop('กรุณากรอกรายละเอียด');
-                                        print('กรุณากรอกรายละเอียด');
+                                      if (widget.type_id == 1) {
+                                        if (_selectedValue == null ||
+                                            detail == '') {
+                                          Navigator.pop(context);
+                                          pop('กรุณากรอกรายละเอียด');
+                                          print('กรุณากรอกรายละเอียด');
+                                        } else {
+                                          checkbefore().then((va) {
+                                            if (va == false) {
+                                              Navigator.pop(context);
+                                              pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                              print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                            } else {
+                                              loopdelete().then((value) {
+                                                loopupload(group).then((value) {
+                                                  loopupload_after(group)
+                                                      .then((value) {
+                                                    updateRemark(gg, 0,
+                                                            '$_selectedValue||$detail||${before_note.text}')
+                                                        .then((value) {
+                                                      updateRemark(gg, 1,
+                                                              after_note.text)
+                                                          .then((value) {
+                                                        Navigator.pop(context);
+                                                        Navigator.pop(context);
+                                                      });
+                                                    });
+                                                  });
+                                                });
+                                              });
+                                            }
+                                          });
+                                        }
+                                      } else if (widget.type_id == 3) {
+                                        if (_selectedValue == null) {
+                                          Navigator.pop(context);
+                                          pop('กรุณากรอกรายละเอียด');
+                                          print('กรุณากรอกรายละเอียด');
+                                        } else {
+                                          checkbefore().then((va) {
+                                            if (va == false) {
+                                              Navigator.pop(context);
+                                              pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                              print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                            } else {
+                                              loopdelete().then((value) {
+                                                loopupload(group).then((value) {
+                                                  loopupload_after(group)
+                                                      .then((value) {
+                                                    updateRemark(gg, 0,
+                                                            '$_selectedValue||$detail||${before_note.text}')
+                                                        .then((value) {
+                                                      updateRemark(gg, 1,
+                                                              after_note.text)
+                                                          .then((value) {
+                                                        Navigator.pop(context);
+                                                        Navigator.pop(context);
+                                                      });
+                                                    });
+                                                  });
+                                                });
+                                              });
+                                            }
+                                          });
+                                        }
                                       } else {
                                         checkbefore().then((va) {
                                           if (va == false) {
@@ -2186,6 +2310,8 @@ class Descript {
   final String img_description;
   final String j_img_remark;
   final int? j_img_accessories;
+  final String hint;
+
   int onApi;
 
   Descript(
@@ -2198,6 +2324,7 @@ class Descript {
       required this.img_description,
       required this.j_img_remark,
       required this.j_img_accessories,
+      required this.hint,
       required this.onApi});
 
   factory Descript.fromJson(Map<String, dynamic> json) {
@@ -2213,6 +2340,7 @@ class Descript {
             ? ""
             : json['j_img_remark'],
         j_img_accessories: json['j_img_accessories'],
+        hint: json['hint'] ?? '',
         onApi: 1);
   }
 }

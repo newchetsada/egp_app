@@ -207,7 +207,7 @@ class _settingPageState extends State<settingPage> {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          CupertinoIcons.person_alt_circle,
+                                          EvaIcons.peopleOutline,
                                           size: 70,
                                           color: Color(0xff57A946)
                                               .withOpacity(0.5),
@@ -282,7 +282,7 @@ class _settingPageState extends State<settingPage> {
                                       width: 70,
                                       child: (pic.isEmpty)
                                           ? Icon(
-                                              CupertinoIcons.person_alt_circle,
+                                              EvaIcons.peopleOutline,
                                               size: 70,
                                               color: Color(0xff57A946)
                                                   .withOpacity(0.5),
@@ -298,7 +298,7 @@ class _settingPageState extends State<settingPage> {
                                             ),
                                     ),
                                     // Icon(
-                                    //   CupertinoIcons.person_alt_circle,
+                                    //   CupertinoEvaIcons.peopleOutline_alt_circle,
                                     //   size: 70,
                                     //   color: Color(0xff57A946).withOpacity(0.5),
                                     // ),
@@ -367,7 +367,7 @@ class _settingPageState extends State<settingPage> {
                                         ]),
                                     child: Center(
                                       child: Icon(
-                                        Icons.edit,
+                                        EvaIcons.edit,
                                         color: Color(0xff9DC75B),
                                       ),
                                     ),
@@ -387,14 +387,6 @@ class _settingPageState extends State<settingPage> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
                       ),
                     ),
                     Container(
@@ -544,7 +536,7 @@ class _settingPageState extends State<settingPage> {
                   child: Row(
                     children: [
                       Icon(
-                        EvaIcons.edit,
+                        EvaIcons.edit2,
                         color: Color(0xff9DC75B),
                         size: 25,
                       ),
@@ -582,7 +574,7 @@ class _settingPageState extends State<settingPage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.headset_rounded,
+                        EvaIcons.pricetags,
                         color: Color(0xff9DC75B),
                         size: 25,
                       ),

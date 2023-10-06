@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -42,6 +43,8 @@ class repair extends StatefulWidget {
   final int j_status;
   final int ppe_flag;
   final String j_remark_complete;
+  final String pic;
+  final int sid;
 
   //
 
@@ -64,7 +67,9 @@ class repair extends StatefulWidget {
       required this.tel,
       required this.j_status,
       required this.ppe_flag,
-      required this.j_remark_complete});
+      required this.j_remark_complete,
+      required this.pic,
+      required this.sid});
 }
 
 class _repairState extends State<repair> {
@@ -85,6 +90,7 @@ class _repairState extends State<repair> {
 
   int ispass = 0;
   bool totalpass = false;
+  int workstatus = 0;
 
   bool contactloading = true;
 
@@ -105,6 +111,9 @@ class _repairState extends State<repair> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    setState(() {
+      workstatus = widget.j_status;
+    });
     // Future.delayed(const Duration(milliseconds: 500), () {
     getUser();
 
@@ -512,14 +521,7 @@ class _repairState extends State<repair> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(25),
                               topRight: Radius.circular(25)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xffE1F5DC),
-                              blurRadius: 20,
-                              spreadRadius: 0,
-                              offset: Offset(0, -3), // Shadow position
-                            ),
-                          ],
+                          //
                         ),
                         child: (widget.j_status == 3)
                             ? Padding(
@@ -725,6 +727,7 @@ class _repairState extends State<repair> {
                                     jidx: widget.jid,
                                     type_id: groupPic[index].type_id,
                                     status: widget.j_status,
+                                    sid: widget.sid,
                                   )));
                     }
                   },
@@ -861,7 +864,7 @@ class _repairState extends State<repair> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(Icons.person,
+                            child: Icon(EvaIcons.peopleOutline,
                                 size: 20,
                                 color: (sign_name_1.isNotEmpty)
                                     ? Color(0xff9CC75B)
@@ -936,7 +939,7 @@ class _repairState extends State<repair> {
                             borderRadius: BorderRadius.circular(100),
                           ),
                           child: Center(
-                            child: Icon(Icons.person,
+                            child: Icon(EvaIcons.peopleOutline,
                                 size: 20,
                                 color: (sign_name_2.isNotEmpty)
                                     ? Color(0xff9CC75B)
@@ -1044,11 +1047,14 @@ class _repairState extends State<repair> {
                   // width: 160,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (widget.j_status == 1) {
+                      if (workstatus == 1) {
                         loading();
                         StartWork().then((jsonResponse) {
                           print(jsonResponse);
                           if (jsonResponse['status'] == true) {
+                            setState(() {
+                              workstatus = 2;
+                            });
                             Navigator.pop(context);
                             controller.nextPage(
                                 duration: Duration(milliseconds: 300),
@@ -1079,7 +1085,7 @@ class _repairState extends State<repair> {
                       ),
                     ),
                     child: Text(
-                      (widget.j_status == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
+                      (workstatus == 1) ? 'เริ่มดำเนินงาน' : 'ถัดไป',
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -1276,28 +1282,66 @@ class _repairState extends State<repair> {
                   height: 10,
                 ),
                 (widget.ppe_flag == 1)
-                    ? Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: Color(0xff57A946),
-                            size: 25,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text('ชุด PPE',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Color(0xff57A946))),
-                        ],
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text('ชุด PPE',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: Color(0xff57A946))),
+                          ],
+                        ),
                       )
                     : Container(),
+
+                // DottedLine(dashColor: Color(0xffD5D5D5)),
+                Text('แผนผังไซต์งาน',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Color(0xff58A946))),
                 SizedBox(
                   height: 10,
                 ),
-                // DottedLine(dashColor: Color(0xffD5D5D5)),
+                AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: GestureDetector(
+                        onTap: (widget.pic.isEmpty)
+                            ? null
+                            : () {
+                                showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                        elevation: 0,
+                                        backgroundColor: Colors.transparent,
+                                        child: PhotoView(
+                                          tightMode: true,
+                                          minScale: 0.25,
+                                          backgroundDecoration: BoxDecoration(
+                                              color: Colors.transparent),
+                                          imageProvider: NetworkImage(
+                                              '$pathPic${widget.pic}'),
+                                        )));
+                              },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: (widget.pic.isEmpty)
+                              ? Image.asset(
+                                  'assets/nolayer.png',
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network('$pathPic${widget.pic}'),
+                        ))),
                 SizedBox(
                   height: 10,
                 ),
@@ -1366,9 +1410,11 @@ class _repairState extends State<repair> {
                             padding:
                                 EdgeInsets.only(left: (index == 0) ? 0 : 10),
                             child: GestureDetector(
-                              onTap: () {
-                                _makePhoneCall(contact[index].j_cont_tel);
-                              },
+                              onTap: (contact[index].j_cont_tel.isEmpty)
+                                  ? null
+                                  : () {
+                                      _makePhoneCall(contact[index].j_cont_tel);
+                                    },
                               child: Container(
                                 width: 150,
                                 decoration: BoxDecoration(
@@ -1393,11 +1439,12 @@ class _repairState extends State<repair> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.person,
+                                        EvaIcons.peopleOutline,
                                         color: Color(0xff2A302C),
                                         size: 22,
                                       ),
                                       Text(contact[index].j_cont_name,
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 13,
@@ -1465,11 +1512,12 @@ class _repairState extends State<repair> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
-                            Icons.person,
+                            EvaIcons.peopleOutline,
                             color: Color(0xff2A302C),
                             size: 22,
                           ),
                           Text(widget.fullname,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13,
@@ -1553,6 +1601,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 1,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           API.getPicLs(widget.jid).then((value) {
                             setState(() {
@@ -1622,6 +1671,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 3,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1658,6 +1708,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 4,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1675,7 +1726,44 @@ class _repairState extends State<repair> {
                         height: 50,
                         width: double.infinity,
                         child: Center(
-                          child: Text('ตู้ DC, AC',
+                          child: Text('ตู้ DC',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 18,
+                                  color: Color(0xff9DC75B))),
+                        ),
+                      ),
+                    ),
+
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => uploadPic(
+                                      jidx: widget.jid,
+                                      type_id: 17,
+                                      status: widget.j_status,
+                                      sid: widget.sid,
+                                    ))).then((value) {
+                          setState(() {
+                            API.getPicLs(widget.jid).then((value) {
+                              setState(() {
+                                List list1 = json.decode(value.body);
+                                groupPic = list1
+                                    .map((m) => picLs.fromJson(m))
+                                    .toList();
+                              });
+                            });
+                          });
+                        });
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        width: double.infinity,
+                        child: Center(
+                          child: Text('ตู้ AC',
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 18,
@@ -1694,6 +1782,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 5,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1730,6 +1819,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 6,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1766,6 +1856,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 7,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1802,6 +1893,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 8,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -1838,6 +1930,7 @@ class _repairState extends State<repair> {
                                       jidx: widget.jid,
                                       type_id: 9,
                                       status: widget.j_status,
+                                      sid: widget.sid,
                                     ))).then((value) {
                           setState(() {
                             API.getPicLs(widget.jid).then((value) {
@@ -2052,6 +2145,7 @@ class _repairState extends State<repair> {
                                     jidx: widget.jid,
                                     type_id: groupPic[index].type_id,
                                     status: widget.j_status,
+                                    sid: widget.sid,
                                   ))).then((value) {
                         API.getPicLs(widget.jid).then((value) {
                           setState(() {
@@ -2276,7 +2370,7 @@ class _repairState extends State<repair> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(Icons.person,
+                                child: Icon(EvaIcons.peopleOutline,
                                     size: 20,
                                     color: (sign_name_1.isNotEmpty)
                                         ? Color(0xff9CC75B)
@@ -2351,7 +2445,7 @@ class _repairState extends State<repair> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Center(
-                                child: Icon(Icons.person,
+                                child: Icon(EvaIcons.peopleOutline,
                                     size: 20,
                                     color: (sign_name_2.isNotEmpty)
                                         ? Color(0xff9CC75B)
@@ -2736,7 +2830,8 @@ class Album {
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      j_cont_name: '${json['j_cont_fname']} ${json['j_cont_lname']}',
+      j_cont_name:
+          '${json['j_cont_fname'] ?? ''} ${json['j_cont_lname'] ?? ''}',
       j_cont_position: json['j_cont_position'],
       j_cont_tel: json['j_cont_tel'],
     );

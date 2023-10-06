@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -298,7 +299,7 @@ class _editprofileState extends State<editprofile> {
                         child: _pickedImage == null
                             ? (widget.pic.isEmpty)
                                 ? Icon(
-                                    CupertinoIcons.person_alt_circle,
+                                    EvaIcons.peopleOutline,
                                     size: 130,
                                     color: Color(0xff57A946).withOpacity(0.5),
                                   )

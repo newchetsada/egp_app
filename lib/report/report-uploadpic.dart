@@ -20,7 +20,17 @@ class ReportuploadPic extends StatefulWidget {
 
   final int jidx;
   final int type_id;
-  ReportuploadPic({required this.jidx, required this.type_id});
+  final int sid;
+  final int? ref_jidx;
+  final int cusId;
+  final String username;
+  ReportuploadPic(
+      {required this.jidx,
+      required this.type_id,
+      required this.sid,
+      required this.ref_jidx,
+      required this.cusId,
+      required this.username});
 }
 
 class _ReportuploadPicState extends State<ReportuploadPic> {
@@ -33,6 +43,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
   bool nothavedevice = false;
   bool nothavedevice_f = false;
   String detail = '';
+  String hint = '';
   String? _selectedValue;
   String gg = '';
   var before_note = TextEditingController();
@@ -46,6 +57,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
   int? iduser;
   bool lsloading = true;
   List? brandls;
+  int? ref;
 
   openCamera() async {
     try {
@@ -111,15 +123,21 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
   getBrandLs() async {
     var response = await http.post(
       Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+          'https://backoffice.energygreenplus.co.th/api/mobile/getBrandBysid'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
-      body: jsonEncode(<dynamic, dynamic>{}),
+      body: jsonEncode(<dynamic, dynamic>{
+        'sid': widget.sid,
+        'accType': (widget.type_id == 1) ? 0 : 1,
+      }),
     );
+    print(response.statusCode);
+
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
       setState(() {
         brandls = jsonResponse;
       });
@@ -157,7 +175,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
+        'jidx': ref,
         'typeId': widget.type_id,
         'groupNo': idg,
         'userName': userName,
@@ -178,7 +196,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
-    request.fields['jidx'] = widget.jidx.toString();
+    request.fields['jidx'] = ref.toString();
     request.fields['imgType'] = imgType.toString();
     request.fields['typeId'] = widget.type_id.toString();
     request.fields['subTypeId'] = '';
@@ -217,7 +235,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
-    request.fields['jidx'] = widget.jidx.toString();
+    request.fields['jidx'] = ref.toString();
     request.fields['imgType'] = imgType.toString();
     request.fields['typeId'] = widget.type_id.toString();
     request.fields['subTypeId'] = '';
@@ -293,7 +311,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
       body: jsonEncode(<dynamic, dynamic>{
-        'jidx': widget.jidx,
+        'jidx': ref,
         'groupNo': groupNo,
         'typeId': widget.type_id,
         'imgType': imgType,
@@ -349,6 +367,32 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
         });
   }
 
+  addrepair() async {
+    var response = await http.post(
+      Uri.parse(
+          'https://backoffice.energygreenplus.co.th/api/mobile/addJobDraft'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'typeFlag': 1,
+        'cusId': widget.cusId,
+        'sid': widget.sid,
+        'refJidx': widget.jidx,
+        'userName': widget.username
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      setState(() {
+        ref = jsonResponse['id'];
+      });
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -373,28 +417,24 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                       ? 'Optimizer'
                                       : (widget.type_id == 9)
                                           ? 'สายไฟ'
-                                          : 'อื่นๆ';
+                                          : (widget.type_id == 17)
+                                              ? 'ตู้ AC'
+                                              : 'อื่นๆ';
     });
-    API.getGroup(widget.jidx, widget.type_id).then((value) {
+    if (widget.ref_jidx == null) {
       setState(() {
-        List list = json.decode(value.body);
-        groupLs = list.map((m) => Group.fromJson(m)).toList();
         lsloading = false;
       });
-      // API.getDescript(widget.jidx, widget.type_id, 3, 0).then((value) {
-      //   setState(() {
-      //     List list1 = json.decode(value.body);
-      //     desLs_before = list1.map((m) => Descript.fromJson(m)).toList();
-      //   });
-      //   API.getDescript(widget.jidx, widget.type_id, 3, 1).then((value_after) {
-      //     setState(() {
-      //       List list2 = json.decode(value_after.body);
-      //       desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
-      //       lsloading = false;
-      //     });
-      //   });
-      // });
-    });
+    } else {
+      API.getGroup(widget.ref_jidx, widget.type_id).then((value) {
+        setState(() {
+          ref = widget.ref_jidx;
+          List list = json.decode(value.body);
+          groupLs = list.map((m) => Group.fromJson(m)).toList();
+          lsloading = false;
+        });
+      });
+    }
   }
 
   @override
@@ -452,14 +492,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(25),
                             topRight: Radius.circular(25)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffE1F5DC),
-                            blurRadius: 20,
-                            spreadRadius: 0,
-                            offset: Offset(0, -3), // Shadow position
-                          ),
-                        ],
+                        //
                       ),
                       child: addcard()),
                   Container(
@@ -671,18 +704,20 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                                       ],
                                                     );
                                             }).then((value) {
-                                          API
-                                              .getGroup(
-                                                  widget.jidx, widget.type_id)
-                                              .then((value) {
-                                            setState(() {
-                                              List list =
-                                                  json.decode(value.body);
-                                              groupLs = list
-                                                  .map((m) => Group.fromJson(m))
-                                                  .toList();
+                                          if (ref != null) {
+                                            API
+                                                .getGroup(ref, widget.type_id)
+                                                .then((value) {
+                                              setState(() {
+                                                List list =
+                                                    json.decode(value.body);
+                                                groupLs = list
+                                                    .map((m) =>
+                                                        Group.fromJson(m))
+                                                    .toList();
+                                              });
                                             });
-                                          });
+                                          }
                                         });
                                       }),
                                       backgroundColor: Colors.red,
@@ -696,7 +731,8 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                     groupLs[index].group_no,
                                     groupLs[index].before,
                                     groupLs[index].after,
-                                    groupLs[index].max_img)));
+                                    groupLs[index].max_img,
+                                    index)));
                       })),
                 )
         ],
@@ -714,6 +750,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
           setState(() {
             _selectedValue = null;
             detail = '';
+            hint = '';
             before_note.text = '';
             after_note.text = '';
             nothavedevice = false;
@@ -721,10 +758,13 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
             deleteLs.clear();
             gg = '';
           });
-          API.getDescript(widget.jidx, widget.type_id, null, 0).then((value) {
+          API.getDescript(ref, widget.type_id, null, 0).then((value) {
             setState(() {
               List list1 = json.decode(value.body);
               desLs_before = list1.map((m) => Descript.fromJson(m)).toList();
+              setState(() {
+                hint = desLs_before[0].hint;
+              });
               for (var i = 0; i < desLs_before.length; i++) {
                 if (desLs_before[i].j_img_remark.isNotEmpty) {
                   var sprit = desLs_before[i].j_img_remark.split('||');
@@ -737,14 +777,12 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
               }
               // print(desLs_before);
             });
-            API
-                .getDescript(widget.jidx, widget.type_id, null, 1)
-                .then((value_after) {
+            API.getDescript(ref, widget.type_id, null, 1).then((value_after) {
               setState(() {
                 List list2 = json.decode(value_after.body);
                 desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
                 Navigator.pop(context);
-                beforeSheet('');
+                beforeSheet('', 0);
               });
             });
           });
@@ -794,7 +832,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
     );
   }
 
-  Widget items(group, before, after, max) {
+  Widget items(group, before, after, max, no) {
     return GestureDetector(
       onTap: () {
         loading();
@@ -803,15 +841,20 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
           detail = '';
           before_note.text = '';
           after_note.text = '';
+          hint = '';
           nothavedevice = false;
           nothavedevice_f = false;
           deleteLs.clear();
           gg = group.toString();
         });
-        API.getDescript(widget.jidx, widget.type_id, group, 0).then((value) {
+        API.getDescript(ref, widget.type_id, group, 0).then((value) {
           setState(() {
             List list1 = json.decode(value.body);
+            print(list1);
             desLs_before = list1.map((m) => Descript.fromJson(m)).toList();
+            setState(() {
+              hint = desLs_before[0].hint;
+            });
             for (var i = 0; i < desLs_before.length; i++) {
               if (desLs_before[i].j_img_remark.isNotEmpty) {
                 var sprit = desLs_before[i].j_img_remark.split('||');
@@ -824,9 +867,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
             }
             // print(desLs_before);
           });
-          API
-              .getDescript(widget.jidx, widget.type_id, group, 1)
-              .then((value_after) {
+          API.getDescript(ref, widget.type_id, group, 1).then((value_after) {
             setState(() {
               List list2 = json.decode(value_after.body);
               desLs_after = list2.map((m) => Descript.fromJson(m)).toList();
@@ -846,7 +887,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
               }
 
               Navigator.pop(context);
-              beforeSheet(group);
+              beforeSheet(group, no + 1);
             });
           });
         });
@@ -876,7 +917,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(' ชุดที่ $group $typeName',
+                  Text(' ชุดที่ ${no + 1} $typeName',
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -1046,7 +1087,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
   //   );
   // }
 
-  void beforeSheet(group) {
+  void beforeSheet(group, no) {
     showModalBottomSheet(
         constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.92),
@@ -1083,179 +1124,200 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                             Text(
                                 (group == '')
                                     ? 'เพิ่มชุด $typeName'
-                                    : 'ชุดที่ $group $typeName',
+                                    : 'ชุดที่ ${no} $typeName',
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                     color: Color(0xff2A302C))),
                           ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('ยี่ห้อแผง',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xff9DC75B))),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    height: 35,
-                                    width: 150,
-                                    padding:
-                                        EdgeInsets.only(left: 10, right: 5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          width: 0.5, color: Color(0xffD3D3D3)),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton(
-                                        hint: Text(
-                                          "เลือกแบรนด์",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: Color(0xff9DC75B)),
-                                        ),
-                                        icon: Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            size: 20,
-                                            color: Color(0xff9DC75B)),
-                                        items: brandls?.map((value) {
-                                          return DropdownMenuItem(
-                                            value: value['brand'].toString(),
-                                            child: Text(
-                                              value['brand'].toString(),
+                        (widget.type_id == 1 || widget.type_id == 3)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          Text('ยี่ห้อ',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 14,
-                                                  color: Color(0xff9DC75B)),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (newvalue) {
-                                          mystate(() {
-                                            _selectedValue = newvalue;
-                                          });
-                                        },
-                                        value: _selectedValue,
+                                                  color: Color(0xff9DC75B))),
+                                        ],
                                       ),
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                children: [
-                                  Text('อาการ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xff9DC75B))),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      mystate(() {
-                                        detail = 'แผงแตก';
-                                      });
-                                    },
-                                    child: Container(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              (detail == 'แผงแตก')
-                                                  ? Icons.radio_button_checked
-                                                  : Icons.radio_button_off,
-                                              color: Color(0xff9DC75B),
-                                              size: 20,
+                                    Expanded(
+                                      flex: 4,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Container(
+                                            height: 35,
+                                            width: 150,
+                                            padding: EdgeInsets.only(
+                                                left: 10, right: 5),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              border: Border.all(
+                                                  width: 0.5,
+                                                  color: Color(0xffD3D3D3)),
                                             ),
-                                            SizedBox(
-                                              width: 5,
+                                            child: DropdownButtonHideUnderline(
+                                              child: DropdownButton(
+                                                hint: Text(
+                                                  "เลือกแบรนด์",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: Color(0xff9DC75B)),
+                                                ),
+                                                icon: Icon(
+                                                    Icons
+                                                        .keyboard_arrow_down_rounded,
+                                                    size: 20,
+                                                    color: Color(0xff9DC75B)),
+                                                items: brandls?.map((value) {
+                                                  return DropdownMenuItem(
+                                                    value: value['brand']
+                                                        .toString(),
+                                                    child: Text(
+                                                      value['brand'].toString(),
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 14,
+                                                          color: Color(
+                                                              0xff9DC75B)),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newvalue) {
+                                                  mystate(() {
+                                                    _selectedValue = newvalue;
+                                                  });
+                                                },
+                                                value: _selectedValue,
+                                              ),
                                             ),
-                                            Text('แผงแตก',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 14,
-                                                    color: Color(0xff9DC75B))),
-                                          ],
-                                        ),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      mystate(() {
-                                        detail = 'แผงดับ';
-                                      });
-                                    },
-                                    child: Container(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              (detail == 'แผงดับ')
-                                                  ? Icons.radio_button_checked
-                                                  : Icons.radio_button_off,
-                                              color: Color(0xff9DC75B),
-                                              size: 20,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text('แผงดับ',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 14,
-                                                    color: Color(0xff9DC75B))),
-                                          ],
-                                        ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
+                        (widget.type_id == 1)
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Row(
+                                        children: [
+                                          Text('อาการ',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: Color(0xff9DC75B))),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              mystate(() {
+                                                detail = 'แผงแตก';
+                                              });
+                                            },
+                                            child: Container(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      (detail == 'แผงแตก')
+                                                          ? Icons
+                                                              .radio_button_checked
+                                                          : Icons
+                                                              .radio_button_off,
+                                                      color: Color(0xff9DC75B),
+                                                      size: 20,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    Text('แผงแตก',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xff9DC75B))),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              mystate(() {
+                                                detail = 'แผงดับ';
+                                              });
+                                            },
+                                            child: Container(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      (detail == 'แผงดับ')
+                                                          ? Icons
+                                                              .radio_button_checked
+                                                          : Icons
+                                                              .radio_button_off,
+                                                      color: Color(0xff9DC75B),
+                                                      size: 20,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    Text('แผงดับ',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xff9DC75B))),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(),
                         SizedBox(
                           height: 10,
                         ),
@@ -1531,7 +1593,9 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                             minLines: 1,
                             maxLines: 5,
                             decoration: InputDecoration(
-                              hintStyle: TextStyle(fontSize: 14),
+                              hintText: hint,
+                              hintStyle: TextStyle(
+                                  fontSize: 14, color: Colors.grey[300]),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.all(10),
                             ),
@@ -1548,35 +1612,194 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                             child: ElevatedButton(
                               onPressed: () {
                                 loading();
-                                if (_selectedValue == null || detail == '') {
-                                  Navigator.pop(context);
-                                  pop('กรุณากรอกรายละเอียด');
-                                  print('กรุณากรอกรายละเอียด');
-                                } else {
-                                  checkbefore().then((va) {
-                                    if (va == false) {
-                                      Navigator.pop(context);
-                                      pop('กรุณาอัพโหลดรูปก่อนซ่อม');
-                                      print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                if (ref == null) {
+                                  addrepair().then((va) {
+                                    if (widget.type_id == 1) {
+                                      if (_selectedValue == null ||
+                                          detail == '') {
+                                        Navigator.pop(context);
+                                        pop('กรุณากรอกรายละเอียด');
+                                        print('กรุณากรอกรายละเอียด');
+                                      } else {
+                                        checkbefore().then((va) {
+                                          if (va == false) {
+                                            Navigator.pop(context);
+                                            pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                            print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          } else {
+                                            loopdelete().then((value) {
+                                              loopupload(group).then((value) {
+                                                loopupload_after(group)
+                                                    .then((value) {
+                                                  updateRemark(gg, 0,
+                                                          '$_selectedValue||$detail||${before_note.text}')
+                                                      .then((value) {
+                                                    updateRemark(gg, 1,
+                                                            after_note.text)
+                                                        .then((value) {
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    });
+                                                  });
+                                                });
+                                              });
+                                            });
+                                          }
+                                        });
+                                      }
+                                    } else if (widget.type_id == 3) {
+                                      if (_selectedValue == null) {
+                                        Navigator.pop(context);
+                                        pop('กรุณากรอกรายละเอียด');
+                                        print('กรุณากรอกรายละเอียด');
+                                      } else {
+                                        checkbefore().then((va) {
+                                          if (va == false) {
+                                            Navigator.pop(context);
+                                            pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                            print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          } else {
+                                            loopdelete().then((value) {
+                                              loopupload(group).then((value) {
+                                                loopupload_after(group)
+                                                    .then((value) {
+                                                  updateRemark(gg, 0,
+                                                          '$_selectedValue||$detail||${before_note.text}')
+                                                      .then((value) {
+                                                    updateRemark(gg, 1,
+                                                            after_note.text)
+                                                        .then((value) {
+                                                      Navigator.pop(context);
+                                                      Navigator.pop(context);
+                                                    });
+                                                  });
+                                                });
+                                              });
+                                            });
+                                          }
+                                        });
+                                      }
                                     } else {
-                                      loopdelete().then((value) {
-                                        loopupload(group).then((value) {
-                                          loopupload_after(group).then((value) {
-                                            updateRemark(gg, 0,
-                                                    '$_selectedValue||$detail||${before_note.text}')
-                                                .then((value) {
-                                              updateRemark(
-                                                      gg, 1, after_note.text)
+                                      checkbefore().then((va) {
+                                        if (va == false) {
+                                          Navigator.pop(context);
+                                          pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                        } else {
+                                          loopdelete().then((value) {
+                                            loopupload(group).then((value) {
+                                              loopupload_after(group)
                                                   .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
+                                                updateRemark(gg, 0,
+                                                        '$_selectedValue||$detail||${before_note.text}')
+                                                    .then((value) {
+                                                  updateRemark(gg, 1,
+                                                          after_note.text)
+                                                      .then((value) {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  });
+                                                });
+                                              });
+                                            });
+                                          });
+                                        }
+                                      });
+                                    }
+                                  });
+                                } else {
+                                  if (widget.type_id == 1) {
+                                    if (_selectedValue == null ||
+                                        detail == '') {
+                                      Navigator.pop(context);
+                                      pop('กรุณากรอกรายละเอียด');
+                                      print('กรุณากรอกรายละเอียด');
+                                    } else {
+                                      checkbefore().then((va) {
+                                        if (va == false) {
+                                          Navigator.pop(context);
+                                          pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                        } else {
+                                          loopdelete().then((value) {
+                                            loopupload(group).then((value) {
+                                              loopupload_after(group)
+                                                  .then((value) {
+                                                updateRemark(gg, 0,
+                                                        '$_selectedValue||$detail||${before_note.text}')
+                                                    .then((value) {
+                                                  updateRemark(gg, 1,
+                                                          after_note.text)
+                                                      .then((value) {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  });
+                                                });
+                                              });
+                                            });
+                                          });
+                                        }
+                                      });
+                                    }
+                                  } else if (widget.type_id == 3) {
+                                    if (_selectedValue == null) {
+                                      Navigator.pop(context);
+                                      pop('กรุณากรอกรายละเอียด');
+                                      print('กรุณากรอกรายละเอียด');
+                                    } else {
+                                      checkbefore().then((va) {
+                                        if (va == false) {
+                                          Navigator.pop(context);
+                                          pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                          print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                        } else {
+                                          loopdelete().then((value) {
+                                            loopupload(group).then((value) {
+                                              loopupload_after(group)
+                                                  .then((value) {
+                                                updateRemark(gg, 0,
+                                                        '$_selectedValue||$detail||${before_note.text}')
+                                                    .then((value) {
+                                                  updateRemark(gg, 1,
+                                                          after_note.text)
+                                                      .then((value) {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  });
+                                                });
+                                              });
+                                            });
+                                          });
+                                        }
+                                      });
+                                    }
+                                  } else {
+                                    checkbefore().then((va) {
+                                      if (va == false) {
+                                        Navigator.pop(context);
+                                        pop('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                        print('กรุณาอัพโหลดรูปก่อนซ่อม');
+                                      } else {
+                                        loopdelete().then((value) {
+                                          loopupload(group).then((value) {
+                                            loopupload_after(group)
+                                                .then((value) {
+                                              updateRemark(gg, 0,
+                                                      '$_selectedValue||$detail||${before_note.text}')
+                                                  .then((value) {
+                                                updateRemark(
+                                                        gg, 1, after_note.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
                                               });
                                             });
                                           });
                                         });
-                                      });
-                                    }
-                                  });
+                                      }
+                                    });
+                                  }
                                 }
                               },
                               style: ElevatedButton.styleFrom(
@@ -1605,13 +1828,15 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
             );
           });
         }).then((value) {
-      API.getGroup(widget.jidx, widget.type_id).then((value) {
-        setState(() {
-          print('ok');
-          List list = json.decode(value.body);
-          groupLs = list.map((m) => Group.fromJson(m)).toList();
+      if (ref != null) {
+        API.getGroup(ref, widget.type_id).then((value) {
+          setState(() {
+            print('ok');
+            List list = json.decode(value.body);
+            groupLs = list.map((m) => Group.fromJson(m)).toList();
+          });
         });
-      });
+      }
     });
   }
 }
@@ -1688,6 +1913,8 @@ class Descript {
   final String img_description;
   final String j_img_remark;
   final int? j_img_accessories;
+  final String hint;
+
   int onApi;
 
   Descript(
@@ -1700,12 +1927,13 @@ class Descript {
       required this.img_description,
       required this.j_img_remark,
       required this.j_img_accessories,
+      required this.hint,
       required this.onApi});
 
   factory Descript.fromJson(Map<String, dynamic> json) {
     return Descript(
         j_img_id: json['j_img_id'],
-        j_img_name: json['j_img_name'],
+        j_img_name: json['j_img_name'] ?? "",
         img_des_id: json['img_des_id'],
         type_id: json['type_id'],
         j_img_type: json['j_img_type'],
@@ -1715,6 +1943,7 @@ class Descript {
             ? ""
             : json['j_img_remark'],
         j_img_accessories: json['j_img_accessories'],
+        hint: json['hint'] ?? '',
         onApi: 1);
   }
 }
