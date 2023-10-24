@@ -12,6 +12,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class homePage extends StatefulWidget {
   @override
@@ -37,6 +38,7 @@ class _homePageState extends State<homePage> {
 
         works = list.map((m) => Album.fromJson(m)).toList();
         datetime = DateTime.now();
+        load = false;
 
         // isLoading = false;
       });
@@ -74,7 +76,8 @@ class _homePageState extends State<homePage> {
         print(jsonResponse);
 
         setState(() {
-          fullname = jsonResponse[0]['tech_fname'];
+          fullname =
+              '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
         });
       }
     } catch (error) {
@@ -88,263 +91,380 @@ class _homePageState extends State<homePage> {
     });
   }
 
+  bool load = true;
+  bool hasinternet = true;
+
+  void checkNet() async {
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == true) {
+      getUser().then((value) {
+        getUserDetail(iduser);
+        _getAPI(iduser);
+      });
+    } else {
+      print('No internet :( Reason:');
+      setState(() {
+        hasinternet = false;
+        load = false;
+      });
+      // print(InternetConnectionChecker().lastTryResults);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    getUser().then((value) {
-      getUserDetail(iduser);
-      _getAPI(iduser);
-    });
+    // getUser().then((value) {
+    //   getUserDetail(iduser);
+    //   _getAPI(iduser);
+    // });
+    checkNet();
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 2,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(125.0),
-          child: AppBar(
-            automaticallyImplyLeading: false,
-            flexibleSpace: SafeArea(
-              child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 10, top: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Hello, $fullname',
-                          style: TextStyle(
-                              color: Color(0xff9DC75B),
-                              fontSize: 30,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        IconButton(
-                            iconSize: 30,
-                            splashRadius: 20,
+    return (load == true)
+        ? Scaffold(
+            body: Center(
+                child: Lottie.asset('assets/logoloading.json', height: 90)))
+        : (hasinternet == false)
+            ? Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Image.asset(
+                      //   'assets/internet.png',
+                      //   height: 150,
+                      // ),
+                      Icon(
+                        CupertinoIcons.wifi_exclamationmark,
+                        size: 150,
+                        color: Color(0xff818181),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Text(
+                        'อินเทอร์เน็ตมีปัญหา',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xff9DC75B),
+                            fontSize: 20),
+                      ),
+                      Text(
+                        'โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff818181),
+                            fontSize: 16),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10)),
+                              color: Color(0xff9DC75B)),
+                          child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => settingPage()),
-                              ).then((value) {
-                                setState(() {
-                                  getUserDetail(iduser);
-                                });
-                              });
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          super.widget));
                             },
-                            icon: Icon(
-                              Icons.settings_rounded,
-                              color: Color(0xff9DC75B),
-                            ))
-                      ],
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'ลองอีกครั้ง',
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : DefaultTabController(
+                initialIndex: 0,
+                length: 2,
+                child: Scaffold(
+                  backgroundColor: Colors.white,
+                  appBar: PreferredSize(
+                    preferredSize: Size.fromHeight(125.0),
+                    child: AppBar(
+                      automaticallyImplyLeading: false,
+                      flexibleSpace: SafeArea(
+                        child: Column(
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 10, top: 20),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Hello, $fullname',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Color(0xff9DC75B),
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w700),
+                                    ),
+                                  ),
+                                  IconButton(
+                                      iconSize: 30,
+                                      splashRadius: 20,
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  settingPage()),
+                                        ).then((value) {
+                                          setState(() {
+                                            getUserDetail(iduser);
+                                          });
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.settings_rounded,
+                                        color: Color(0xff9DC75B),
+                                      ))
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 20, right: 20, top: 10),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedIndex = 0;
+                                      });
+                                      _controller.animateToPage(0,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.ease);
+                                    },
+                                    child: (_selectedIndex == 0)
+                                        ? Container(
+                                            height: 35,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20)),
+                                                color: Color(0xffAED76E)),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Text(
+                                                  'งาน',
+                                                  style: TextStyle(
+                                                      color: Color(0xff2A302C),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 35,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20)),
+                                                color: Color(0xffffffff),
+                                                border: Border.all(
+                                                    color: Color(0xffAED76E))),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Text(
+                                                  'งาน',
+                                                  style: TextStyle(
+                                                      color: Color(0xff9DC75B),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedIndex = 1;
+                                      });
+                                      _controller.animateToPage(1,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.ease);
+                                    },
+                                    child: (_selectedIndex == 1)
+                                        ? Container(
+                                            height: 35,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20)),
+                                                color: Color(0xffAED76E)),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Text(
+                                                  'เสร็จสิ้น',
+                                                  style: TextStyle(
+                                                      color: Color(0xff2A302C),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            height: 35,
+                                            width: 90,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20)),
+                                                color: Color(0xffffffff),
+                                                border: Border.all(
+                                                    color: Color(0xffAED76E))),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Text(
+                                                  'เสร็จสิ้น',
+                                                  style: TextStyle(
+                                                      color: Color(0xff9DC75B),
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      elevation: 0,
+                      backgroundColor: Colors.white,
+                      // bottom: TabBar(
+                      //   splashBorderRadius: BorderRadius.all(Radius.circular(15)),
+                      //   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
+                      //   indicatorWeight: 5,
+                      //   indicatorColor: Color(0xff57A946),
+                      //   labelStyle: TextStyle(
+                      //     fontWeight: FontWeight.w600,
+                      //     fontSize: 15,
+                      //   ),
+                      //   labelColor: Color(0xff57A946),
+                      //   unselectedLabelColor: Color(0xff9D9D9D),
+                      //   tabs: <Widget>[
+                      //     Icon(Icons.abc)
+                      //     // Tab(
+                      //     //   text: 'งาน',
+                      //     // ),,
+                      //     ,
+                      //     Tab(
+                      //       text: 'เสร็จสิ้น',
+                      //     ),
+                      //   ],
+                      // ),
                     ),
                   ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 20, top: 10),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedIndex = 0;
-                            });
-                            _controller.animateToPage(0,
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease);
-                          },
-                          child: (_selectedIndex == 0)
-                              ? Container(
-                                  height: 35,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffAED76E)),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'งาน',
-                                        style: TextStyle(
-                                            color: Color(0xff2A302C),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  height: 35,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffffffff),
-                                      border:
-                                          Border.all(color: Color(0xffAED76E))),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'งาน',
-                                        style: TextStyle(
-                                            color: Color(0xff9DC75B),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                  body: PageView(
+                    controller: _controller,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: <Widget>[
+                      Center(
+                        child: RefreshIndicator(
+                          onRefresh: () => _ref(),
+                          child: ListView.builder(
+                            padding: EdgeInsets.only(bottom: 30),
+                            itemCount: works.length,
+                            itemBuilder: (context, index) {
+                              return (works[index].j_status == 3)
+                                  ? Container()
+                                  : cardWork(
+                                      works[index].type_id,
+                                      works[index].j_status,
+                                      works[index].senddate,
+                                      works[index].cus_name,
+                                      works[index].jidx,
+                                      works[index].j_no);
+                            },
+                          ),
                         ),
-                        SizedBox(
-                          width: 20,
+                      ),
+                      //finished
+                      Center(
+                        child: RefreshIndicator(
+                          onRefresh: () => _ref(),
+                          child: ListView.builder(
+                            padding: EdgeInsets.only(bottom: 30),
+                            itemCount: works.length,
+                            itemBuilder: (context, index) {
+                              return (works[index].j_status == 3)
+                                  ? cardWork(
+                                      works[index].type_id,
+                                      works[index].j_status,
+                                      works[index].senddate,
+                                      works[index].cus_name,
+                                      works[index].jidx,
+                                      works[index].j_no)
+                                  : Container();
+                            },
+                          ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedIndex = 1;
-                            });
-                            _controller.animateToPage(1,
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.ease);
-                          },
-                          child: (_selectedIndex == 1)
-                              ? Container(
-                                  height: 35,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffAED76E)),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'เสร็จสิ้น',
-                                        style: TextStyle(
-                                            color: Color(0xff2A302C),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  height: 35,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                      color: Color(0xffffffff),
-                                      border:
-                                          Border.all(color: Color(0xffAED76E))),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Text(
-                                        'เสร็จสิ้น',
-                                        style: TextStyle(
-                                            color: Color(0xff9DC75B),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            elevation: 0,
-            backgroundColor: Colors.white,
-            // bottom: TabBar(
-            //   splashBorderRadius: BorderRadius.all(Radius.circular(15)),
-            //   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
-            //   indicatorWeight: 5,
-            //   indicatorColor: Color(0xff57A946),
-            //   labelStyle: TextStyle(
-            //     fontWeight: FontWeight.w600,
-            //     fontSize: 15,
-            //   ),
-            //   labelColor: Color(0xff57A946),
-            //   unselectedLabelColor: Color(0xff9D9D9D),
-            //   tabs: <Widget>[
-            //     Icon(Icons.abc)
-            //     // Tab(
-            //     //   text: 'งาน',
-            //     // ),,
-            //     ,
-            //     Tab(
-            //       text: 'เสร็จสิ้น',
-            //     ),
-            //   ],
-            // ),
-          ),
-        ),
-        body: PageView(
-          controller: _controller,
-          physics: NeverScrollableScrollPhysics(),
-          children: <Widget>[
-            Center(
-              child: RefreshIndicator(
-                onRefresh: () => _ref(),
-                child: ListView.builder(
-                  itemCount: works.length,
-                  itemBuilder: (context, index) {
-                    return (works[index].j_status == 3)
-                        ? Container()
-                        : cardWork(
-                            works[index].type_id,
-                            works[index].j_status,
-                            works[index].senddate,
-                            works[index].cus_name,
-                            works[index].jidx);
-                  },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            //finished
-            Center(
-              child: RefreshIndicator(
-                onRefresh: () => _ref(),
-                child: ListView.builder(
-                  itemCount: works.length,
-                  itemBuilder: (context, index) {
-                    return (works[index].j_status == 3)
-                        ? cardWork(
-                            works[index].type_id,
-                            works[index].j_status,
-                            works[index].senddate,
-                            works[index].cus_name,
-                            works[index].jidx)
-                        : Container();
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+              );
   }
 
   Widget taskall() {
@@ -356,7 +476,7 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget cardWork(type, status, date, comp, id) {
+  Widget cardWork(type, status, date, comp, id, sn) {
     var col = (status == 1)
         ? Color(0xff1975D0)
         : (status == 2)
@@ -412,84 +532,67 @@ class _homePageState extends State<homePage> {
               });
 
           getWorkdetail(iduser, id).then((jsonResponse) {
-            setState(() {
-              print(jsonResponse);
-              j_start_date = DateFormat('dd/MM/yyyy HH:mm')
-                  .format(DateTime.parse(jsonResponse[0]['j_start_date']))
-                  .toString();
-              j_send_date = DateFormat('dd/MM/yyyy HH:mm')
-                  .format(DateTime.parse(jsonResponse[0]['j_send_date']))
-                  .toString();
-              cus_name = jsonResponse[0]['cus_name'];
-              site_name = jsonResponse[0]['site_name'];
-              cus_address = jsonResponse[0]['cus_address'] +
-                  ' ' +
-                  jsonResponse[0]['tambon_th'] +
-                  ' ' +
-                  jsonResponse[0]['amphur_th'] +
-                  ' ' +
-                  jsonResponse[0]['province_th'] +
-                  ' ' +
-                  jsonResponse[0]['postcode'];
-              install_date = DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(jsonResponse[0]['install_date']))
-                  .toString();
-              warranty_expire = DateFormat('dd/MM/yyyy')
-                  .format(DateTime.parse(jsonResponse[0]['warranty_expire']))
-                  .toString();
-              power_peak = jsonResponse[0]['power_peak'].toString();
-              j_detail = jsonResponse[0]['j_detail'];
-              remark_tech = jsonResponse[0]['remark_tech'];
-              lat = jsonResponse[0]['lat'];
-              lon = jsonResponse[0]['lon'];
-              site_clener = jsonResponse[0]['site_clener'];
-              fullname =
-                  '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
-              position = jsonResponse[0]['position'];
-              tel = jsonResponse[0]['tel'];
-              j_status = jsonResponse[0]['j_status'];
-              ppe_flag = jsonResponse[0]['ppe_flag'];
-              j_remark_complete = (jsonResponse[0]['j_remark_complete'] == null)
-                  ? ''
-                  : jsonResponse[0]['j_remark_complete'];
-              sid = jsonResponse[0]['sid'];
-              site_layout = jsonResponse[0]['site_layout'] ?? '';
-            });
+            if (jsonResponse != null) {
+              setState(() {
+                print(jsonResponse);
+                j_start_date = DateFormat('dd/MM/yyyy HH:mm')
+                    .format(DateTime.parse(jsonResponse[0]['j_start_date']))
+                    .toString();
+                j_send_date = DateFormat('dd/MM/yyyy HH:mm')
+                    .format(DateTime.parse(jsonResponse[0]['j_send_date']))
+                    .toString();
+                cus_name = jsonResponse[0]['cus_name'];
+                site_name = jsonResponse[0]['site_name'];
+                cus_address = jsonResponse[0]['cus_address'] +
+                    ' ' +
+                    jsonResponse[0]['tambon_th'] +
+                    ' ' +
+                    jsonResponse[0]['amphur_th'] +
+                    ' ' +
+                    jsonResponse[0]['province_th'] +
+                    ' ' +
+                    jsonResponse[0]['postcode'];
+                install_date = DateFormat('dd/MM/yyyy')
+                    .format(DateTime.parse(jsonResponse[0]['install_date']))
+                    .toString();
+                warranty_expire = DateFormat('dd/MM/yyyy')
+                    .format(DateTime.parse(jsonResponse[0]['warranty_expire']))
+                    .toString();
+                power_peak = jsonResponse[0]['power_peak'].toString();
+                j_detail = jsonResponse[0]['j_detail'];
+                remark_tech = jsonResponse[0]['remark_tech'];
+                lat = jsonResponse[0]['lat'];
+                lon = jsonResponse[0]['lon'];
+                site_clener = jsonResponse[0]['site_clener'];
+                // fullname =
+                //     '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
+                fullname = jsonResponse[0]['fullname'] ?? '';
+                position = jsonResponse[0]['position'];
+                tel = jsonResponse[0]['tel'];
+                j_status = jsonResponse[0]['j_status'];
+                ppe_flag = jsonResponse[0]['ppe_flag'];
+                j_remark_complete =
+                    (jsonResponse[0]['j_remark_complete'] == null)
+                        ? ''
+                        : jsonResponse[0]['j_remark_complete'];
+                sid = jsonResponse[0]['sid'];
+                site_layout = jsonResponse[0]['site_layout'] ?? '';
+              });
+            }
           }).then((value) {
             Navigator.pop(context);
-            (type == 0)
-                ? Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => cleansolar(
-                              jid: id,
-                              j_start_date: j_start_date,
-                              j_send_date: j_send_date,
-                              cus_name: cus_name,
-                              cus_address: cus_address,
-                              install_date: install_date,
-                              warranty_expire: warranty_expire,
-                              power_peak: power_peak,
-                              j_detail: j_detail,
-                              remark_tech: remark_tech,
-                              lat: lat,
-                              lon: lon,
-                              site_name: site_name,
-                              fullname: fullname,
-                              position: position,
-                              tel: tel,
-                              j_status: j_status,
-                              ppe_flag: ppe_flag,
-                              j_remark_complete: j_remark_complete,
-                              sid: sid,
-                              pic: site_layout,
-                            )),
+            (sid == 0)
+                ? ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('เกิดข้อผิดพลาด โปรดลองอีกครั้ง'),
+                      backgroundColor: Colors.red,
+                    ),
                   )
-                : (type == 1 || type == 2)
+                : (type == 0)
                     ? Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => repair(
+                            builder: (context) => cleansolar(
                                   jid: id,
                                   j_start_date: j_start_date,
                                   j_send_date: j_send_date,
@@ -509,37 +612,65 @@ class _homePageState extends State<homePage> {
                                   j_status: j_status,
                                   ppe_flag: ppe_flag,
                                   j_remark_complete: j_remark_complete,
-                                  pic: site_layout,
                                   sid: sid,
-                                )))
-                    : Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => research(
-                                  jid: id,
-                                  j_start_date: j_start_date,
-                                  j_send_date: j_send_date,
-                                  cus_name: cus_name,
-                                  cus_address: cus_address,
-                                  install_date: install_date,
-                                  warranty_expire: warranty_expire,
-                                  power_peak: power_peak,
-                                  j_detail: j_detail,
-                                  remark_tech: remark_tech,
-                                  lat: lat,
-                                  lon: lon,
-                                  site_name: site_name,
-                                  fullname: fullname,
-                                  position: position,
-                                  tel: tel,
-                                  j_status: j_status,
-                                  ppe_flag: ppe_flag,
-                                  j_remark_complete: j_remark_complete,
-                                  type: type,
                                   pic: site_layout,
-                                  sid: sid,
                                 )),
-                      );
+                      )
+                    : (type == 1 || type == 2)
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => repair(
+                                      jid: id,
+                                      j_start_date: j_start_date,
+                                      j_send_date: j_send_date,
+                                      cus_name: cus_name,
+                                      cus_address: cus_address,
+                                      install_date: install_date,
+                                      warranty_expire: warranty_expire,
+                                      power_peak: power_peak,
+                                      j_detail: j_detail,
+                                      remark_tech: remark_tech,
+                                      lat: lat,
+                                      lon: lon,
+                                      site_name: site_name,
+                                      fullname: fullname,
+                                      position: position,
+                                      tel: tel,
+                                      j_status: j_status,
+                                      ppe_flag: ppe_flag,
+                                      j_remark_complete: j_remark_complete,
+                                      pic: site_layout,
+                                      sid: sid,
+                                    )))
+                        : Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => research(
+                                      jid: id,
+                                      j_start_date: j_start_date,
+                                      j_send_date: j_send_date,
+                                      cus_name: cus_name,
+                                      cus_address: cus_address,
+                                      install_date: install_date,
+                                      warranty_expire: warranty_expire,
+                                      power_peak: power_peak,
+                                      j_detail: j_detail,
+                                      remark_tech: remark_tech,
+                                      lat: lat,
+                                      lon: lon,
+                                      site_name: site_name,
+                                      fullname: fullname,
+                                      position: position,
+                                      tel: tel,
+                                      j_status: j_status,
+                                      ppe_flag: ppe_flag,
+                                      j_remark_complete: j_remark_complete,
+                                      type: type,
+                                      pic: site_layout,
+                                      sid: sid,
+                                    )),
+                          );
           });
         },
         child: Container(
@@ -583,6 +714,13 @@ class _homePageState extends State<homePage> {
                                 color: Color(0xff9DC75B),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            '$sn',
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 117, 117, 117),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
                           ),
                         ],
                       ),
@@ -748,7 +886,7 @@ class _homePageState extends State<homePage> {
                                               child: Center(
                                                 child: Padding(
                                                   padding: const EdgeInsets
-                                                          .symmetric(
+                                                      .symmetric(
                                                       horizontal: 10),
                                                   child: Text(
                                                     'เสร็จสิ้น',
@@ -848,6 +986,8 @@ class _homePageState extends State<homePage> {
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
         return jsonResponse;
+      } else {
+        getWorkdetail(userId, jidx);
       }
     } catch (error) {
       print(error);
@@ -882,6 +1022,7 @@ class Album {
   final int j_status;
   final int type_id;
   final String senddate;
+  final String j_no;
 
   const Album(
       {required this.jidx,
@@ -890,7 +1031,8 @@ class Album {
       required this.cus_name,
       required this.j_status,
       required this.type_id,
-      required this.senddate});
+      required this.senddate,
+      required this.j_no});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
@@ -901,6 +1043,7 @@ class Album {
         cus_name: json['cus_name'],
         j_status: json['j_status'],
         type_id: json['type_flag'],
-        senddate: json['j_send_date']);
+        senddate: json['j_send_date'],
+        j_no: json['j_no']);
   }
 }

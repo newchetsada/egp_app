@@ -346,7 +346,8 @@ class _acauditState extends State<acaudit> {
               ),
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: 60,
+          toolbarHeight:
+              (defaultTargetPlatform == TargetPlatform.android) ? 80 : 60,
           backgroundColor: Color(0xffF8FFF6),
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
@@ -358,66 +359,72 @@ class _acauditState extends State<acaudit> {
               ),
             ),
             child: SafeArea(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
+                child: Padding(
+              padding: EdgeInsets.only(
+                  top: (defaultTargetPlatform == TargetPlatform.android)
+                      ? 20
+                      : 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Text(widget.typeName,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Color(0xff2A302C))),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
                     children: [
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: Color(0xff57A946),
-                            size: 20,
-                          )),
-                      SizedBox(
-                        width: 10,
+                      Container(
+                        height: 15,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                          //
+                        ),
                       ),
-                      Expanded(
-                        child: Text(widget.typeName,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Color(0xff2A302C))),
+                      Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+
+                          // boxShadow: [
+                          //   BoxShadow(
+                          //     color: Colors.white,
+                          //     blurRadius: 5,
+                          //     spreadRadius: 5,
+                          //     offset: Offset(0, 10), // Shadow position
+                          //   ),
+                          // ],
+                        ),
                       ),
                     ],
-                  ),
-                ),
-                Column(
-                  children: [
-                    Container(
-                      height: 15,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25)),
-                        //
-                      ),
-                    ),
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.white,
-                        //     blurRadius: 5,
-                        //     spreadRadius: 5,
-                        //     offset: Offset(0, 10), // Shadow position
-                        //   ),
-                        // ],
-                      ),
-                    ),
-                  ],
-                )
-              ],
+                  )
+                ],
+              ),
             )),
           ),
         ),
@@ -758,7 +765,8 @@ class _acauditState extends State<acaudit> {
                                 subb == 50 ||
                                 subb == 71 ||
                                 subb == 72 ||
-                                subb == 73)
+                                subb == 73 ||
+                                widget.typeId == 40)
                             ? Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: GestureDetector(

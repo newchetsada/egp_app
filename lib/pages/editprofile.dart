@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -151,12 +152,17 @@ class _editprofileState extends State<editprofile> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        toolbarHeight: 50,
+        toolbarHeight:
+            (defaultTargetPlatform == TargetPlatform.android) ? 70 : 50,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         flexibleSpace: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+            padding: EdgeInsets.only(
+                left: 30,
+                right: 30,
+                top:
+                    (defaultTargetPlatform == TargetPlatform.android) ? 20 : 0),
             child: Row(
               children: [
                 GestureDetector(
@@ -166,7 +172,7 @@ class _editprofileState extends State<editprofile> {
                     child: Icon(
                       Icons.arrow_back,
                       color: Color(0xff57A946),
-                      size: 20,
+                      size: 25,
                     )),
                 SizedBox(
                   width: 10,

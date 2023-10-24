@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
@@ -294,7 +295,8 @@ class _groupresearchState extends State<groupresearch> {
               ),
         appBar: AppBar(
           elevation: 0,
-          toolbarHeight: 100,
+          toolbarHeight:
+              (defaultTargetPlatform == TargetPlatform.android) ? 120 : 100,
           backgroundColor: Color(0xffF8FFF6),
           automaticallyImplyLeading: false,
           flexibleSpace: Container(
@@ -306,80 +308,86 @@ class _groupresearchState extends State<groupresearch> {
               ),
             ),
             child: SafeArea(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: Color(0xff57A946),
-                            size: 20,
-                          )),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(widget.typeName,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Color(0xff2A302C))),
-                    ],
+                child: Padding(
+              padding: EdgeInsets.only(
+                  top: (defaultTargetPlatform == TargetPlatform.android)
+                      ? 20
+                      : 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(widget.typeName,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xff2A302C))),
+                      ],
+                    ),
                   ),
-                ),
-                Column(
-                  children: [
-                    Container(
+                  Column(
+                    children: [
+                      Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                topRight: Radius.circular(25)),
+                            //
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 30,
+                              right: 30,
+                              top: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  widget.typeName,
+                                  style: TextStyle(
+                                      color: Color(0xff9DC75B),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          )),
+                      Container(
+                        height: 15,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(25),
-                              topRight: Radius.circular(25)),
-                          //
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 30,
-                            right: 30,
-                            top: 20,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                widget.typeName,
-                                style: TextStyle(
-                                    color: Color(0xff9DC75B),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                        )),
-                    Container(
-                      height: 15,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
 
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.white,
-                        //     blurRadius: 5,
-                        //     spreadRadius: 5,
-                        //     offset: Offset(0, 10), // Shadow position
-                        //   ),
-                        // ],
+                          // boxShadow: [
+                          //   BoxShadow(
+                          //     color: Colors.white,
+                          //     blurRadius: 5,
+                          //     spreadRadius: 5,
+                          //     offset: Offset(0, 10), // Shadow position
+                          //   ),
+                          // ],
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  )
+                ],
+              ),
             )),
           ),
         ),

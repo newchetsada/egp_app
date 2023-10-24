@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD-QgfTrJ2uf3h1Qqlj82iKaKtds3DxqCg',
-    appId: '1:110970666061:android:635c25ab16dc99a0cf3004',
+    appId: '1:110970666061:android:3b362f705b8e541fcf3004',
     messagingSenderId: '110970666061',
     projectId: 'backoffice-egp',
     storageBucket: 'backoffice-egp.appspot.com',

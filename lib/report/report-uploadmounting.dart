@@ -430,7 +430,8 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        toolbarHeight: 140,
+        toolbarHeight:
+            (defaultTargetPlatform == TargetPlatform.android) ? 160 : 140,
         backgroundColor: Color(0xffF8FFF6),
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
@@ -442,62 +443,67 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
             ),
           ),
           child: SafeArea(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Color(0xff57A946),
-                          size: 20,
-                        )),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(typeName,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Color(0xff2A302C))),
-                  ],
+              child: Padding(
+            padding: EdgeInsets.only(
+                top:
+                    (defaultTargetPlatform == TargetPlatform.android) ? 20 : 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Color(0xff57A946),
+                            size: 25,
+                          )),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(typeName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xff2A302C))),
+                    ],
+                  ),
                 ),
-              ),
-              Column(
-                children: [
-                  Container(
+                Column(
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                          //
+                        ),
+                        child: addcard()),
+                    Container(
+                      height: 15,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25)),
-                        //
-                      ),
-                      child: addcard()),
-                  Container(
-                    height: 15,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
 
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.white,
-                      //     blurRadius: 5,
-                      //     spreadRadius: 5,
-                      //     offset: Offset(0, 10), // Shadow position
-                      //   ),
-                      // ],
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: Colors.white,
+                        //     blurRadius: 5,
+                        //     spreadRadius: 5,
+                        //     offset: Offset(0, 10), // Shadow position
+                        //   ),
+                        // ],
+                      ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           )),
         ),
       ),

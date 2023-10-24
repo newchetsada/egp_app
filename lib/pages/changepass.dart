@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
@@ -68,12 +69,17 @@ class _changepassState extends State<changepass> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        toolbarHeight: 50,
+        toolbarHeight:
+            (defaultTargetPlatform == TargetPlatform.android) ? 70 : 50,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         flexibleSpace: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+            padding: EdgeInsets.only(
+                left: 30,
+                right: 30,
+                top:
+                    (defaultTargetPlatform == TargetPlatform.android) ? 20 : 0),
             child: Row(
               children: [
                 GestureDetector(
@@ -83,7 +89,7 @@ class _changepassState extends State<changepass> {
                     child: Icon(
                       Icons.arrow_back,
                       color: Color(0xff57A946),
-                      size: 20,
+                      size: 25,
                     )),
                 SizedBox(
                   width: 10,

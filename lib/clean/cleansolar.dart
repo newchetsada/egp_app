@@ -8,6 +8,7 @@ import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/report/report.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_launcher_icons/xml_templates.dart';
@@ -445,7 +446,8 @@ class _cleansolarState extends State<cleansolar> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          toolbarHeight: 210,
+          toolbarHeight:
+              (defaultTargetPlatform == TargetPlatform.android) ? 200 : 180,
           elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: Color(0xffF8FFF6),
@@ -458,183 +460,189 @@ class _cleansolarState extends State<cleansolar> {
               ),
             ),
             child: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  FocusScope.of(context).unfocus();
-                                  if (_curpage == 0) {
-                                    Navigator.pop(context);
-                                  } else {
-                                    controller.previousPage(
-                                        duration: Duration(milliseconds: 300),
-                                        curve: Curves.ease);
-                                  }
-                                },
-                                child: Icon(
-                                  Icons.arrow_back,
-                                  color: Color(0xff57A946),
-                                  size: 20,
-                                )),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text((_curpage == 0) ? 'รายละเอียด' : 'ดำเนินงาน',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                    color: Color(0xff2A302C))),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text('ล้างแผง',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: Color(0xff57A946))),
-                        Text('บริษัท : ${widget.cus_name} ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                                color: Color(0xff57A946))),
-                        Text('สาขา : ${widget.site_name}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Color(0xff57A946))),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            openMap(widget.lat, widget.lon);
-                          },
-                          child: Row(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: (defaultTargetPlatform == TargetPlatform.android)
+                        ? 20
+                        : 0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Icon(
-                                Icons.location_on_rounded,
-                                color: Color(0xff57A946),
-                              ),
+                              GestureDetector(
+                                  onTap: () {
+                                    FocusScope.of(context).unfocus();
+                                    if (_curpage == 0) {
+                                      Navigator.pop(context);
+                                    } else {
+                                      controller.previousPage(
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.ease);
+                                    }
+                                  },
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Color(0xff57A946),
+                                    size: 25,
+                                  )),
                               SizedBox(
                                 width: 10,
                               ),
-                              Flexible(
-                                child: Text(widget.cus_address,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 12,
-                                        color: Color(0xff646464))),
-                              )
+                              Text((_curpage == 0) ? 'รายละเอียด' : 'ดำเนินงาน',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: Color(0xff2A302C))),
                             ],
                           ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text('ล้างแผง',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Color(0xff57A946))),
+                          Text('บริษัท : ${widget.cus_name} ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Color(0xff57A946))),
+                          Text('สาขา : ${widget.site_name}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xff57A946))),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          // GestureDetector(
+                          //   onTap: () {
+                          //     openMap(widget.lat, widget.lon);
+                          //   },
+                          //   child: Row(
+                          //     children: [
+                          //       Icon(
+                          //         Icons.location_on_rounded,
+                          //         color: Color(0xff57A946),
+                          //       ),
+                          //       SizedBox(
+                          //         width: 10,
+                          //       ),
+                          //       Flexible(
+                          //         child: Text(widget.cus_address,
+                          //             style: TextStyle(
+                          //                 fontWeight: FontWeight.w500,
+                          //                 fontSize: 12,
+                          //                 color: Color(0xff646464))),
+                          //       )
+                          //     ],
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                topRight: Radius.circular(25)),
+                            //
+                          ),
+                          child: (widget.j_status == 3)
+                              ? Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 30,
+                                    right: 30,
+                                    top: 25,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Center(
+                                          child: Text('รายละเอียด',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: (_curpage == 0)
+                                                      ? Color(0xff57A946)
+                                                      : Color(0xff7A86A1))),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Center(
+                                          child: Text('ส่งงาน',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14,
+                                                  color: (_curpage == 1)
+                                                      ? Color(0xff57A946)
+                                                      : Color(0xff7A86A1))),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 30,
+                                    right: 30,
+                                    top: 25,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('รายละเอียด',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: (_curpage == 0)
+                                                  ? Color(0xff57A946)
+                                                  : Color(0xff7A86A1))),
+                                      Text('ดำเนินงาน',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: (_curpage == 1)
+                                                  ? Color(0xff57A946)
+                                                  : Color(0xff7A86A1))),
+                                      Text('ตรวจสอบ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: (_curpage == 2)
+                                                  ? Color(0xff57A946)
+                                                  : Color(0xff7A86A1))),
+                                      Text('ส่งงาน',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: (_curpage == 3)
+                                                  ? Color(0xff57A946)
+                                                  : Color(0xff7A86A1))),
+                                    ],
+                                  ),
+                                ),
+                        ),
+                        Container(
+                          height: 15,
+                          color: Colors.white,
                         ),
                       ],
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(25),
-                              topRight: Radius.circular(25)),
-                          //
-                        ),
-                        child: (widget.j_status == 3)
-                            ? Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 30,
-                                  right: 30,
-                                  top: 25,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Center(
-                                        child: Text('รายละเอียด',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 14,
-                                                color: (_curpage == 0)
-                                                    ? Color(0xff57A946)
-                                                    : Color(0xff7A86A1))),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Center(
-                                        child: Text('ส่งงาน',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 14,
-                                                color: (_curpage == 1)
-                                                    ? Color(0xff57A946)
-                                                    : Color(0xff7A86A1))),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 30,
-                                  right: 30,
-                                  top: 25,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('รายละเอียด',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 0)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
-                                    Text('ดำเนินงาน',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 1)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
-                                    Text('ตรวจสอบ',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 2)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
-                                    Text('ส่งงาน',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                            color: (_curpage == 3)
-                                                ? Color(0xff57A946)
-                                                : Color(0xff7A86A1))),
-                                  ],
-                                ),
-                              ),
-                      ),
-                      Container(
-                        height: 15,
-                        color: Colors.white,
-                      ),
-                    ],
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -876,9 +884,184 @@ class _cleansolarState extends State<cleansolar> {
                     )),
                   ]),
                 ),
+
                 SizedBox(
                   height: 10,
                 ),
+                Text('ติดต่อ',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        color: Color(0xff58A946))),
+                SizedBox(
+                  height: 10,
+                ),
+                (contactloading == true)
+                    ? SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                            itemCount: 3,
+                            scrollDirection: Axis.horizontal,
+                            // padding: EdgeInsets.symmetric(horizontal: 30),
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                    left: (index == 0) ? 0 : 10),
+                                child: Shimmer.fromColors(
+                                  baseColor: Colors.grey[200]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    height: 100,
+                                    width: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Color(0xffE1F5DC),
+                                          Color(0xffD6EFB4),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }))
+                    : (contact.isEmpty)
+                        ? SizedBox(
+                            height: 100,
+                            child: Center(
+                              child: Text('ไม่มีข้อมูลผู้ติดต่อ',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                      color:
+                                          Color.fromARGB(255, 153, 156, 153))),
+                            ),
+                          )
+                        : SizedBox(
+                            height: 100,
+                            child: ListView.builder(
+                              itemCount: contact.length,
+                              scrollDirection: Axis.horizontal,
+                              // padding: EdgeInsets.symmetric(horizontal: 30),
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      left: (index == 0) ? 0 : 10),
+                                  child: GestureDetector(
+                                    onTap: (contact[index].j_cont_tel.isEmpty)
+                                        ? null
+                                        : () {
+                                            _makePhoneCall(
+                                                contact[index].j_cont_tel);
+                                          },
+                                    child: Container(
+                                      width: 150,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Color(0xffE1F5DC),
+                                            Color(0xffD6EFB4),
+                                          ],
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 15),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(
+                                              EvaIcons.peopleOutline,
+                                              color: Color(0xff2A302C),
+                                              size: 22,
+                                            ),
+                                            Text(contact[index].j_cont_name,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontSize: 13,
+                                                    color: Color(0xff464646))),
+                                            Text(
+                                                'ตำแหน่ง : ${contact[index].j_cont_position}',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 13,
+                                                    color: Color(0xff464646))),
+                                            Text(contact[index].j_cont_tel,
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 14,
+                                                    color: Color(0xff464646)))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                SizedBox(
+                  height: 20,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    openMap(widget.lat, widget.lon);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        border: Border.all(color: Color(0xffD6EFB4), width: 1)),
+                    height: 50,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            color: Color(0xff57A946),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Flexible(
+                            child: Text(widget.cus_address,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: Color(0xff646464))),
+                          ),
+                          // SizedBox(
+                          //   width: 5,
+                          // ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Color(0xff57A946),
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+
                 Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -988,134 +1171,13 @@ class _cleansolarState extends State<cleansolar> {
                                 )
                               : Image.network('$pathPic${widget.pic}'),
                         ))),
-                SizedBox(
-                  height: 10,
-                ),
-                Text('ติดต่อ',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Color(0xff58A946))),
-                SizedBox(
-                  height: 10,
-                ),
+
+                // SizedBox(
+                //   height: 10,
+                // ),
               ],
             ),
           ),
-          (contactloading == true)
-              ? SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                      itemCount: 3,
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.symmetric(horizontal: 30),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.only(left: (index == 0) ? 0 : 10),
-                          child: Shimmer.fromColors(
-                            baseColor: Colors.grey[200]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              height: 100,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Color(0xffE1F5DC),
-                                    Color(0xffD6EFB4),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }))
-              : (contact.isEmpty)
-                  ? SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: Text('ไม่มีข้อมูลผู้ติดต่อ',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Color.fromARGB(255, 153, 156, 153))),
-                      ),
-                    )
-                  : SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        itemCount: contact.length,
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 30),
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding:
-                                EdgeInsets.only(left: (index == 0) ? 0 : 10),
-                            child: GestureDetector(
-                              onTap: (contact[index].j_cont_tel.isEmpty)
-                                  ? null
-                                  : () {
-                                      _makePhoneCall(contact[index].j_cont_tel);
-                                    },
-                              child: Container(
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xffE1F5DC),
-                                      Color(0xffD6EFB4),
-                                    ],
-                                  ),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 15),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        EvaIcons.peopleOutline,
-                                        color: Color(0xff2A302C),
-                                        size: 22,
-                                      ),
-                                      Text(contact[index].j_cont_name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              overflow: TextOverflow.ellipsis,
-                                              fontSize: 13,
-                                              color: Color(0xff464646))),
-                                      Text(
-                                          'ตำแหน่ง : ${contact[index].j_cont_position}',
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13,
-                                              color: Color(0xff464646))),
-                                      Text(contact[index].j_cont_tel,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: Color(0xff464646)))
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
@@ -1124,7 +1186,7 @@ class _cleansolarState extends State<cleansolar> {
                 SizedBox(
                   height: 20,
                 ),
-                Text('ผู้เปิดงาน',
+                Text('เจ้าหน้าที่ประสานงาน',
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,

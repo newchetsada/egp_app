@@ -140,7 +140,8 @@ class _settingPageState extends State<settingPage> {
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
-          toolbarHeight: 210,
+          toolbarHeight:
+              (defaultTargetPlatform == TargetPlatform.android) ? 230 : 210,
           elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: Color(0xffF8FFF6),
@@ -153,251 +154,258 @@ class _settingPageState extends State<settingPage> {
               ),
             ),
             child: SafeArea(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: Color(0xff57A946),
-                            size: 20,
-                          )),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text('ตั้งค่า',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Color(0xff2A302C))),
-                    ],
+                child: Padding(
+              padding: EdgeInsets.only(
+                  top: (defaultTargetPlatform == TargetPlatform.android)
+                      ? 20
+                      : 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text('ตั้งค่า',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xff2A302C))),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Text(
-                    'โปรไฟล์',
-                    style: TextStyle(
-                        fontSize: 27,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xff57A946)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      'โปรไฟล์',
+                      style: TextStyle(
+                          fontSize: 27,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xff57A946)),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Column(
-                    children: [
-                      (isLoading == true)
-                          ? Shimmer.fromColors(
-                              baseColor: Colors.grey[200]!,
-                              highlightColor: Colors.grey[50]!,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          EvaIcons.peopleOutline,
-                                          size: 70,
-                                          color: Color(0xff57A946)
-                                              .withOpacity(0.5),
-                                        ),
-                                        SizedBox(
-                                          width: 20,
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 20),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  height: 20,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.black,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  5))),
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Container(
-                                                  height: 20,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.black,
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                              Radius.circular(
-                                                                  5))),
-                                                ),
-                                              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Column(
+                      children: [
+                        (isLoading == true)
+                            ? Shimmer.fromColors(
+                                baseColor: Colors.grey[200]!,
+                                highlightColor: Colors.grey[50]!,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            EvaIcons.peopleOutline,
+                                            size: 70,
+                                            color: Color(0xff57A946)
+                                                .withOpacity(0.5),
+                                          ),
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 20),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    height: 20,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.black,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Container(
+                                                    height: 20,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.black,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        color: Color(0xffE1F5DC),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Color(0xff149C32)
-                                                  .withOpacity(0.15),
-                                              blurRadius: 10)
-                                        ]),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      height: 70,
-                                      width: 70,
-                                      child: (pic.isEmpty)
-                                          ? Icon(
-                                              EvaIcons.peopleOutline,
-                                              size: 70,
-                                              color: Color(0xff57A946)
-                                                  .withOpacity(0.5),
-                                            )
-                                          : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              child: Image.network(
-                                                  fit: BoxFit.cover,
-                                                  height: double.infinity,
-                                                  width: double.infinity,
-                                                  'https://backoffice.energygreenplus.co.th/$pic'),
-                                            ),
-                                    ),
-                                    // Icon(
-                                    //   CupertinoEvaIcons.peopleOutline_alt_circle,
-                                    //   size: 70,
-                                    //   color: Color(0xff57A946).withOpacity(0.5),
-                                    // ),
-                                    SizedBox(
-                                      width: 20,
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '$tech_fname $tech_lname',
-                                          style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xff57A946)),
-                                        ),
-                                        Text(
-                                          'แก้ไขโปรไฟล์',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color(0xff2A302C)),
-                                        ),
-                                      ],
+                                    Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                          color: Color(0xffE1F5DC),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Color(0xff149C32)
+                                                    .withOpacity(0.15),
+                                                blurRadius: 10)
+                                          ]),
                                     ),
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => editprofile(
-                                                id: iduser,
-                                                fname: tech_fname,
-                                                lname: tech_lname,
-                                                companame: tech_company,
-                                                email: tech_email,
-                                                line: tech_line,
-                                                position: tech_position,
-                                                tel: tech_tel,
-                                                userName: userName,
-                                                pic: pic,
-                                              )),
-                                    ).then((value) {
-                                      setState(() {
-                                        getUserDetail(iduser);
+                              )
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        height: 70,
+                                        width: 70,
+                                        child: (pic.isEmpty)
+                                            ? Icon(
+                                                EvaIcons.peopleOutline,
+                                                size: 70,
+                                                color: Color(0xff57A946)
+                                                    .withOpacity(0.5),
+                                              )
+                                            : ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                child: Image.network(
+                                                    fit: BoxFit.cover,
+                                                    height: double.infinity,
+                                                    width: double.infinity,
+                                                    'https://backoffice.energygreenplus.co.th/$pic'),
+                                              ),
+                                      ),
+                                      // Icon(
+                                      //   CupertinoEvaIcons.peopleOutline_alt_circle,
+                                      //   size: 70,
+                                      //   color: Color(0xff57A946).withOpacity(0.5),
+                                      // ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$tech_fname $tech_lname',
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xff57A946)),
+                                          ),
+                                          Text(
+                                            'แก้ไขโปรไฟล์',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(0xff2A302C)),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => editprofile(
+                                                  id: iduser,
+                                                  fname: tech_fname,
+                                                  lname: tech_lname,
+                                                  companame: tech_company,
+                                                  email: tech_email,
+                                                  line: tech_line,
+                                                  position: tech_position,
+                                                  tel: tech_tel,
+                                                  userName: userName,
+                                                  pic: pic,
+                                                )),
+                                      ).then((value) {
+                                        setState(() {
+                                          getUserDetail(iduser);
+                                        });
                                       });
-                                    });
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        color: Color(0xffE1F5DC),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Color(0xff149C32)
-                                                  .withOpacity(0.15),
-                                              blurRadius: 10)
-                                        ]),
-                                    child: Center(
-                                      child: Icon(
-                                        EvaIcons.edit,
-                                        color: Color(0xff9DC75B),
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                          color: Color(0xffE1F5DC),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Color(0xff149C32)
+                                                    .withOpacity(0.15),
+                                                blurRadius: 10)
+                                          ]),
+                                      child: Center(
+                                        child: Icon(
+                                          EvaIcons.edit,
+                                          color: Color(0xff9DC75B),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )
-                              ],
-                            ),
-                    ],
+                                  )
+                                ],
+                              ),
+                      ],
+                    ),
                   ),
-                ),
-                Column(
-                  children: [
-                    Container(
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25)),
+                  Column(
+                    children: [
+                      Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(25),
+                              topRight: Radius.circular(25)),
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
+                      Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  )
+                ],
+              ),
             )),
           ),
         ),
