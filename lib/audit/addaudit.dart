@@ -184,6 +184,7 @@ class _addauditState extends State<addaudit> {
   void initState() {
     super.initState();
     getUser();
+    print(widget.typeId);
     API.getSubLs(widget.sid, widget.jidx, widget.typeId).then((response) {
       setState(() {
         List list = json.decode(response.body);
@@ -460,6 +461,8 @@ class _addauditState extends State<addaudit> {
                                                     sn: groupSub[index].sn,
                                                     sin:
                                                         groupSub[index].sins_id,
+                                                    model:
+                                                        groupSub[index].model,
                                                   )
                                                 : acaudit(
                                                     jidx: widget.jidx,
@@ -469,6 +472,9 @@ class _addauditState extends State<addaudit> {
                                                     group: 0,
                                                     sin:
                                                         groupSub[index].sins_id,
+                                                    sn: groupSub[index].sn,
+                                                    model:
+                                                        groupSub[index].model,
                                                   ))).then((value) {
                                       API
                                           .getSubLs(widget.sid, widget.jidx,
@@ -487,7 +493,7 @@ class _addauditState extends State<addaudit> {
                                     });
                                   },
                                   child: Container(
-                                    height: 60,
+                                    height: 80,
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -497,7 +503,7 @@ class _addauditState extends State<addaudit> {
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
+                                          vertical: 10, horizontal: 20),
                                       child: Row(
                                         children: [
                                           Expanded(
@@ -526,18 +532,52 @@ class _addauditState extends State<addaudit> {
                                                 ),
                                                 (widget.typeId == 32 ||
                                                         widget.typeId == 37 ||
-                                                        widget.typeId == 29)
-                                                    ? Text(
-                                                        'SN ${groupSub[index].sn}',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                            color: Color(
-                                                                0xff57A946),
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            fontSize: 12),
-                                                      )
+                                                        widget.typeId == 29 ||
+                                                        widget.typeId == 31 ||
+                                                        widget.typeId == 30 ||
+                                                        widget.typeId == 40)
+                                                    ? (groupSub[index]
+                                                            .model
+                                                            .isNotEmpty)
+                                                        ? Text(
+                                                            groupSub[index]
+                                                                .model,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xff57A946),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12),
+                                                          )
+                                                        : Container()
+                                                    : Container(),
+                                                (widget.typeId == 32 ||
+                                                        widget.typeId == 37 ||
+                                                        widget.typeId == 29 ||
+                                                        widget.typeId == 31 ||
+                                                        widget.typeId == 30 ||
+                                                        widget.typeId == 40)
+                                                    ? (groupSub[index]
+                                                            .sn
+                                                            .isNotEmpty)
+                                                        ? Text(
+                                                            groupSub[index].sn,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xff57A946),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontSize: 12),
+                                                          )
+                                                        : Container()
                                                     : Container()
                                               ],
                                             ),

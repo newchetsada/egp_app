@@ -26,6 +26,7 @@ class addinverter extends StatefulWidget {
   final int no;
   final String sn;
   final int sin;
+  final String model;
 
   addinverter(
       {required this.jidx,
@@ -35,7 +36,8 @@ class addinverter extends StatefulWidget {
       required this.group,
       required this.no,
       required this.sn,
-      required this.sin});
+      required this.sin,
+      required this.model});
 }
 
 class _addinverterState extends State<addinverter> {
@@ -712,14 +714,26 @@ class _addinverterState extends State<addinverter> {
                   fontWeight: FontWeight.w600,
                   fontSize: 15),
             ),
-            Text(
-              'SN ${widget.sn}',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: Color(0xff57A946),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12),
-            ),
+            (widget.sn.isNotEmpty)
+                ? Text(
+                    widget.sn,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Color(0xff57A946),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
+                  )
+                : Container(),
+            (widget.model.isNotEmpty)
+                ? Text(
+                    widget.model,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Color(0xff57A946),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12),
+                  )
+                : Container(),
             SizedBox(
               height: 10,
             ),

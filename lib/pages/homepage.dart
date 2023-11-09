@@ -435,7 +435,8 @@ class _homePageState extends State<homePage> {
                                       works[index].senddate,
                                       works[index].cus_name,
                                       works[index].jidx,
-                                      works[index].j_no);
+                                      works[index].j_no,
+                                      works[index].job_newly_delayed);
                             },
                           ),
                         ),
@@ -455,7 +456,8 @@ class _homePageState extends State<homePage> {
                                       works[index].senddate,
                                       works[index].cus_name,
                                       works[index].jidx,
-                                      works[index].j_no)
+                                      works[index].j_no,
+                                      works[index].job_newly_delayed)
                                   : Container();
                             },
                           ),
@@ -476,11 +478,13 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget cardWork(type, status, date, comp, id, sn) {
+  Widget cardWork(type, status, date, comp, id, sn, delay) {
     var col = (status == 1)
         ? Color(0xff1975D0)
         : (status == 2)
-            ? Color(0xff7540EE)
+            ? (datetime.isAfter(DateTime.parse(date)))
+                ? Color(0xffE44E47)
+                : Color(0xff7540EE)
             : (status == 3)
                 ? Color(0xff2DAC34)
                 : Color(0xff9DC75B);
@@ -507,9 +511,11 @@ class _homePageState extends State<homePage> {
           String tel = '';
           int j_status = 0;
           int ppe_flag = 0;
+          int belt_flag = 0;
           String j_remark_complete = '';
           int sid = 0;
           String site_layout = '';
+          List sitepic = [];
 
           //
           showDialog(
@@ -541,8 +547,8 @@ class _homePageState extends State<homePage> {
                 j_send_date = DateFormat('dd/MM/yyyy HH:mm')
                     .format(DateTime.parse(jsonResponse[0]['j_send_date']))
                     .toString();
-                cus_name = jsonResponse[0]['cus_name'];
-                site_name = jsonResponse[0]['site_name'];
+                cus_name = jsonResponse[0]['cus_name'] ?? '';
+                site_name = jsonResponse[0]['site_name'] ?? '';
                 cus_address = jsonResponse[0]['cus_address'] +
                     ' ' +
                     jsonResponse[0]['tambon_th'] +
@@ -559,24 +565,23 @@ class _homePageState extends State<homePage> {
                     .format(DateTime.parse(jsonResponse[0]['warranty_expire']))
                     .toString();
                 power_peak = jsonResponse[0]['power_peak'].toString();
-                j_detail = jsonResponse[0]['j_detail'];
-                remark_tech = jsonResponse[0]['remark_tech'];
-                lat = jsonResponse[0]['lat'];
-                lon = jsonResponse[0]['lon'];
-                site_clener = jsonResponse[0]['site_clener'];
+                j_detail = jsonResponse[0]['j_detail'] ?? '';
+                remark_tech = jsonResponse[0]['remark_tech'] ?? '';
+                lat = jsonResponse[0]['lat'] ?? 0;
+                lon = jsonResponse[0]['lon'] ?? 0;
+                site_clener = jsonResponse[0]['site_clener'] ?? '';
                 // fullname =
                 //     '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
                 fullname = jsonResponse[0]['fullname'] ?? '';
-                position = jsonResponse[0]['position'];
-                tel = jsonResponse[0]['tel'];
+                position = jsonResponse[0]['position'] ?? '';
+                tel = jsonResponse[0]['tel'] ?? '';
                 j_status = jsonResponse[0]['j_status'];
                 ppe_flag = jsonResponse[0]['ppe_flag'];
-                j_remark_complete =
-                    (jsonResponse[0]['j_remark_complete'] == null)
-                        ? ''
-                        : jsonResponse[0]['j_remark_complete'];
+                j_remark_complete = jsonResponse[0]['j_remark_complete'] ?? '';
                 sid = jsonResponse[0]['sid'];
                 site_layout = jsonResponse[0]['site_layout'] ?? '';
+                sitepic = jsonResponse[0]['images'] ?? [];
+                belt_flag = jsonResponse[0]['belt_flag'] ?? 0;
               });
             }
           }).then((value) {
@@ -614,6 +619,8 @@ class _homePageState extends State<homePage> {
                                   j_remark_complete: j_remark_complete,
                                   sid: sid,
                                   pic: site_layout,
+                                  sitepic: sitepic,
+                                  belt_flag: belt_flag,
                                 )),
                       )
                     : (type == 1 || type == 2)
@@ -642,6 +649,8 @@ class _homePageState extends State<homePage> {
                                       j_remark_complete: j_remark_complete,
                                       pic: site_layout,
                                       sid: sid,
+                                      sitepic: sitepic,
+                                      belt_flag: belt_flag,
                                     )))
                         : Navigator.push(
                             context,
@@ -669,6 +678,8 @@ class _homePageState extends State<homePage> {
                                       type: type,
                                       pic: site_layout,
                                       sid: sid,
+                                      sitepic: sitepic,
+                                      belt_flag: belt_flag,
                                     )),
                           );
           });
@@ -764,7 +775,7 @@ class _homePageState extends State<homePage> {
                             children: [
                               Icon(
                                 Icons.calendar_month_rounded,
-                                size: 20,
+                                size: 15,
                                 color: col,
                               ),
                               SizedBox(
@@ -783,7 +794,7 @@ class _homePageState extends State<homePage> {
                               ),
                               Icon(
                                 Icons.access_time_filled_rounded,
-                                size: 20,
+                                size: 15,
                                 color: col,
                               ),
                               SizedBox(
@@ -801,36 +812,6 @@ class _homePageState extends State<homePage> {
                           ),
                           Row(
                             children: [
-                              (status == 3)
-                                  ? Container()
-                                  : (datetime.isAfter(DateTime.parse(date)))
-                                      ? Container(
-                                          height: 30,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5)),
-                                              color: Color.fromARGB(
-                                                  255, 255, 214, 211)),
-                                          child: Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Text(
-                                                'ล่าช้า',
-                                                style: TextStyle(
-                                                    color: Color(0xffE44E47),
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(),
-                              SizedBox(
-                                width: 5,
-                              ),
                               (status == 1)
                                   ? Container(
                                       height: 30,
@@ -901,6 +882,61 @@ class _homePageState extends State<homePage> {
                                               ),
                                             )
                                           : Container(),
+                              (delay == 1)
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5)),
+                                            color: Color(0xffFEF0D6)),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Text(
+                                              'เลยกำหนด',
+                                              style: TextStyle(
+                                                  color: Color(0xffFBB237),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              (status == 2)
+                                  ? (datetime.isAfter(DateTime.parse(date)))
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 5),
+                                          child: Container(
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(5)),
+                                                color: Color(0xffFFF0F8)),
+                                            child: Center(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10),
+                                                child: Text(
+                                                  'ล่าช้า',
+                                                  style: TextStyle(
+                                                      color: Color(0xffE44E47),
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container()
+                                  : Container(),
                             ],
                           ),
                         ],
@@ -1023,6 +1059,7 @@ class Album {
   final int type_id;
   final String senddate;
   final String j_no;
+  final int job_newly_delayed;
 
   const Album(
       {required this.jidx,
@@ -1032,7 +1069,8 @@ class Album {
       required this.j_status,
       required this.type_id,
       required this.senddate,
-      required this.j_no});
+      required this.j_no,
+      required this.job_newly_delayed});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
@@ -1044,6 +1082,7 @@ class Album {
         j_status: json['j_status'],
         type_id: json['type_flag'],
         senddate: json['j_send_date'],
-        j_no: json['j_no']);
+        j_no: json['j_no'],
+        job_newly_delayed: json['job_newly_delayed']);
   }
 }

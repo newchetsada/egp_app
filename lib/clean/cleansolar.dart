@@ -47,6 +47,8 @@ class cleansolar extends StatefulWidget {
   final String j_remark_complete;
   final int sid;
   final String pic;
+  final List sitepic;
+  final int belt_flag;
 
   //
 
@@ -71,7 +73,9 @@ class cleansolar extends StatefulWidget {
       required this.ppe_flag,
       required this.j_remark_complete,
       required this.sid,
-      required this.pic});
+      required this.pic,
+      required this.sitepic,
+      required this.belt_flag});
 }
 
 class _cleansolarState extends State<cleansolar> {
@@ -233,6 +237,8 @@ class _cleansolarState extends State<cleansolar> {
   }
 
   StartWork() async {
+    print(widget.jid);
+    print(userName);
     var response = await http.post(
       Uri.parse(
           'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
@@ -327,6 +333,8 @@ class _cleansolarState extends State<cleansolar> {
     getcountphoto(widget.jid);
     getsign1(widget.jid);
     getsign2(widget.jid);
+
+    print(widget.sitepic);
   }
 
   Future<void> _makePhoneCall(String phoneNumber) async {
@@ -955,8 +963,41 @@ class _cleansolarState extends State<cleansolar> {
                                     onTap: (contact[index].j_cont_tel.isEmpty)
                                         ? null
                                         : () {
-                                            _makePhoneCall(
-                                                contact[index].j_cont_tel);
+                                            var tel = contact[index].j_cont_tel;
+                                            var moretel = tel.split(', ');
+                                            if (moretel.length > 1) {
+                                              showAdaptiveActionSheet(
+                                                context: context,
+                                                // title: const Text('Title'),
+                                                actions: List.generate(
+                                                  moretel.length,
+                                                  (index) => BottomSheetAction(
+                                                    title: Text(moretel[index],
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 16,
+                                                        )),
+                                                    onPressed: (context) {
+                                                      Navigator.pop(context);
+                                                      _makePhoneCall(
+                                                          moretel[index]);
+                                                    },
+                                                  ),
+                                                ),
+
+                                                cancelAction: CancelAction(
+                                                    title: Text('Cancel',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 16,
+                                                        ))),
+                                              );
+                                            } else {
+                                              _makePhoneCall(
+                                                  contact[index].j_cont_tel);
+                                            }
                                           },
                                     child: Container(
                                       width: 150,
@@ -1001,6 +1042,7 @@ class _cleansolarState extends State<cleansolar> {
                                                     fontSize: 13,
                                                     color: Color(0xff464646))),
                                             Text(contact[index].j_cont_tel,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: 14,
@@ -1029,21 +1071,28 @@ class _cleansolarState extends State<cleansolar> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.location_on_rounded,
-                            color: Color(0xff57A946),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Flexible(
-                            child: Text(widget.cus_address,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    color: Color(0xff646464))),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on_rounded,
+                                  color: Color(0xff57A946),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Expanded(
+                                  child: Text(widget.cus_address,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          color: Color(0xff646464))),
+                                ),
+                              ],
+                            ),
                           ),
                           // SizedBox(
                           //   width: 5,
@@ -1078,7 +1127,7 @@ class _cleansolarState extends State<cleansolar> {
                 SizedBox(
                   height: 10,
                 ),
-                Text('ขนาดการติดตั้ง : ${widget.power_peak}',
+                Text('ขนาดการติดตั้ง : ${widget.power_peak} kW',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -1086,7 +1135,7 @@ class _cleansolarState extends State<cleansolar> {
                 SizedBox(
                   height: 10,
                 ),
-                Text('จำนวนแผง : ${widget.power_peak}',
+                Text('จำนวนแผง : ${widget.power_peak} PV',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -1133,6 +1182,29 @@ class _cleansolarState extends State<cleansolar> {
                       )
                     : Container(),
 
+                (widget.belt_flag == 1)
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_rounded,
+                              color: Color(0xff57A946),
+                              size: 25,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text('คาดเข็มขัดนิรภัย',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: Color(0xff57A946))),
+                          ],
+                        ),
+                      )
+                    : Container(),
+
                 // DottedLine(dashColor: Color(0xffD5D5D5)),
                 Text('แผนผังไซต์งาน',
                     style: TextStyle(
@@ -1142,39 +1214,129 @@ class _cleansolarState extends State<cleansolar> {
                 SizedBox(
                   height: 10,
                 ),
-                AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: GestureDetector(
-                        onTap: (widget.pic.isEmpty)
-                            ? null
-                            : () {
-                                showDialog(
-                                    context: context,
-                                    builder: (_) => Dialog(
-                                        elevation: 0,
-                                        backgroundColor: Colors.transparent,
-                                        child: PhotoView(
-                                          tightMode: true,
-                                          minScale: 0.25,
-                                          backgroundDecoration: BoxDecoration(
-                                              color: Colors.transparent),
-                                          imageProvider: NetworkImage(
-                                              '$pathPic${widget.pic}'),
-                                        )));
-                              },
+                (widget.sitepic.isEmpty)
+                    ? AspectRatio(
+                        aspectRatio: 16 / 9,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: (widget.pic.isEmpty)
-                              ? Image.asset(
-                                  'assets/nolayer.png',
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.network('$pathPic${widget.pic}'),
-                        ))),
-
-                // SizedBox(
-                //   height: 10,
-                // ),
+                          child: Image.asset(
+                            'assets/nolayer.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ))
+                    : AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: ListView.builder(
+                          itemCount: widget.sitepic.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  EdgeInsets.only(left: (index == 0) ? 0 : 10),
+                              child: AspectRatio(
+                                aspectRatio: 16 / 11,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10)),
+                                    color: (widget.sitepic[index]
+                                                    ['site_img_des'] ==
+                                                null ||
+                                            widget.sitepic[index]
+                                                    ['site_img_des'] ==
+                                                '')
+                                        ? Colors.transparent
+                                        : Color(0xffEDFAEA),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      AspectRatio(
+                                          aspectRatio: 16 / 9,
+                                          child: GestureDetector(
+                                              onTap: (widget.pic.isEmpty)
+                                                  ? null
+                                                  : () {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (_) =>
+                                                              Dialog(
+                                                                  elevation: 0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child:
+                                                                      PhotoView(
+                                                                    tightMode:
+                                                                        true,
+                                                                    minScale:
+                                                                        0.25,
+                                                                    backgroundDecoration:
+                                                                        BoxDecoration(
+                                                                            color:
+                                                                                Colors.transparent),
+                                                                    imageProvider:
+                                                                        NetworkImage(
+                                                                            '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                                  )));
+                                                    },
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.network(
+                                                    '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                              ))),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                  widget.sitepic[index]
+                                                          ['site_img_des'] ??
+                                                      '',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 14,
+                                                      color:
+                                                          Color(0xff2A302C))),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.symmetric(
+                                      //       vertical: 5),
+                                      //   child: Expanded(
+                                      //     child: Row(
+                                      //       children: [
+                                      //         Text(
+                                      //             // widget.sitepic[index]
+                                      //             //         ['site_img_des'] ??
+                                      //             'fwagfsebgifuoasjpkugykuguviohovigydfisuhigyfdusijdhguiyidfsjihgd',
+                                      //             overflow: TextOverflow.ellipsis,
+                                      //             style: TextStyle(
+                                      //                 fontWeight: FontWeight.w500,
+                                      //                 fontSize: 14,
+                                      //                 color: Color(0xff2A302C))),
+                                      //       ],
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
               ],
             ),
           ),
@@ -1196,7 +1358,41 @@ class _cleansolarState extends State<cleansolar> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    widget.tel.isEmpty ? null : _makePhoneCall(widget.tel);
+                    if (widget.tel.isEmpty) {
+                    } else {
+                      var tel = widget.tel;
+                      var moretel = tel.split(', ');
+                      print(moretel);
+                      if (moretel.length > 1) {
+                        showAdaptiveActionSheet(
+                          context: context,
+                          // title: const Text('Title'),
+                          actions: List.generate(
+                            moretel.length,
+                            (index) => BottomSheetAction(
+                              title: Text(moretel[index],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  )),
+                              onPressed: (context) {
+                                Navigator.pop(context);
+                                _makePhoneCall(moretel[index]);
+                              },
+                            ),
+                          ),
+
+                          cancelAction: CancelAction(
+                              title: Text('Cancel',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ))),
+                        );
+                      } else {
+                        _makePhoneCall(widget.tel);
+                      }
+                    }
                   },
                   child: Container(
                     width: 150,
@@ -2649,8 +2845,8 @@ class Album {
     return Album(
       j_cont_name:
           '${json['j_cont_fname'] ?? ''} ${json['j_cont_lname'] ?? ''}',
-      j_cont_position: json['j_cont_position'],
-      j_cont_tel: json['j_cont_tel'],
+      j_cont_position: json['j_cont_position'] ?? '',
+      j_cont_tel: json['j_cont_tel'] ?? '',
     );
   }
 }

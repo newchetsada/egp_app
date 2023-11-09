@@ -22,6 +22,8 @@ class acaudit extends StatefulWidget {
   final int status;
   final int group;
   final int sin;
+  final String sn;
+  final String model;
 
   acaudit(
       {required this.jidx,
@@ -29,7 +31,9 @@ class acaudit extends StatefulWidget {
       required this.typeName,
       required this.status,
       required this.group,
-      required this.sin});
+      required this.sin,
+      required this.sn,
+      required this.model});
 }
 
 class _acauditState extends State<acaudit> {
@@ -441,6 +445,32 @@ class _acauditState extends State<acaudit> {
                     fontWeight: FontWeight.w600),
               ),
             ),
+            (widget.sn.isNotEmpty)
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      widget.sn,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: Color(0xff57A946),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12),
+                    ),
+                  )
+                : Container(),
+            (widget.model.isNotEmpty)
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      widget.model,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: Color(0xff57A946),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12),
+                    ),
+                  )
+                : Container(),
             SizedBox(
               height: 10,
             ),
