@@ -35,6 +35,7 @@ class cleansolar extends StatefulWidget {
   final String install_date;
   final String warranty_expire;
   final String power_peak;
+  final String amount;
   final String j_detail;
   final String remark_tech;
   final double lat;
@@ -75,7 +76,8 @@ class cleansolar extends StatefulWidget {
       required this.sid,
       required this.pic,
       required this.sitepic,
-      required this.belt_flag});
+      required this.belt_flag,
+      required this.amount});
 }
 
 class _cleansolarState extends State<cleansolar> {
@@ -209,6 +211,7 @@ class _cleansolarState extends State<cleansolar> {
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
+        print('sign2 : $jsonResponse');
 
         setState(() {
           sign_name_2 = jsonResponse[0]['sign_name'];
@@ -1135,7 +1138,7 @@ class _cleansolarState extends State<cleansolar> {
                 SizedBox(
                   height: 10,
                 ),
-                Text('จำนวนแผง : ${widget.power_peak} PV',
+                Text('จำนวนแผง : ${widget.amount} PV',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
@@ -1898,163 +1901,181 @@ class _cleansolarState extends State<cleansolar> {
           ],
         ),
       ),
-      body: ListView(
-        children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
-                child: GestureDetector(
-                    onTap: () {
-                      (sign_name_1.isNotEmpty)
-                          ? popsign(path_sign1)
-                          : sheet('ผู้ติดต่อหน้างาน', 3);
-                    },
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: (sign_name_1.isNotEmpty)
-                            ? Color(0xff9DC75B)
-                            : Color(0xffEEF5E2),
-                        borderRadius: BorderRadius.circular(15),
-                        // border: Border.all(color: Color(0xffE0ECDE)),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: (sign_name_1.isNotEmpty)
-                                    ? Colors.white
-                                    : Color(0xff9CC75B),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Center(
-                                child: Icon(EvaIcons.peopleOutline,
-                                    size: 20,
-                                    color: (sign_name_1.isNotEmpty)
-                                        ? Color(0xff9CC75B)
-                                        : Colors.white),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ผู้ติดต่อหน้างาน',
-                                  style: TextStyle(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await getsign1(widget.jid);
+          await getsign2(widget.jid);
+        },
+        child: ListView(
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
+                  child: GestureDetector(
+                      onTap: () async {
+                        loading();
+                        await getsign1(widget.jid);
+                        await getsign2(widget.jid);
+                        Navigator.pop(context);
+
+                        (sign_name_1.isNotEmpty)
+                            ? popsign(path_sign1)
+                            : sheet('ผู้ติดต่อหน้างาน', 3);
+                      },
+                      child: Container(
+                        height: 70,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: (sign_name_1.isNotEmpty)
+                              ? Color(0xff9DC75B)
+                              : Color(0xffEEF5E2),
+                          borderRadius: BorderRadius.circular(15),
+                          // border: Border.all(color: Color(0xffE0ECDE)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: (sign_name_1.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xff9CC75B),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Center(
+                                  child: Icon(EvaIcons.peopleOutline,
+                                      size: 20,
                                       color: (sign_name_1.isNotEmpty)
-                                          ? Colors.white
-                                          : Color(0xffAED76E),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14),
+                                          ? Color(0xff9CC75B)
+                                          : Colors.white),
                                 ),
-                                (sign_name_1.isNotEmpty)
-                                    ? Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text(
-                                          sign_name_1,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 12),
-                                        ),
-                                      )
-                                    : Container()
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
-                child: GestureDetector(
-                    onTap: () {
-                      (sign_name_2.isNotEmpty)
-                          ? popsign(path_sign2)
-                          : sheet('ช่าง', 2);
-                    },
-                    child: Container(
-                      height: 70,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: (sign_name_2.isNotEmpty)
-                            ? Color(0xff9DC75B)
-                            : Color(0xffEEF5E2),
-                        borderRadius: BorderRadius.circular(15),
-                        // border: Border.all(color: Color(0xffE0ECDE)),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: (sign_name_2.isNotEmpty)
-                                    ? Colors.white
-                                    : Color(0xff9CC75B),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: Center(
-                                child: Icon(EvaIcons.peopleOutline,
-                                    size: 20,
-                                    color: (sign_name_2.isNotEmpty)
-                                        ? Color(0xff9CC75B)
-                                        : Colors.white),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ช่าง',
-                                  style: TextStyle(
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ผู้ติดต่อหน้างาน',
+                                    style: TextStyle(
+                                        color: (sign_name_1.isNotEmpty)
+                                            ? Colors.white
+                                            : Color(0xffAED76E),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14),
+                                  ),
+                                  (sign_name_1.isNotEmpty)
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            sign_name_1,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+                  child: GestureDetector(
+                      onTap: () async {
+                        loading();
+                        await getsign1(widget.jid);
+                        await getsign2(widget.jid);
+                        Navigator.pop(context);
+
+                        (sign_name_2.isNotEmpty)
+                            ? popsign(path_sign2)
+                            : sheet('ช่าง', 2);
+                      },
+                      child: Container(
+                        height: 70,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: (sign_name_2.isNotEmpty)
+                              ? Color(0xff9DC75B)
+                              : Color(0xffEEF5E2),
+                          borderRadius: BorderRadius.circular(15),
+                          // border: Border.all(color: Color(0xffE0ECDE)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: (sign_name_2.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xff9CC75B),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Center(
+                                  child: Icon(EvaIcons.peopleOutline,
+                                      size: 20,
                                       color: (sign_name_2.isNotEmpty)
-                                          ? Colors.white
-                                          : Color(0xffAED76E),
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14),
+                                          ? Color(0xff9CC75B)
+                                          : Colors.white),
                                 ),
-                                (sign_name_2.isNotEmpty)
-                                    ? Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Text(
-                                          sign_name_2,
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 12),
-                                        ),
-                                      )
-                                    : Container()
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
-            ],
-          ),
-        ],
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ช่าง',
+                                    style: TextStyle(
+                                        color: (sign_name_2.isNotEmpty)
+                                            ? Colors.white
+                                            : Color(0xffAED76E),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14),
+                                  ),
+                                  (sign_name_2.isNotEmpty)
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            sign_name_2,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

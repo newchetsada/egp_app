@@ -32,16 +32,23 @@ class _homePageState extends State<homePage> {
   _getAPI(id) {
     var idd = id;
     API.getWorkLs(idd).then((response) {
-      setState(() {
-        List list = json.decode(response.body);
-        print(list);
+      if (response.statusCode == 200) {
+        setState(() {
+          List list = json.decode(response.body);
+          print(list);
 
-        works = list.map((m) => Album.fromJson(m)).toList();
-        datetime = DateTime.now();
-        load = false;
+          works = list.map((m) => Album.fromJson(m)).toList();
+          datetime = DateTime.now();
+          load = false;
 
-        // isLoading = false;
-      });
+          // isLoading = false;
+        });
+      } else {
+        setState(() {
+          hasinternet = false;
+          load = false;
+        });
+      }
     });
   }
 
@@ -78,6 +85,11 @@ class _homePageState extends State<homePage> {
         setState(() {
           fullname =
               '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';
+        });
+      } else {
+        setState(() {
+          hasinternet = false;
+          load = false;
         });
       }
     } catch (error) {
@@ -432,11 +444,13 @@ class _homePageState extends State<homePage> {
                                   : cardWork(
                                       works[index].type_id,
                                       works[index].j_status,
-                                      works[index].senddate,
+                                      works[index].startdate,
                                       works[index].cus_name,
                                       works[index].jidx,
                                       works[index].j_no,
-                                      works[index].job_newly_delayed);
+                                      works[index].job_newly_delayed,
+                                      // works[index].senddate
+                                    );
                             },
                           ),
                         ),
@@ -453,11 +467,13 @@ class _homePageState extends State<homePage> {
                                   ? cardWork(
                                       works[index].type_id,
                                       works[index].j_status,
-                                      works[index].senddate,
+                                      works[index].startdate,
                                       works[index].cus_name,
                                       works[index].jidx,
                                       works[index].j_no,
-                                      works[index].job_newly_delayed)
+                                      works[index].job_newly_delayed,
+                                      // works[index].senddate
+                                    )
                                   : Container();
                             },
                           ),
@@ -478,16 +494,20 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget cardWork(type, status, date, comp, id, sn, delay) {
+  Widget cardWork(type, status, datestart, comp, id, sn, delay) {
     var col = (status == 1)
         ? Color(0xff1975D0)
         : (status == 2)
-            ? (datetime.isAfter(DateTime.parse(date)))
-                ? Color(0xffE44E47)
-                : Color(0xff7540EE)
+            ?
+            // (datetime.isAfter(DateTime.parse(datesend)))
+            //     ? Color(0xffE44E47)
+            //     :
+            Color(0xff7540EE)
             : (status == 3)
                 ? Color(0xff2DAC34)
-                : Color(0xff9DC75B);
+                : (status == 5)
+                    ? Color(0xffE44E47)
+                    : Color(0xff9DC75B);
     return Padding(
       padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
       child: GestureDetector(
@@ -501,6 +521,7 @@ class _homePageState extends State<homePage> {
           String install_date = '';
           String warranty_expire = '';
           String power_peak = '';
+          String amount = '';
           String j_detail = '';
           String remark_tech = '';
           double lat = 0;
@@ -513,7 +534,7 @@ class _homePageState extends State<homePage> {
           int ppe_flag = 0;
           int belt_flag = 0;
           String j_remark_complete = '';
-          int sid = 0;
+          int? sid;
           String site_layout = '';
           List sitepic = [];
 
@@ -558,13 +579,23 @@ class _homePageState extends State<homePage> {
                     jsonResponse[0]['province_th'] +
                     ' ' +
                     jsonResponse[0]['postcode'];
-                install_date = DateFormat('dd/MM/yyyy')
-                    .format(DateTime.parse(jsonResponse[0]['install_date']))
-                    .toString();
-                warranty_expire = DateFormat('dd/MM/yyyy')
-                    .format(DateTime.parse(jsonResponse[0]['warranty_expire']))
-                    .toString();
-                power_peak = jsonResponse[0]['power_peak'].toString();
+                install_date = (jsonResponse[0]['install_date'] == null)
+                    ? ''
+                    : DateFormat('dd/MM/yyyy')
+                        .format(DateTime.parse(jsonResponse[0]['install_date']))
+                        .toString();
+                warranty_expire = (jsonResponse[0]['warranty_expire'] == null)
+                    ? ''
+                    : DateFormat('dd/MM/yyyy')
+                        .format(
+                            DateTime.parse(jsonResponse[0]['warranty_expire']))
+                        .toString();
+                power_peak = (jsonResponse[0]['power_peak'] == null)
+                    ? ''
+                    : jsonResponse[0]['power_peak'].toString();
+                amount = (jsonResponse[0]['amount'] == null)
+                    ? ''
+                    : jsonResponse[0]['amount'].toString();
                 j_detail = jsonResponse[0]['j_detail'] ?? '';
                 remark_tech = jsonResponse[0]['remark_tech'] ?? '';
                 lat = jsonResponse[0]['lat'] ?? 0;
@@ -617,12 +648,13 @@ class _homePageState extends State<homePage> {
                                   j_status: j_status,
                                   ppe_flag: ppe_flag,
                                   j_remark_complete: j_remark_complete,
-                                  sid: sid,
+                                  sid: sid ?? 0,
                                   pic: site_layout,
                                   sitepic: sitepic,
                                   belt_flag: belt_flag,
+                                  amount: amount,
                                 )),
-                      )
+                      ).then((value) => _ref())
                     : (type == 1 || type == 2)
                         ? Navigator.push(
                             context,
@@ -648,10 +680,11 @@ class _homePageState extends State<homePage> {
                                       ppe_flag: ppe_flag,
                                       j_remark_complete: j_remark_complete,
                                       pic: site_layout,
-                                      sid: sid,
+                                      sid: sid ?? 0,
                                       sitepic: sitepic,
                                       belt_flag: belt_flag,
-                                    )))
+                                      amount: amount,
+                                    ))).then((value) => _ref())
                         : Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -680,8 +713,9 @@ class _homePageState extends State<homePage> {
                                       sid: sid,
                                       sitepic: sitepic,
                                       belt_flag: belt_flag,
+                                      amount: amount,
                                     )),
-                          );
+                          ).then((value) => _ref());
           });
         },
         child: Container(
@@ -783,7 +817,7 @@ class _homePageState extends State<homePage> {
                               ),
                               Text(
                                 DateFormat('dd/MM/yyyy')
-                                    .format(DateTime.parse(date)),
+                                    .format(DateTime.parse(datestart)),
                                 style: TextStyle(
                                     color: col,
                                     fontSize: 12,
@@ -802,7 +836,7 @@ class _homePageState extends State<homePage> {
                               ),
                               Text(
                                 DateFormat('HH:mm')
-                                    .format(DateTime.parse(date)),
+                                    .format(DateTime.parse(datestart)),
                                 style: TextStyle(
                                     color: col,
                                     fontSize: 12,
@@ -833,7 +867,7 @@ class _homePageState extends State<homePage> {
                                         ),
                                       ),
                                     )
-                                  : (status == 2)
+                                  : (status == 2 || status == 5)
                                       ? Container(
                                           height: 30,
                                           decoration: BoxDecoration(
@@ -907,35 +941,30 @@ class _homePageState extends State<homePage> {
                                       ),
                                     )
                                   : Container(),
-                              (status == 2)
-                                  ? (datetime.isAfter(DateTime.parse(date)))
-                                      ? Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Container(
-                                            height: 30,
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(5)),
-                                                color: Color(0xffFFF0F8)),
-                                            child: Center(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                child: Text(
-                                                  'ล่าช้า',
-                                                  style: TextStyle(
-                                                      color: Color(0xffE44E47),
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w600),
-                                                ),
-                                              ),
+                              (status == 5)
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5)),
+                                            color: Color(0xffFFF0F8)),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Text(
+                                              'ล่าช้า',
+                                              style: TextStyle(
+                                                  color: Color(0xffE44E47),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600),
                                             ),
                                           ),
-                                        )
-                                      : Container()
+                                        ),
+                                      ),
+                                    )
                                   : Container(),
                             ],
                           ),

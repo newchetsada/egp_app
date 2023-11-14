@@ -353,7 +353,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
   void initState() {
     super.initState();
     getUser();
-    getBrandLs();
+    // getBrandLs();
     setState(() {
       typeName = (widget.type_id == 1)
           ? 'PV (แผงโซล่าเซลล์)'
@@ -1551,31 +1551,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                 title: Text('Camera'),
                                                 onPressed: (context) {
                                                   openCamera().then((value) {
-                                                    mystate(() {
-                                                      desLs_before.add(Descript(
-                                                          j_img_id: 0,
-                                                          j_img_name:
-                                                              value.path,
-                                                          onApi: 0,
-                                                          group_no: null,
-                                                          img_des_id: 7,
-                                                          img_description:
-                                                              'ภาพจุดที่เสีย',
-                                                          j_img_accessories:
-                                                              null,
-                                                          j_img_remark: '',
-                                                          j_img_type: 0,
-                                                          type_id: null,
-                                                          hint: ''));
-                                                    });
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                              BottomSheetAction(
-                                                  title: Text('Photos'),
-                                                  onPressed: (context) {
-                                                    openPhoto().then((value) {
+                                                    if (value != null) {
                                                       mystate(() {
                                                         desLs_before.add(Descript(
                                                             j_img_id: 0,
@@ -1592,13 +1568,41 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                             j_img_type: 0,
                                                             type_id: null,
                                                             hint: ''));
-
-                                                        // desLs_before[index]
-                                                        //         .j_img_name =
-                                                        //     value.path;
-                                                        // desLs_before[index]
-                                                        //     .onApi = 0;
                                                       });
+                                                    }
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                              BottomSheetAction(
+                                                  title: Text('Photos'),
+                                                  onPressed: (context) {
+                                                    openPhoto().then((value) {
+                                                      if (value != null) {
+                                                        mystate(() {
+                                                          desLs_before.add(Descript(
+                                                              j_img_id: 0,
+                                                              j_img_name:
+                                                                  value.path,
+                                                              onApi: 0,
+                                                              group_no: null,
+                                                              img_des_id: 7,
+                                                              img_description:
+                                                                  'ภาพจุดที่เสีย',
+                                                              j_img_accessories:
+                                                                  null,
+                                                              j_img_remark: '',
+                                                              j_img_type: 0,
+                                                              type_id: null,
+                                                              hint: ''));
+
+                                                          // desLs_before[index]
+                                                          //         .j_img_name =
+                                                          //     value.path;
+                                                          // desLs_before[index]
+                                                          //     .onApi = 0;
+                                                        });
+                                                      }
                                                     });
 
                                                     Navigator.pop(context);
@@ -1657,22 +1661,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                       onPressed: (context) {
                                                         openCamera()
                                                             .then((value) {
-                                                          mystate(() {
-                                                            desLs_before[index]
-                                                                    .j_img_name =
-                                                                value.path;
-                                                            desLs_before[index]
-                                                                .onApi = 0;
-                                                          });
-                                                        });
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                    BottomSheetAction(
-                                                        title: Text('Photos'),
-                                                        onPressed: (context) {
-                                                          openPhoto()
-                                                              .then((value) {
+                                                          if (value != null) {
                                                             mystate(() {
                                                               desLs_before[
                                                                           index]
@@ -1682,6 +1671,27 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                       index]
                                                                   .onApi = 0;
                                                             });
+                                                          }
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    BottomSheetAction(
+                                                        title: Text('Photos'),
+                                                        onPressed: (context) {
+                                                          openPhoto()
+                                                              .then((value) {
+                                                            if (value != null) {
+                                                              mystate(() {
+                                                                desLs_before[
+                                                                            index]
+                                                                        .j_img_name =
+                                                                    value.path;
+                                                                desLs_before[
+                                                                        index]
+                                                                    .onApi = 0;
+                                                              });
+                                                            }
                                                           });
 
                                                           Navigator.pop(
@@ -2014,31 +2024,35 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                 (context) {
                                                               openCamera().then(
                                                                   (value) {
-                                                                mystate(() {
-                                                                  desLs_after.add(Descript(
-                                                                      j_img_id:
-                                                                          0,
-                                                                      j_img_name:
-                                                                          value
-                                                                              .path,
-                                                                      onApi: 0,
-                                                                      group_no:
-                                                                          null,
-                                                                      img_des_id:
-                                                                          8,
-                                                                      img_description:
-                                                                          'ภาพจุดที่แก้ไข',
-                                                                      j_img_accessories:
-                                                                          null,
-                                                                      j_img_remark:
-                                                                          '',
-                                                                      j_img_type:
-                                                                          1,
-                                                                      type_id:
-                                                                          null,
-                                                                      hint:
-                                                                          ''));
-                                                                });
+                                                                if (value !=
+                                                                    null) {
+                                                                  mystate(() {
+                                                                    desLs_after.add(Descript(
+                                                                        j_img_id:
+                                                                            0,
+                                                                        j_img_name:
+                                                                            value
+                                                                                .path,
+                                                                        onApi:
+                                                                            0,
+                                                                        group_no:
+                                                                            null,
+                                                                        img_des_id:
+                                                                            8,
+                                                                        img_description:
+                                                                            'ภาพจุดที่แก้ไข',
+                                                                        j_img_accessories:
+                                                                            null,
+                                                                        j_img_remark:
+                                                                            '',
+                                                                        j_img_type:
+                                                                            1,
+                                                                        type_id:
+                                                                            null,
+                                                                        hint:
+                                                                            ''));
+                                                                  });
+                                                                }
                                                               });
                                                               Navigator.pop(
                                                                   context);
@@ -2051,33 +2065,25 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                   (context) {
                                                                 openPhoto().then(
                                                                     (value) {
-                                                                  mystate(() {
-                                                                    desLs_after.insert(
-                                                                        0,
-                                                                        Descript(
-                                                                            j_img_id:
-                                                                                0,
-                                                                            j_img_name: value
-                                                                                .path,
-                                                                            onApi:
-                                                                                0,
-                                                                            group_no:
-                                                                                null,
-                                                                            img_des_id:
-                                                                                8,
-                                                                            img_description:
-                                                                                'ภาพจุดที่แก้ไข',
-                                                                            j_img_accessories:
-                                                                                null,
-                                                                            j_img_remark:
-                                                                                '',
-                                                                            j_img_type:
-                                                                                1,
-                                                                            type_id:
-                                                                                null,
-                                                                            hint:
-                                                                                ''));
-                                                                  });
+                                                                  if (value !=
+                                                                      null) {
+                                                                    mystate(() {
+                                                                      desLs_after.insert(
+                                                                          0,
+                                                                          Descript(
+                                                                              j_img_id: 0,
+                                                                              j_img_name: value.path,
+                                                                              onApi: 0,
+                                                                              group_no: null,
+                                                                              img_des_id: 8,
+                                                                              img_description: 'ภาพจุดที่แก้ไข',
+                                                                              j_img_accessories: null,
+                                                                              j_img_remark: '',
+                                                                              j_img_type: 1,
+                                                                              type_id: null,
+                                                                              hint: ''));
+                                                                    });
+                                                                  }
                                                                 });
 
                                                                 Navigator.pop(
@@ -2248,33 +2254,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                       onPressed: (context) {
                                                         openCamera()
                                                             .then((value) {
-                                                          mystate(() {
-                                                            desLs_after.add(Descript(
-                                                                j_img_id: 0,
-                                                                j_img_name:
-                                                                    value.path,
-                                                                onApi: 0,
-                                                                group_no: null,
-                                                                img_des_id: 8,
-                                                                img_description:
-                                                                    'ภาพจุดแก้ไข',
-                                                                j_img_accessories:
-                                                                    null,
-                                                                j_img_remark:
-                                                                    '',
-                                                                j_img_type: 1,
-                                                                type_id: null,
-                                                                hint: ''));
-                                                          });
-                                                        });
-                                                        Navigator.pop(context);
-                                                      },
-                                                    ),
-                                                    BottomSheetAction(
-                                                        title: Text('Photos'),
-                                                        onPressed: (context) {
-                                                          openPhoto()
-                                                              .then((value) {
+                                                          if (value != null) {
                                                             mystate(() {
                                                               desLs_after.add(Descript(
                                                                   j_img_id: 0,
@@ -2294,13 +2274,48 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                   j_img_type: 1,
                                                                   type_id: null,
                                                                   hint: ''));
-
-                                                              // desLs_before[index]
-                                                              //         .j_img_name =
-                                                              //     value.path;
-                                                              // desLs_before[index]
-                                                              //     .onApi = 0;
                                                             });
+                                                          }
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                    BottomSheetAction(
+                                                        title: Text('Photos'),
+                                                        onPressed: (context) {
+                                                          openPhoto()
+                                                              .then((value) {
+                                                            if (value != null) {
+                                                              mystate(() {
+                                                                desLs_after.add(Descript(
+                                                                    j_img_id: 0,
+                                                                    j_img_name:
+                                                                        value
+                                                                            .path,
+                                                                    onApi: 0,
+                                                                    group_no:
+                                                                        null,
+                                                                    img_des_id:
+                                                                        8,
+                                                                    img_description:
+                                                                        'ภาพจุดแก้ไข',
+                                                                    j_img_accessories:
+                                                                        null,
+                                                                    j_img_remark:
+                                                                        '',
+                                                                    j_img_type:
+                                                                        1,
+                                                                    type_id:
+                                                                        null,
+                                                                    hint: ''));
+
+                                                                // desLs_before[index]
+                                                                //         .j_img_name =
+                                                                //     value.path;
+                                                                // desLs_before[index]
+                                                                //     .onApi = 0;
+                                                              });
+                                                            }
                                                           });
 
                                                           Navigator.pop(
@@ -2380,29 +2395,34 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                           onPressed: (context) {
                                                             openCamera()
                                                                 .then((value) {
-                                                              mystate(() {
-                                                                desLs_after.add(Descript(
-                                                                    j_img_id: 0,
-                                                                    j_img_name:
-                                                                        value
-                                                                            .path,
-                                                                    onApi: 0,
-                                                                    group_no:
-                                                                        null,
-                                                                    img_des_id:
-                                                                        8,
-                                                                    img_description:
-                                                                        'ภาพจุดที่แก้ไข',
-                                                                    j_img_accessories:
-                                                                        null,
-                                                                    j_img_remark:
-                                                                        '',
-                                                                    j_img_type:
-                                                                        1,
-                                                                    type_id:
-                                                                        null,
-                                                                    hint: ''));
-                                                              });
+                                                              if (value !=
+                                                                  null) {
+                                                                mystate(() {
+                                                                  desLs_after.add(Descript(
+                                                                      j_img_id:
+                                                                          0,
+                                                                      j_img_name:
+                                                                          value
+                                                                              .path,
+                                                                      onApi: 0,
+                                                                      group_no:
+                                                                          null,
+                                                                      img_des_id:
+                                                                          8,
+                                                                      img_description:
+                                                                          'ภาพจุดที่แก้ไข',
+                                                                      j_img_accessories:
+                                                                          null,
+                                                                      j_img_remark:
+                                                                          '',
+                                                                      j_img_type:
+                                                                          1,
+                                                                      type_id:
+                                                                          null,
+                                                                      hint:
+                                                                          ''));
+                                                                });
+                                                              }
                                                             });
                                                             Navigator.pop(
                                                                 context);
@@ -2415,33 +2435,36 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                 (context) {
                                                               openPhoto().then(
                                                                   (value) {
-                                                                mystate(() {
-                                                                  desLs_after.insert(
-                                                                      0,
-                                                                      Descript(
-                                                                          j_img_id:
-                                                                              0,
-                                                                          j_img_name: value
-                                                                              .path,
-                                                                          onApi:
-                                                                              0,
-                                                                          group_no:
-                                                                              null,
-                                                                          img_des_id:
-                                                                              8,
-                                                                          img_description:
-                                                                              'ภาพจุดที่แก้ไข',
-                                                                          j_img_accessories:
-                                                                              null,
-                                                                          j_img_remark:
-                                                                              '',
-                                                                          j_img_type:
-                                                                              1,
-                                                                          type_id:
-                                                                              null,
-                                                                          hint:
-                                                                              ''));
-                                                                });
+                                                                if (value !=
+                                                                    null) {
+                                                                  mystate(() {
+                                                                    desLs_after.insert(
+                                                                        0,
+                                                                        Descript(
+                                                                            j_img_id:
+                                                                                0,
+                                                                            j_img_name: value
+                                                                                .path,
+                                                                            onApi:
+                                                                                0,
+                                                                            group_no:
+                                                                                null,
+                                                                            img_des_id:
+                                                                                8,
+                                                                            img_description:
+                                                                                'ภาพจุดที่แก้ไข',
+                                                                            j_img_accessories:
+                                                                                null,
+                                                                            j_img_remark:
+                                                                                '',
+                                                                            j_img_type:
+                                                                                1,
+                                                                            type_id:
+                                                                                null,
+                                                                            hint:
+                                                                                ''));
+                                                                  });
+                                                                }
                                                               });
 
                                                               Navigator.pop(

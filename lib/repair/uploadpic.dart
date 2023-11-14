@@ -1484,13 +1484,15 @@ class _uploadPicState extends State<uploadPic> {
                                                     onPressed: (context) {
                                                       openCamera()
                                                           .then((value) {
-                                                        mystate(() {
-                                                          desLs_before[index]
-                                                                  .j_img_name =
-                                                              value.path;
-                                                          desLs_before[index]
-                                                              .onApi = 0;
-                                                        });
+                                                        if (value != null) {
+                                                          mystate(() {
+                                                            desLs_before[index]
+                                                                    .j_img_name =
+                                                                value.path;
+                                                            desLs_before[index]
+                                                                .onApi = 0;
+                                                          });
+                                                        }
                                                       });
                                                       Navigator.pop(context);
                                                     },
@@ -1500,13 +1502,17 @@ class _uploadPicState extends State<uploadPic> {
                                                       onPressed: (context) {
                                                         openPhoto()
                                                             .then((value) {
-                                                          mystate(() {
-                                                            desLs_before[index]
-                                                                    .j_img_name =
-                                                                value.path;
-                                                            desLs_before[index]
-                                                                .onApi = 0;
-                                                          });
+                                                          if (value != null) {
+                                                            mystate(() {
+                                                              desLs_before[
+                                                                          index]
+                                                                      .j_img_name =
+                                                                  value.path;
+                                                              desLs_before[
+                                                                      index]
+                                                                  .onApi = 0;
+                                                            });
+                                                          }
                                                         });
 
                                                         Navigator.pop(context);
@@ -1842,15 +1848,16 @@ class _uploadPicState extends State<uploadPic> {
                                                         onPressed: (context) {
                                                           openCamera()
                                                               .then((value) {
-                                                            mystate(() {
-                                                              desLs_before[
-                                                                          index]
-                                                                      .j_img_name =
-                                                                  value.path;
-                                                              desLs_before[
-                                                                      index]
-                                                                  .onApi = 0;
-                                                            });
+                                                            if (value != null) {
+                                                              mystate(() {
+                                                                desLs_after[index]
+                                                                        .j_img_name =
+                                                                    value.path;
+                                                                desLs_after[
+                                                                        index]
+                                                                    .onApi = 0;
+                                                              });
+                                                            }
                                                           });
                                                           Navigator.pop(
                                                               context);
@@ -1861,14 +1868,18 @@ class _uploadPicState extends State<uploadPic> {
                                                           onPressed: (context) {
                                                             openPhoto()
                                                                 .then((value) {
-                                                              mystate(() {
-                                                                desLs_after[index]
-                                                                        .j_img_name =
-                                                                    value.path;
-                                                                desLs_after[
-                                                                        index]
-                                                                    .onApi = 0;
-                                                              });
+                                                              if (value !=
+                                                                  null) {
+                                                                mystate(() {
+                                                                  desLs_after[index]
+                                                                          .j_img_name =
+                                                                      value
+                                                                          .path;
+                                                                  desLs_after[
+                                                                          index]
+                                                                      .onApi = 0;
+                                                                });
+                                                              }
                                                             });
 
                                                             Navigator.pop(

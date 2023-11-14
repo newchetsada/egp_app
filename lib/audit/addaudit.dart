@@ -23,7 +23,7 @@ class addaudit extends StatefulWidget {
   final String typeName;
   final int status;
   final int? choice;
-  final int sid;
+  final int? sid;
 
   addaudit(
       {required this.jidx,
