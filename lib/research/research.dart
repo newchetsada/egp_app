@@ -10,6 +10,7 @@ import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/report/report.dart';
 import 'package:egp_app/research/groupresearch.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -197,8 +198,9 @@ class _researchState extends State<research> {
   Future getsign1(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse((widget.type == 3)
+            ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'
+            : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -227,8 +229,9 @@ class _researchState extends State<research> {
   Future getsign2(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse((widget.type == 3)
+            ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'
+            : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1549,6 +1552,7 @@ class _researchState extends State<research> {
                   children: List.generate(groupPic.length, (index) {
                     return GestureDetector(
                       onTap: () {
+                        print(groupPic[index].type_id);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -2579,25 +2583,30 @@ class _researchState extends State<research> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => signature(
-                                          jidx: widget.jid,
-                                          imgType: type,
-                                          signName: putname.text,
-                                          user: userName,
-                                        )),
-                              ).then((value) {
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                                setState(() {
-                                  getsign1(widget.jid);
-                                  getsign2(widget.jid);
+                              if (putname.text.isEmpty) {
+                                pop('กรุณากรอกชื่อ-นามสกุล');
+                              } else {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => signature(
+                                            jidx: widget.jid,
+                                            imgType: type,
+                                            signName: putname.text,
+                                            user: userName,
+                                            type: widget.type,
+                                          )),
+                                ).then((value) {
+                                  SystemChrome.setPreferredOrientations([
+                                    DeviceOrientation.portraitUp,
+                                  ]);
+                                  setState(() {
+                                    getsign1(widget.jid);
+                                    getsign2(widget.jid);
+                                  });
                                 });
-                              });
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
@@ -2623,6 +2632,46 @@ class _researchState extends State<research> {
               ),
             ),
           );
+        });
+  }
+
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
         });
   }
 }

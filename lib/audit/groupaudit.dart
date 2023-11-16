@@ -38,6 +38,7 @@ class _groupauditState extends State<groupaudit> {
   var remark = TextEditingController();
   List deleteLs = [];
   int? pass;
+  int? isemp;
 
   String userName = "Loading...";
   int? iduser;
@@ -248,6 +249,7 @@ class _groupauditState extends State<groupaudit> {
   void initState() {
     super.initState();
     getUser();
+
     if (widget.choice == 0) {
       API.getSubLs(widget.jidx, widget.typeId).then((response) {
         setState(() {
@@ -269,9 +271,11 @@ class _groupauditState extends State<groupaudit> {
           if (picdetail.isEmpty) {
             remark.text = '';
             pass = null;
+            isemp = null;
           } else {
             remark.text = picdetail[0].remark;
             pass = picdetail[0].check;
+            isemp = picdetail[0].check;
           }
         });
       });
@@ -348,14 +352,26 @@ class _groupauditState extends State<groupaudit> {
                                     });
                                   } else {
                                     loopdelete().then((value) {
-                                      uploadPic(null, "").then((value) {
+                                      if (isemp == 0) {
                                         updateRemark(widget.jidx, widget.typeId,
                                                 null, remark.text)
                                             .then((value) {
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                         });
-                                      });
+                                      } else {
+                                        uploadPic(null, "").then((value) {
+                                          updateRemark(
+                                                  widget.jidx,
+                                                  widget.typeId,
+                                                  null,
+                                                  remark.text)
+                                              .then((value) {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          });
+                                        });
+                                      }
                                     });
                                   }
                                 } else if (pass == 1 && pic.isNotEmpty) {

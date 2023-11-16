@@ -653,6 +653,7 @@ class _homePageState extends State<homePage> {
                                   sitepic: sitepic,
                                   belt_flag: belt_flag,
                                   amount: amount,
+                                  type: type,
                                 )),
                       ).then((value) => _ref())
                     : (type == 1 || type == 2)
@@ -684,6 +685,7 @@ class _homePageState extends State<homePage> {
                                       sitepic: sitepic,
                                       belt_flag: belt_flag,
                                       amount: amount,
+                                      type: type,
                                     ))).then((value) => _ref())
                         : Navigator.push(
                             context,

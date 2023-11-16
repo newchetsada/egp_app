@@ -48,6 +48,7 @@ class _acauditState extends State<acaudit> {
   int? pass;
   String? _selectedValue;
   List brandls = ['V', 'A', 'Ohm', 'W/m2'];
+  int? isemp;
 
   String userName = "Loading...";
   int? iduser;
@@ -508,10 +509,12 @@ class _acauditState extends State<acaudit> {
                                   pass = null;
                                   _selectedValue = null;
                                   av.text = '';
+                                  isemp = null;
                                 } else {
                                   remark.text = picdetail[0].remark;
                                   pass = picdetail[0].check;
                                   _selectedValue = picdetail[0].sub_type_unit;
+                                  isemp = picdetail[0].check;
                                   av.text = (picdetail[0].measured_value ==
                                           null)
                                       ? ''
@@ -1287,8 +1290,7 @@ class _acauditState extends State<acaudit> {
                                           });
                                         } else {
                                           loopdelete().then((value) {
-                                            uploadPic(null, subb.toString())
-                                                .then((value) {
+                                            if (isemp == 0) {
                                               updateRemark(
                                                       widget.jidx,
                                                       widget.typeId,
@@ -1298,7 +1300,20 @@ class _acauditState extends State<acaudit> {
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
                                               });
-                                            });
+                                            } else {
+                                              uploadPic(null, subb.toString())
+                                                  .then((value) {
+                                                updateRemark(
+                                                        widget.jidx,
+                                                        widget.typeId,
+                                                        subb,
+                                                        remark.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
+                                              });
+                                            }
                                           });
                                         }
                                       } else if (pass == 1 && pic.isNotEmpty) {
@@ -1317,8 +1332,7 @@ class _acauditState extends State<acaudit> {
                                         });
                                       } else if (pass == 2) {
                                         loopdelete().then((value) {
-                                          uploadPic(null, subb.toString())
-                                              .then((value) {
+                                          if (isemp == 2) {
                                             updateRemark(
                                                     widget.jidx,
                                                     widget.typeId,
@@ -1328,7 +1342,20 @@ class _acauditState extends State<acaudit> {
                                               Navigator.pop(context);
                                               Navigator.pop(context);
                                             });
-                                          });
+                                          } else {
+                                            uploadPic(null, subb.toString())
+                                                .then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          }
                                         });
                                       } else {
                                         Navigator.pop(context);

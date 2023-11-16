@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 
 class signature extends StatefulWidget {
   @override
@@ -14,11 +15,13 @@ class signature extends StatefulWidget {
   final int imgType;
   final String signName;
   final String user;
+  final int type;
   signature(
       {required this.jidx,
       required this.imgType,
       required this.signName,
-      required this.user});
+      required this.user,
+      required this.type});
 }
 
 class _signatureState extends State<signature> {
@@ -31,6 +34,8 @@ class _signatureState extends State<signature> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
     ]);
+
+    print(widget.signName);
   }
 
   void poptest(total) {
@@ -56,8 +61,9 @@ class _signatureState extends State<signature> {
   uploadPic(image) async {
     var request = http.MultipartRequest(
         'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+        Uri.parse((widget.type == 4)
+            ? 'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklist'
+            : 'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -80,6 +86,8 @@ class _signatureState extends State<signature> {
         filename: '${DateTime.now().toString()}.png'));
 
     var response = await request.send();
+
+    print(response.statusCode);
 
     response.stream.transform(utf8.decoder).listen((value) {
       print(value);
@@ -166,6 +174,7 @@ class _signatureState extends State<signature> {
                         width: 150,
                         child: ElevatedButton(
                           onPressed: () async {
+                            loading();
                             final sign = _sign.currentState;
 
                             final image = await sign?.getData();
@@ -179,6 +188,7 @@ class _signatureState extends State<signature> {
                               _img = data!;
                             });
                             uploadPic(_img).then((value) {
+                              Navigator.pop(context);
                               Navigator.pop(context);
                             });
                           },
@@ -203,5 +213,25 @@ class _signatureState extends State<signature> {
             ),
           ),
         ));
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 }

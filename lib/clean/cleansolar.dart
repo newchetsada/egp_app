@@ -50,6 +50,7 @@ class cleansolar extends StatefulWidget {
   final String pic;
   final List sitepic;
   final int belt_flag;
+  final int type;
 
   //
 
@@ -77,7 +78,8 @@ class cleansolar extends StatefulWidget {
       required this.pic,
       required this.sitepic,
       required this.belt_flag,
-      required this.amount});
+      required this.amount,
+      required this.type});
 }
 
 class _cleansolarState extends State<cleansolar> {
@@ -190,6 +192,46 @@ class _cleansolarState extends State<cleansolar> {
     } catch (error) {
       print(error);
     }
+  }
+
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
   }
 
   Future getsign2(jidx) async {
@@ -2785,25 +2827,50 @@ class _cleansolarState extends State<cleansolar> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => signature(
-                                          jidx: widget.jid,
-                                          imgType: type,
-                                          signName: putname.text,
-                                          user: userName,
-                                        )),
-                              ).then((value) {
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                                setState(() {
-                                  getsign1(widget.jid);
-                                  getsign2(widget.jid);
+                              if (putname.text.isEmpty) {
+                                pop('กรุณากรอกชื่อ-นามสกุล');
+                              } else {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => signature(
+                                            jidx: widget.jid,
+                                            imgType: type,
+                                            signName: putname.text,
+                                            user: userName,
+                                            type: widget.type,
+                                          )),
+                                ).then((value) {
+                                  SystemChrome.setPreferredOrientations([
+                                    DeviceOrientation.portraitUp,
+                                  ]);
+                                  setState(() {
+                                    getsign1(widget.jid);
+                                    getsign2(widget.jid);
+                                  });
                                 });
-                              });
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => signature(
+                                            jidx: widget.jid,
+                                            imgType: type,
+                                            signName: putname.text,
+                                            user: userName,
+                                            type: widget.type,
+                                          )),
+                                ).then((value) {
+                                  SystemChrome.setPreferredOrientations([
+                                    DeviceOrientation.portraitUp,
+                                  ]);
+                                  setState(() {
+                                    getsign1(widget.jid);
+                                    getsign2(widget.jid);
+                                  });
+                                });
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,

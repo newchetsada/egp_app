@@ -59,6 +59,7 @@ class _addinverterState extends State<addinverter> {
   var headpic = <Album>[];
   var headremark = TextEditingController();
   String subtypeno = '';
+  int? isemp;
 
   String userName = "Loading...";
   int? iduser;
@@ -380,9 +381,11 @@ class _addinverterState extends State<addinverter> {
         if (headpicdetail.isEmpty) {
           headremark.text = '';
           headpass = null;
+          isemp = null;
         } else {
           headremark.text = headpicdetail[0].remark;
           headpass = headpicdetail[0].check;
+          isemp = headpicdetail[0].check;
         }
       });
     });
@@ -570,14 +573,23 @@ class _addinverterState extends State<addinverter> {
                                   });
                                 } else {
                                   headloopdelete().then((value) {
-                                    uploadPic(null, "80", "").then((value) {
+                                    if (isemp == 0) {
                                       updateRemark(widget.jidx, widget.typeId,
                                               80, headremark.text, headpass)
                                           .then((value) {
                                         Navigator.pop(context);
                                         Navigator.pop(context);
                                       });
-                                    });
+                                    } else {
+                                      uploadPic(null, "80", "").then((value) {
+                                        updateRemark(widget.jidx, widget.typeId,
+                                                80, headremark.text, headpass)
+                                            .then((value) {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        });
+                                      });
+                                    }
                                   });
                                 }
                               } else if (headpass == 1 && headpic.isNotEmpty) {
@@ -1125,9 +1137,11 @@ class _addinverterState extends State<addinverter> {
                                     pass = null;
                                     _selectedValue = null;
                                     av.text = '';
+                                    isemp = null;
                                   } else {
                                     remark.text = picdeail[0].remark;
                                     pass = picdeail[0].check;
+                                    isemp = picdeail[0].check;
                                     _selectedValue = picdeail[0].sub_type_unit;
                                     av.text = (picdeail[0].measured_value ==
                                             null)
@@ -1835,9 +1849,7 @@ class _addinverterState extends State<addinverter> {
                                           });
                                         } else {
                                           loopdelete().then((value) {
-                                            uploadPic(null, subb.toString(),
-                                                    subtypeno)
-                                                .then((value) {
+                                            if (isemp == 0) {
                                               updateRemark(
                                                       widget.jidx,
                                                       widget.typeId,
@@ -1848,7 +1860,22 @@ class _addinverterState extends State<addinverter> {
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
                                               });
-                                            });
+                                            } else {
+                                              uploadPic(null, subb.toString(),
+                                                      subtypeno)
+                                                  .then((value) {
+                                                updateRemark(
+                                                        widget.jidx,
+                                                        widget.typeId,
+                                                        subb,
+                                                        remark.text,
+                                                        pass)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
+                                              });
+                                            }
                                           });
                                         }
                                       } else if (pass == 1 && pic.isNotEmpty) {
