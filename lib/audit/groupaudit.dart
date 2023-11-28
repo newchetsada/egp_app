@@ -948,9 +948,11 @@ class _groupauditState extends State<groupaudit> {
                                       if (picdetail.isEmpty) {
                                         remark.text = '';
                                         pass = null;
+                                        isemp = null;
                                       } else {
                                         remark.text = picdetail[0].remark;
                                         pass = picdetail[0].check;
+                                        isemp = picdetail[0].check;
                                       }
                                     });
                                     Navigator.pop(context);
@@ -1566,8 +1568,7 @@ class _groupauditState extends State<groupaudit> {
                                           });
                                         } else {
                                           loopdelete().then((value) {
-                                            uploadPic(null, subb.toString())
-                                                .then((value) {
+                                            if (isemp == 0) {
                                               updateRemark(
                                                       widget.jidx,
                                                       widget.typeId,
@@ -1577,7 +1578,20 @@ class _groupauditState extends State<groupaudit> {
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
                                               });
-                                            });
+                                            } else {
+                                              uploadPic(null, subb.toString())
+                                                  .then((value) {
+                                                updateRemark(
+                                                        widget.jidx,
+                                                        widget.typeId,
+                                                        subb,
+                                                        remark.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
+                                              });
+                                            }
                                           });
                                         }
                                       } else if (pass == 1 && pic.isNotEmpty) {
