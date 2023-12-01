@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:egp_app/config.dart';
 
 class login extends StatefulWidget {
   _loginState createState() => _loginState();
@@ -176,8 +177,7 @@ class _loginState extends State<login> {
 
   signIn(user, pass, token) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/mobileLogin'),
+      Uri.parse('$api/api/mobile/mobileLogin'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

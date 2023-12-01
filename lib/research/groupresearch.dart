@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:egp_app/config.dart';
 
 class groupresearch extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _groupresearchState extends State<groupresearch> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
   var groupSub = <SubLs>[];
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+
   var pic = <Album>[];
   var remark = TextEditingController();
   List deleteLs = [];
@@ -112,9 +113,7 @@ class _groupresearchState extends State<groupresearch> {
 
   uploadPic(File image, sub) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+        'POST', Uri.parse('$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -145,8 +144,7 @@ class _groupresearchState extends State<groupresearch> {
 
   deletePic(id) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobImage'),
+      Uri.parse('$api/api/mobile/deleteJobImage'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -165,8 +163,7 @@ class _groupresearchState extends State<groupresearch> {
 
   updateRemark(id, type, sub, note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/updateJobDetailInGroup'),
+      Uri.parse('$api/api/mobile/updateJobDetailInGroup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -414,7 +411,7 @@ class _groupresearchState extends State<groupresearch> {
                                   borderRadius: BorderRadius.circular(13),
                                   child: (pic[index].onApi == 1)
                                       ? Image.network(
-                                          '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                          '$api/${pic[index].j_img_name}', // this image doesn't exist
                                           fit: BoxFit.cover,
                                           height: double.infinity,
                                           width: double.infinity,
@@ -522,7 +519,7 @@ class _groupresearchState extends State<groupresearch> {
                                         borderRadius: BorderRadius.circular(13),
                                         child: (pic[index].onApi == 1)
                                             ? Image.network(
-                                                '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                 fit: BoxFit.cover,
                                                 height: double.infinity,
                                                 width: double.infinity,
@@ -806,7 +803,7 @@ class _groupresearchState extends State<groupresearch> {
                                               BorderRadius.circular(13),
                                           child: (pic[index].onApi == 1)
                                               ? Image.network(
-                                                  '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                  '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                   fit: BoxFit.cover,
                                                   height: double.infinity,
                                                   width: double.infinity,
@@ -931,7 +928,7 @@ class _groupresearchState extends State<groupresearch> {
                                                     child: (pic[index].onApi ==
                                                             1)
                                                         ? Image.network(
-                                                            '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                            '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                             fit: BoxFit.cover,
                                                             height:
                                                                 double.infinity,
@@ -1211,8 +1208,7 @@ class _groupresearchState extends State<groupresearch> {
 class API {
   static Future getSubLs(idd, type) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupSurveyImageLs'),
+      Uri.parse('$api/api/mobile/getJobGroupSurveyImageLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1224,8 +1220,7 @@ class API {
 
   static Future getPicLs(idd, type, sub) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+      Uri.parse('$api/api/mobile/getJobGroupDetail'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

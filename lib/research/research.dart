@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:egp_app/config.dart';
 
 class research extends StatefulWidget {
   @override
@@ -97,7 +98,7 @@ class _researchState extends State<research> {
   String path_sign1 = '';
   String sign_name_2 = '';
   String path_sign2 = '';
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+
   int ispass = 0;
   bool totalpass = false;
   int workstatus = 0;
@@ -158,8 +159,7 @@ class _researchState extends State<research> {
 
   StartWork() async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
+      Uri.parse('$api/api/mobile/startWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -177,8 +177,7 @@ class _researchState extends State<research> {
 
   endWork(note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/endWorking'),
+      Uri.parse('$api/api/mobile/endWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -199,8 +198,8 @@ class _researchState extends State<research> {
     try {
       var response = await http.post(
         Uri.parse((widget.type == 3)
-            ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'
-            : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
+            ? '$api/api/mobile/getJobGroupDetail'
+            : '$api/api/mobile/getJobGroupDetailByAudit'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -230,8 +229,8 @@ class _researchState extends State<research> {
     try {
       var response = await http.post(
         Uri.parse((widget.type == 3)
-            ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'
-            : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
+            ? '$api/api/mobile/getJobGroupDetail'
+            : '$api/api/mobile/getJobGroupDetailByAudit'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -289,7 +288,7 @@ class _researchState extends State<research> {
               borderRadius: BorderRadius.all(Radius.circular(20))),
           content: SingleChildScrollView(
               child: Center(
-            child: Image.network('$pathPic$path'),
+            child: Image.network('$api/$path'),
           )),
         );
       },
@@ -1261,14 +1260,14 @@ class _researchState extends State<research> {
                                                                                 Colors.transparent),
                                                                     imageProvider:
                                                                         NetworkImage(
-                                                                            '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                                            '$api/${widget.sitepic[index]['site_img_name']}'),
                                                                   )));
                                                     },
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 child: Image.network(
-                                                    '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                    '$api/${widget.sitepic[index]['site_img_name']}'),
                                               ))),
                                       Expanded(
                                         child: Padding(
@@ -2680,8 +2679,7 @@ class _researchState extends State<research> {
 class API {
   static Future getContactLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobContactMobileLs'),
+      Uri.parse('$api/api/mobile/getJobContactMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -2697,8 +2695,8 @@ class API {
   static Future getGroupLs(idd, typ) async {
     final response = await http.post(
       Uri.parse((typ == 3)
-          ? 'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForSurvey'
-          : 'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForAudit'),
+          ? '$api/api/mobile/getJobHeaderImageForSurvey'
+          : '$api/api/mobile/getJobHeaderImageForAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:egp_app/config.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -33,7 +34,7 @@ class _groupauditState extends State<groupaudit> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
   var groupSub = <SubLs>[];
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+
   var pic = <Album>[];
   var remark = TextEditingController();
   List deleteLs = [];
@@ -162,9 +163,7 @@ class _groupauditState extends State<groupaudit> {
 
   uploadPic(File? image, sub) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklist'));
+        'POST', Uri.parse('$api/api/mobile/uploadJobImageChecklist'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -198,8 +197,7 @@ class _groupauditState extends State<groupaudit> {
 
   deletePic(id) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteImageChecklist'),
+      Uri.parse('$api/api/mobile/deleteImageChecklist'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -220,8 +218,7 @@ class _groupauditState extends State<groupaudit> {
 
   updateRemark(id, type, sub, note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklistDetailIn'),
+      Uri.parse('$api/api/mobile/uploadJobImageChecklistDetailIn'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -627,7 +624,7 @@ class _groupauditState extends State<groupaudit> {
                                                   BorderRadius.circular(13),
                                               child: (pic[index].onApi == 1)
                                                   ? Image.network(
-                                                      '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                      '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                       fit: BoxFit.cover,
                                                       height: double.infinity,
                                                       width: double.infinity,
@@ -748,7 +745,7 @@ class _groupauditState extends State<groupaudit> {
                                                     child: (pic[index].onApi ==
                                                             1)
                                                         ? Image.network(
-                                                            '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                            '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                             fit: BoxFit.cover,
                                                             height:
                                                                 double.infinity,
@@ -1196,7 +1193,7 @@ class _groupauditState extends State<groupaudit> {
                                               BorderRadius.circular(13),
                                           child: (pic[index].onApi == 1)
                                               ? Image.network(
-                                                  '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                  '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                   fit: BoxFit.cover,
                                                   height: double.infinity,
                                                   width: double.infinity,
@@ -1321,7 +1318,7 @@ class _groupauditState extends State<groupaudit> {
                                                     child: (pic[index].onApi ==
                                                             1)
                                                         ? Image.network(
-                                                            '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                            '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                             fit: BoxFit.cover,
                                                             height:
                                                                 double.infinity,
@@ -1675,8 +1672,7 @@ class _groupauditState extends State<groupaudit> {
 class API {
   static Future getSubLs(idd, type) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupAuditImageLs'),
+      Uri.parse('$api/api/mobile/getJobGroupAuditImageLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1689,8 +1685,7 @@ class API {
 
   static Future getPicLs(idd, type, sub) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetailByAudit'),
+      Uri.parse('$api/api/mobile/getJobGroupDetailByAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

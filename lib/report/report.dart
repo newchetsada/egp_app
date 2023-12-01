@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:egp_app/config.dart';
 
 class report extends StatefulWidget {
   @override
@@ -47,8 +48,7 @@ class _reportState extends State<report> {
 
   Future getWork(idd, jidx) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+      Uri.parse('$api/api/mobile/getJobAttempMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -978,8 +978,7 @@ class _reportState extends State<report> {
 class API {
   static Future getPicLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForRepair'),
+      Uri.parse('$api/api/mobile/getJobHeaderImageForRepair'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

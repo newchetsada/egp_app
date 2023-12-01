@@ -10,6 +10,7 @@ import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:http/http.dart' as http;
+import 'package:egp_app/config.dart';
 
 // import 'package:path/path.dart';
 import 'package:async/async.dart';
@@ -47,7 +48,7 @@ class _photopageState extends State<photopage> {
 
   int limitFile = 0;
   List deleteLs = [];
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+
   var pic = <Album>[];
 
   getUser() async {
@@ -75,7 +76,7 @@ class _photopageState extends State<photopage> {
               child: Center(
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network('$pathPic$path')),
+                child: Image.network('$api/$path')),
           )),
         );
       },
@@ -231,9 +232,7 @@ class _photopageState extends State<photopage> {
 
   uploadPic(File image) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+        'POST', Uri.parse('$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -264,8 +263,7 @@ class _photopageState extends State<photopage> {
 
   deletePic(id) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobImage'),
+      Uri.parse('$api/api/mobile/deleteJobImage'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -284,8 +282,7 @@ class _photopageState extends State<photopage> {
 
   updateRemark(id, type, note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/updateJobDetailInGroup'),
+      Uri.parse('$api/api/mobile/updateJobDetailInGroup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -593,7 +590,7 @@ class _photopageState extends State<photopage> {
                                     borderRadius: BorderRadius.circular(13),
                                     child: (pic[index].onApi == 1)
                                         ? Image.network(
-                                            '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                            '$api/${pic[index].j_img_name}', // this image doesn't exist
                                             fit: BoxFit.cover,
                                             height: double.infinity,
                                             width: double.infinity,
@@ -670,7 +667,7 @@ class _photopageState extends State<photopage> {
                                                     BorderRadius.circular(13),
                                                 child: (pic[index].onApi == 1)
                                                     ? Image.network(
-                                                        '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                        '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                         fit: BoxFit.cover,
                                                         height: double.infinity,
                                                         width: double.infinity,
@@ -817,7 +814,7 @@ class _photopageState extends State<photopage> {
                                                       BorderRadius.circular(13),
                                                   child: (pic[index].onApi == 1)
                                                       ? Image.network(
-                                                          '$pathPic${pic[index].j_img_name}', // this image doesn't exist
+                                                          '$api/${pic[index].j_img_name}', // this image doesn't exist
                                                           fit: BoxFit.cover,
                                                           height:
                                                               double.infinity,
@@ -1061,8 +1058,7 @@ class _photopageState extends State<photopage> {
 class API {
   static Future getPicLs(idd, type) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+      Uri.parse('$api/api/mobile/getJobGroupDetail'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

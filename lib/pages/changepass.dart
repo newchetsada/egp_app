@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:egp_app/config.dart';
 
 class changepass extends StatefulWidget {
   @override
@@ -23,8 +24,7 @@ class _changepassState extends State<changepass> {
 
   changePass() async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/changePass'),
+      Uri.parse('$api/api/mobile/changePass'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

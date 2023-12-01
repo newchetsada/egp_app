@@ -19,6 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
+import 'package:egp_app/config.dart';
 
 import 'hero_dialog_route.dart';
 
@@ -94,7 +95,6 @@ class _repairState extends State<repair> {
   String path_sign1 = '';
   String sign_name_2 = '';
   String path_sign2 = '';
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
 
   String userName = "Loading...";
 
@@ -153,8 +153,7 @@ class _repairState extends State<repair> {
   Future getsign1(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse('$api/api/mobile/getJobGroupDetail'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -183,8 +182,7 @@ class _repairState extends State<repair> {
   Future getsign2(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse('$api/api/mobile/getJobGroupDetail'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -212,8 +210,7 @@ class _repairState extends State<repair> {
 
   endWork(note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/endWorking'),
+      Uri.parse('$api/api/mobile/endWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -242,7 +239,7 @@ class _repairState extends State<repair> {
               borderRadius: BorderRadius.all(Radius.circular(20))),
           content: SingleChildScrollView(
               child: Center(
-            child: Image.network('$pathPic${path}'),
+            child: Image.network('$api/${path}'),
           )),
         );
       },
@@ -282,8 +279,7 @@ class _repairState extends State<repair> {
 
   StartWork() async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
+      Uri.parse('$api/api/mobile/startWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1632,14 +1628,14 @@ class _repairState extends State<repair> {
                                                                                 Colors.transparent),
                                                                     imageProvider:
                                                                         NetworkImage(
-                                                                            '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                                            '$api/${widget.sitepic[index]['site_img_name']}'),
                                                                   )));
                                                     },
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 child: Image.network(
-                                                    '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                    '$api/${widget.sitepic[index]['site_img_name']}'),
                                               ))),
                                       Expanded(
                                         child: Padding(
@@ -3110,8 +3106,7 @@ class _repairState extends State<repair> {
 class API {
   static Future getContactLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobContactMobileLs'),
+      Uri.parse('$api/api/mobile/getJobContactMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -3125,8 +3120,7 @@ class API {
 
   static Future getPicLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForRepair'),
+      Uri.parse('$api/api/mobile/getJobHeaderImageForRepair'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

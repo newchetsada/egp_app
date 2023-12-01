@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:egp_app/audit/acaudit.dart';
 import 'package:egp_app/audit/addinverter.dart';
+import 'package:egp_app/config.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -38,7 +39,7 @@ class _addauditState extends State<addaudit> {
   final ImagePicker imgpicker = ImagePicker();
   List<XFile> imagefiles = [];
   var groupSub = <SubLs>[];
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
+  //
   var remark = TextEditingController();
   List deleteLs = [];
   int? pass;
@@ -119,7 +120,7 @@ class _addauditState extends State<addaudit> {
   // deletePic(id) async {
   //   var response = await http.post(
   //     Uri.parse(
-  //         'https://backoffice.energygreenplus.co.th/api/mobile/deleteImageChecklist'),
+  //         '$api/api/mobile/deleteImageChecklist'),
   //     headers: <String, String>{
   //       'Content-Type': 'application/json; charset=UTF-8',
   //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -141,7 +142,7 @@ class _addauditState extends State<addaudit> {
   // deleteGroup(groupNo) async {
   //   var response = await http.post(
   //     Uri.parse(
-  //         'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobGroupImageAudit'),
+  //         '$api/api/mobile/deleteJobGroupImageAudit'),
   //     headers: <String, String>{
   //       'Content-Type': 'application/json; charset=UTF-8',
   //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -163,7 +164,7 @@ class _addauditState extends State<addaudit> {
   // addgroup() async {
   //   var response = await http.post(
   //     Uri.parse(
-  //         'https://backoffice.energygreenplus.co.th/api/mobile/addGroupAudit'),
+  //         '$api/api/mobile/addGroupAudit'),
   //     headers: <String, String>{
   //       'Content-Type': 'application/json; charset=UTF-8',
   //       'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -814,8 +815,7 @@ class _addauditState extends State<addaudit> {
 class API {
   static Future getSubLs(idd, jidx, typeId) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getAccessoriesAudit'),
+      Uri.parse('$api/api/mobile/getAccessoriesAudit'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:egp_app/config.dart';
 
 class signature extends StatefulWidget {
   @override
@@ -62,8 +63,8 @@ class _signatureState extends State<signature> {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse((widget.type == 4)
-            ? 'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImageChecklist'
-            : 'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+            ? '$api/api/mobile/uploadJobImageChecklist'
+            : '$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 

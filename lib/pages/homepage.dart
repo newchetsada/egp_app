@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:egp_app/config.dart';
 
 class homePage extends StatefulWidget {
   @override
@@ -67,8 +68,7 @@ class _homePageState extends State<homePage> {
   Future getUserDetail(userId) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/master/getTechnicianLs'),
+        Uri.parse('$api/api/master/getTechnicianLs'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1038,8 +1038,7 @@ class _homePageState extends State<homePage> {
   Future getWorkdetail(userId, jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+        Uri.parse('$api/api/mobile/getJobAttempMobileLs'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1066,8 +1065,7 @@ class _homePageState extends State<homePage> {
 class API {
   static Future getWorkLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+      Uri.parse('$api/api/mobile/getJobAttempMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

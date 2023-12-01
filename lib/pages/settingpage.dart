@@ -14,6 +14,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
+import 'package:egp_app/config.dart';
 
 class settingPage extends StatefulWidget {
   @override
@@ -53,8 +54,7 @@ class _settingPageState extends State<settingPage> {
 
   signOut(id, user, token) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/mobileLogout'),
+      Uri.parse('$api/api/mobile/mobileLogout'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -92,8 +92,7 @@ class _settingPageState extends State<settingPage> {
   Future getUserDetail(userId) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/master/getTechnicianLs'),
+        Uri.parse('$api/api/master/getTechnicianLs'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -301,7 +300,7 @@ class _settingPageState extends State<settingPage> {
                                                     fit: BoxFit.cover,
                                                     height: double.infinity,
                                                     width: double.infinity,
-                                                    'https://backoffice.energygreenplus.co.th/$pic'),
+                                                    '$api/$pic'),
                                               ),
                                       ),
                                       // Icon(

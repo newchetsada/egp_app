@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
-import 'package:egp_app/clean/photopage.dart';
+import 'package:egp_app/clean/cleanphotopage.dart';
+// import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/report/report.dart';
@@ -21,6 +22,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:http/http.dart' as http;
+import 'package:egp_app/config.dart';
 
 class cleansolar extends StatefulWidget {
   _cleansolarState createState() => _cleansolarState();
@@ -102,8 +104,6 @@ class _cleansolarState extends State<cleansolar> {
 
   var remarkEnd = TextEditingController();
 
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
-
   getUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
@@ -139,8 +139,7 @@ class _cleansolarState extends State<cleansolar> {
   Future getcountphoto(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobHeaderImageForClean'),
+        Uri.parse('$api/api/mobile/getJobHeaderImageForClean'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -167,8 +166,7 @@ class _cleansolarState extends State<cleansolar> {
   Future getsign1(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse('$api/api/mobile/getJobGroupDetail'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -237,8 +235,7 @@ class _cleansolarState extends State<cleansolar> {
   Future getsign2(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupDetail'),
+        Uri.parse('$api/api/mobile/getJobGroupDetail'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -267,8 +264,7 @@ class _cleansolarState extends State<cleansolar> {
 
   Future getWork(idd, jidx) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobAttempMobileLs'),
+      Uri.parse('$api/api/mobile/getJobAttempMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -285,8 +281,7 @@ class _cleansolarState extends State<cleansolar> {
     print(widget.jid);
     print(userName);
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/startWorking'),
+      Uri.parse('$api/api/mobile/startWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -304,8 +299,7 @@ class _cleansolarState extends State<cleansolar> {
 
   endWork(note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/endWorking'),
+      Uri.parse('$api/api/mobile/endWorking'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -354,7 +348,7 @@ class _cleansolarState extends State<cleansolar> {
               borderRadius: BorderRadius.all(Radius.circular(20))),
           content: SingleChildScrollView(
               child: Center(
-            child: Image.network('$pathPic${path}'),
+            child: Image.network('$api/${path}'),
           )),
         );
       },
@@ -1299,37 +1293,32 @@ class _cleansolarState extends State<cleansolar> {
                                       AspectRatio(
                                           aspectRatio: 16 / 9,
                                           child: GestureDetector(
-                                              onTap: (widget.pic.isEmpty)
-                                                  ? null
-                                                  : () {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (_) =>
-                                                              Dialog(
-                                                                  elevation: 0,
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .transparent,
-                                                                  child:
-                                                                      PhotoView(
-                                                                    tightMode:
-                                                                        true,
-                                                                    minScale:
-                                                                        0.25,
-                                                                    backgroundDecoration:
-                                                                        BoxDecoration(
-                                                                            color:
-                                                                                Colors.transparent),
-                                                                    imageProvider:
-                                                                        NetworkImage(
-                                                                            '$pathPic${widget.sitepic[index]['site_img_name']}'),
-                                                                  )));
-                                                    },
+                                              onTap: () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (_) => Dialog(
+                                                        elevation: 0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        child: PhotoView(
+                                                          tightMode: true,
+                                                          minScale: 0.25,
+                                                          backgroundDecoration:
+                                                              BoxDecoration(
+                                                                  color: Colors
+                                                                      .transparent),
+                                                          imageProvider:
+                                                              NetworkImage(
+                                                                  '$api/${widget.sitepic[index]['site_img_name']}'),
+                                                        )));
+                                              },
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 child: Image.network(
-                                                    '$pathPic${widget.sitepic[index]['site_img_name']}'),
+                                                  '$api/${widget.sitepic[index]['site_img_name']}',
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ))),
                                       Expanded(
                                         child: Padding(
@@ -1626,7 +1615,7 @@ class _cleansolarState extends State<cleansolar> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => photopage(
+                                builder: (context) => cleanphotopage(
                                       type: 0,
                                       limit: total_taken,
                                       jidx: widget.jid,
@@ -1760,7 +1749,7 @@ class _cleansolarState extends State<cleansolar> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => photopage(
+                                builder: (context) => cleanphotopage(
                                       type: 1,
                                       limit: total_taken,
                                       jidx: widget.jid,
@@ -2308,7 +2297,7 @@ class _cleansolarState extends State<cleansolar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => photopage(
+                            builder: (context) => cleanphotopage(
                                   type: 0,
                                   limit: total_taken,
                                   jidx: widget.jid,
@@ -2438,7 +2427,7 @@ class _cleansolarState extends State<cleansolar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => photopage(
+                            builder: (context) => cleanphotopage(
                                   type: 1,
                                   limit: total_taken,
                                   jidx: widget.jid,
@@ -2904,8 +2893,7 @@ class _cleansolarState extends State<cleansolar> {
 class API {
   static Future getContactLs(idd) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobContactMobileLs'),
+      Uri.parse('$api/api/mobile/getJobContactMobileLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',

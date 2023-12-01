@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:egp_app/config.dart';
 
 class editprofile extends StatefulWidget {
   @override
@@ -81,9 +82,7 @@ class _editprofileState extends State<editprofile> {
 
   updatePro(File? image) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/master/updateTechnician'));
+        'POST', Uri.parse('$api/api/master/updateTechnician'));
     request.headers['X-API-Key'] = 'evdplusm8DdW+Wd3UCweHj';
     request.fields['techId'] = widget.id.toString();
     request.fields['userName'] = widget.userName;
@@ -315,7 +314,7 @@ class _editprofileState extends State<editprofile> {
                                         fit: BoxFit.cover,
                                         height: double.infinity,
                                         width: double.infinity,
-                                        'https://backoffice.energygreenplus.co.th/${widget.pic}'),
+                                        '$api/${widget.pic}'),
                                   )
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(100),

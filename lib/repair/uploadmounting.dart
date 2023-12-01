@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:egp_app/config.dart';
 import 'package:shimmer/shimmer.dart';
 
 class uploadPicMounting extends StatefulWidget {
@@ -41,8 +42,6 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
   var after_note = TextEditingController();
 
   List deleteLs = [];
-
-  String pathPic = 'https://backoffice.energygreenplus.co.th/';
 
   String userName = "Loading...";
   int? iduser;
@@ -84,8 +83,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   getBrandLs() async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/master/getBrandLs'),
+      Uri.parse('$api/api/master/getBrandLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -135,8 +133,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   deletePic(id) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobImage'),
+      Uri.parse('$api/api/mobile/deleteJobImage'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -155,8 +152,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   deleteGroup(idg) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/deleteJobGroupImage'),
+      Uri.parse('$api/api/mobile/deleteJobGroupImage'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -177,9 +173,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   uploadPic(File image, imgType, img_des_id, group_no) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+        'POST', Uri.parse('$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -216,9 +210,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   uploadnoPic(imgType, img_des_id, group_no) async {
     var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(
-            'https://backoffice.energygreenplus.co.th/api/mobile/uploadJobImage'));
+        'POST', Uri.parse('$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
@@ -282,8 +274,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 
   updateRemark(groupNo, imgType, note) async {
     var response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/updateJobDetailInGroup'),
+      Uri.parse('$api/api/mobile/updateJobDetailInGroup'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -1464,7 +1455,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                       1)
                                                                   ? Image
                                                                       .network(
-                                                                      '$pathPic${desLs_before[index].j_img_name}', // this image doesn't exist
+                                                                      '$api/${desLs_before[index].j_img_name}', // this image doesn't exist
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       height: double
@@ -1732,7 +1723,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                         1)
                                                                     ? Image
                                                                         .network(
-                                                                        '$pathPic${desLs_before[index].j_img_name}', // this image doesn't exist
+                                                                        '$api/${desLs_before[index].j_img_name}', // this image doesn't exist
                                                                         fit: BoxFit
                                                                             .cover,
                                                                         height:
@@ -2144,7 +2135,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                       1)
                                                                   ? Image
                                                                       .network(
-                                                                      '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
+                                                                      '$api/${desLs_after[index].j_img_name}', // this image doesn't exist
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       height: double
@@ -2527,7 +2518,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                                                                         1)
                                                                     ? Image
                                                                         .network(
-                                                                        '$pathPic${desLs_after[index].j_img_name}', // this image doesn't exist
+                                                                        '$api/${desLs_after[index].j_img_name}', // this image doesn't exist
                                                                         fit: BoxFit
                                                                             .cover,
                                                                         height:
@@ -2796,8 +2787,7 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
 class API {
   static Future getGroup(idd, typeId) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupRepairImageLs'),
+      Uri.parse('$api/api/mobile/getJobGroupRepairImageLs'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
@@ -2809,8 +2799,7 @@ class API {
 
   static Future getDescript(idd, typeId, groupNo, imgType) async {
     final response = await http.post(
-      Uri.parse(
-          'https://backoffice.energygreenplus.co.th/api/mobile/getJobGroupRepairDetail'),
+      Uri.parse('$api/api/mobile/getJobGroupRepairDetail'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
