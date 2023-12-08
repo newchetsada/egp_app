@@ -60,7 +60,11 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
 
   openCamera() async {
     try {
-      var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
+      var pickedfile = await imgpicker.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 1080,
+          maxWidth: 1080,
+          imageQuality: 50);
       if (pickedfile != null) {
         return pickedfile;
       } else {
@@ -75,8 +79,8 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
     try {
       var pickedfile = await imgpicker.pickImage(
           source: ImageSource.gallery,
-          maxHeight: 480,
-          maxWidth: 640,
+          maxHeight: 1080,
+          maxWidth: 1080,
           imageQuality: 50);
       if (pickedfile != null) {
         return pickedfile;

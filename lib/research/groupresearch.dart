@@ -51,7 +51,8 @@ class _groupresearchState extends State<groupresearch> {
 
   openImages() async {
     try {
-      var pickedfiles = await imgpicker.pickMultiImage();
+      var pickedfiles = await imgpicker.pickMultiImage(
+          maxHeight: 1080, maxWidth: 1080, imageQuality: 50);
       //you can use ImageCourse.camera for Camera capture
       if (pickedfiles != null) {
         // return pickedfiles;
@@ -73,7 +74,11 @@ class _groupresearchState extends State<groupresearch> {
 
   openCamera() async {
     try {
-      var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
+      var pickedfile = await imgpicker.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 1080,
+          maxWidth: 1080,
+          imageQuality: 50);
       //you can use ImageCourse.camera for Camera capture
       if (pickedfile != null) {
         // return pickedfile;

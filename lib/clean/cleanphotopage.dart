@@ -215,8 +215,8 @@ class _cleanphotopageState extends State<cleanphotopage> {
     try {
       var pickedfile = await imgpicker.pickImage(
           source: ImageSource.gallery,
-          maxHeight: 480,
-          maxWidth: 640,
+          maxHeight: 1080,
+          maxWidth: 1080,
           imageQuality: 50);
       if (pickedfile != null) {
         return pickedfile;
@@ -230,7 +230,11 @@ class _cleanphotopageState extends State<cleanphotopage> {
 
   openCamera() async {
     try {
-      var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
+      var pickedfile = await imgpicker.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 1080,
+          maxWidth: 1080,
+          imageQuality: 50);
       if (pickedfile != null) {
         return pickedfile;
       } else {
@@ -1181,6 +1185,6 @@ class ExPic {
     return ExPic(
         j_img_cleaning_id: json['j_img_cleaning_id'],
         j_img_cleaning_name: json['j_img_cleaning_name'] ?? '',
-        j_img_cleaning_des: json['cleaningj_img_cleaning_des_des_name'] ?? '');
+        j_img_cleaning_des: json['j_img_cleaning_des'] ?? '');
   }
 }

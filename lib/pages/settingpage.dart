@@ -109,11 +109,11 @@ class _settingPageState extends State<settingPage> {
           tech_fname = jsonResponse[0]['tech_fname'] ?? '';
           tech_lname = jsonResponse[0]['tech_lname'] ?? '';
 
-          tech_position = jsonResponse[0]['tech_position'];
-          tech_company = jsonResponse[0]['tech_company'];
-          tech_tel = jsonResponse[0]['tech_tel'];
-          tech_line = jsonResponse[0]['tech_line'];
-          tech_email = jsonResponse[0]['tech_email'];
+          tech_position = jsonResponse[0]['tech_position'] ?? '';
+          tech_company = jsonResponse[0]['tech_company'] ?? '';
+          tech_tel = jsonResponse[0]['tech_tel'] ?? '';
+          tech_line = jsonResponse[0]['tech_line'] ?? '';
+          tech_email = jsonResponse[0]['tech_email'] ?? '';
           pic = jsonResponse[0]['tech_profile'];
         });
       }

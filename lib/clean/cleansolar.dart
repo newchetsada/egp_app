@@ -3,6 +3,7 @@ import 'dart:ffi';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:egp_app/clean/cleanphotopage.dart';
+import 'package:egp_app/clean/photopage.dart';
 // import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
@@ -1615,7 +1616,7 @@ class _cleansolarState extends State<cleansolar> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => cleanphotopage(
+                                builder: (context) => photopage(
                                       type: 0,
                                       limit: total_taken,
                                       jidx: widget.jid,
@@ -1749,7 +1750,7 @@ class _cleansolarState extends State<cleansolar> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => cleanphotopage(
+                                builder: (context) => photopage(
                                       type: 1,
                                       limit: total_taken,
                                       jidx: widget.jid,
@@ -2297,7 +2298,7 @@ class _cleansolarState extends State<cleansolar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => cleanphotopage(
+                            builder: (context) => photopage(
                                   type: 0,
                                   limit: total_taken,
                                   jidx: widget.jid,
@@ -2427,7 +2428,7 @@ class _cleansolarState extends State<cleansolar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => cleanphotopage(
+                            builder: (context) => photopage(
                                   type: 1,
                                   limit: total_taken,
                                   jidx: widget.jid,

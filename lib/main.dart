@@ -2,12 +2,15 @@ import 'package:egp_app/clean/cleansolar.dart';
 import 'package:egp_app/home.dart';
 import 'package:egp_app/login.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/up.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
   print('background message ${message.notification!.body}');
@@ -61,17 +64,42 @@ void main() async {
     print('Message clicked!');
   });
 
+  final remoteConfig = FirebaseRemoteConfig.instance;
+  await remoteConfig.setConfigSettings(RemoteConfigSettings(
+    // cache refresh time
+    fetchTimeout: const Duration(seconds: 1),
+    // a fetch will wait up to 10 seconds before timing out
+    minimumFetchInterval: const Duration(seconds: 10),
+  ));
+  await remoteConfig.fetchAndActivate();
+  print(remoteConfig.getInt('android'));
+  print(remoteConfig.getInt('ios'));
+  bool up = false;
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    if (remoteConfig.getInt('android') > 100) {
+      print('ver android update');
+      up = true;
+    }
+  } else {
+    if (remoteConfig.getInt('ios') > 100) {
+      print('ver ios update');
+      up = true;
+    }
+  }
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var isLogin = prefs.getString('user');
 
   runApp(MyApp(
     isLogin: isLogin,
+    isUp: up,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final isLogin;
-  MyApp({super.key, required this.isLogin});
+  final isUp;
+  MyApp({super.key, required this.isLogin, required this.isUp});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +119,11 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Noto Sans Thai',
           primarySwatch: Colors.blue,
         ),
-        home: (isLogin != null) ? homePage() : login(),
+        home: (isUp == true)
+            ? updatePage()
+            : (isLogin != null)
+                ? homePage()
+                : login(),
         // homePage(),
       ),
     );

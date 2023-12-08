@@ -180,7 +180,8 @@ class _photopageState extends State<photopage> {
 
   openImages() async {
     try {
-      var pickedfiles = await imgpicker.pickMultiImage();
+      var pickedfiles = await imgpicker.pickMultiImage(
+          maxHeight: 1080, maxWidth: 1080, imageQuality: 50);
       //you can use ImageCourse.camera for Camera capture
       if (pickedfiles != null) {
         if (pickedfiles.length > limitFile - pic.length) {
@@ -211,7 +212,11 @@ class _photopageState extends State<photopage> {
 
   openCamera() async {
     try {
-      var pickedfile = await imgpicker.pickImage(source: ImageSource.camera);
+      var pickedfile = await imgpicker.pickImage(
+          source: ImageSource.camera,
+          maxHeight: 1080,
+          maxWidth: 1080,
+          imageQuality: 50);
       //you can use ImageCourse.camera for Camera capture
       if (pickedfile != null) {
         // imagefiles.add(pickedfile);
