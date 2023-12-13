@@ -570,15 +570,8 @@ class _homePageState extends State<homePage> {
                     .toString();
                 cus_name = jsonResponse[0]['cus_name'] ?? '';
                 site_name = jsonResponse[0]['site_name'] ?? '';
-                cus_address = jsonResponse[0]['cus_address'] +
-                    ' ' +
-                    jsonResponse[0]['tambon_th'] +
-                    ' ' +
-                    jsonResponse[0]['amphur_th'] +
-                    ' ' +
-                    jsonResponse[0]['province_th'] +
-                    ' ' +
-                    jsonResponse[0]['postcode'];
+                cus_address =
+                    '${jsonResponse[0]['cus_address'] ?? ''} ${jsonResponse[0]['tambon_th'] ?? ''} ${jsonResponse[0]['amphur_th'] ?? ''} ${jsonResponse[0]['province_th'] ?? ''} ${jsonResponse[0]['postcode'] ?? ''}';
                 install_date = (jsonResponse[0]['install_date'] == null)
                     ? ''
                     : DateFormat('dd/MM/yyyy')
