@@ -300,6 +300,7 @@ class _photopageState extends State<photopage> {
         'userName': userName,
       }),
     );
+    print(response.statusCode);
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);

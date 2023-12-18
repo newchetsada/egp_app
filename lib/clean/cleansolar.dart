@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:egp_app/clean/cleanphotopage.dart';
@@ -7,6 +7,7 @@ import 'package:egp_app/clean/cleanphotopage.dart';
 // import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/pages/homepage.dart';
+import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:egp_app/report/report.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
@@ -1295,30 +1296,42 @@ class _cleansolarState extends State<cleansolar> {
                                           aspectRatio: 16 / 9,
                                           child: GestureDetector(
                                               onTap: () {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (_) => Dialog(
-                                                        elevation: 0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        child: PhotoView(
-                                                          tightMode: true,
-                                                          minScale: 0.25,
-                                                          backgroundDecoration:
-                                                              BoxDecoration(
-                                                                  color: Colors
-                                                                      .transparent),
-                                                          imageProvider:
-                                                              NetworkImage(
-                                                                  '$api/${widget.sitepic[index]['site_img_name']}'),
-                                                        )));
+                                                Navigator.push(
+                                                    context,
+                                                    HeroDialogRoute(
+                                                        builder: (BuildContext
+                                                                context) =>
+                                                            Dialog(
+                                                                elevation: 0,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .transparent,
+                                                                child: Hero(
+                                                                  tag:
+                                                                      'pic$index',
+                                                                  child:
+                                                                      PhotoView(
+                                                                    tightMode:
+                                                                        true,
+                                                                    backgroundDecoration:
+                                                                        BoxDecoration(
+                                                                            color:
+                                                                                Colors.transparent),
+                                                                    imageProvider:
+                                                                        NetworkImage(
+                                                                            '$api/${widget.sitepic[index]['site_img_name']}'),
+                                                                  ),
+                                                                ))));
                                               },
-                                              child: ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                child: Image.network(
-                                                  '$api/${widget.sitepic[index]['site_img_name']}',
-                                                  fit: BoxFit.cover,
+                                              child: Hero(
+                                                tag: 'pic$index',
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  child: Image.network(
+                                                    '$api/${widget.sitepic[index]['site_img_name']}',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                               ))),
                                       Expanded(
@@ -1329,18 +1342,69 @@ class _cleansolarState extends State<cleansolar> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              Text(
-                                                  widget.sitepic[index]
-                                                          ['site_img_des'] ??
-                                                      '',
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 14,
-                                                      color:
-                                                          Color(0xff2A302C))),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showModalBottomSheet<void>(
+                                                    context: context,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return SafeArea(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          child: Container(
+                                                            width:
+                                                                double.infinity,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color(
+                                                                  0xffEDFAEA),
+                                                            ),
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              child: Text(
+                                                                  widget.sitepic[
+                                                                              index]
+                                                                          [
+                                                                          'site_img_des'] ??
+                                                                      '',
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Color(
+                                                                          0xff2A302C))),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Text(
+                                                    widget.sitepic[index]
+                                                            ['site_img_des'] ??
+                                                        '',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff2A302C))),
+                                              ),
                                             ],
                                           ),
                                         ),

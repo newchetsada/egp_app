@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -638,32 +639,43 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                               aspectRatio: 16 / 9,
                                               child: GestureDetector(
                                                   onTap: () {
-                                                    showDialog(
-                                                        context: context,
-                                                        builder: (_) => Dialog(
-                                                            elevation: 0,
-                                                            backgroundColor:
-                                                                Colors
-                                                                    .transparent,
-                                                            child: PhotoView(
-                                                              tightMode: true,
-                                                              minScale: 0.25,
-                                                              backgroundDecoration:
-                                                                  BoxDecoration(
-                                                                      color: Colors
-                                                                          .transparent),
-                                                              imageProvider:
-                                                                  NetworkImage(
-                                                                      '$api/${picEx[index].j_img_cleaning_name}'),
-                                                            )));
+                                                    Navigator.push(
+                                                        context,
+                                                        HeroDialogRoute(
+                                                            builder: (BuildContext
+                                                                    context) =>
+                                                                Dialog(
+                                                                    elevation:
+                                                                        0,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .transparent,
+                                                                    child: Hero(
+                                                                      tag:
+                                                                          'ex$index',
+                                                                      child:
+                                                                          PhotoView(
+                                                                        tightMode:
+                                                                            true,
+                                                                        backgroundDecoration:
+                                                                            BoxDecoration(color: Colors.transparent),
+                                                                        imageProvider:
+                                                                            NetworkImage(
+                                                                          '$api/${picEx[index].j_img_cleaning_name}',
+                                                                        ),
+                                                                      ),
+                                                                    ))));
                                                   },
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    child: Image.network(
-                                                      '$api/${picEx[index].j_img_cleaning_name}',
-                                                      fit: BoxFit.cover,
+                                                  child: Hero(
+                                                    tag: 'ex$index',
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: Image.network(
+                                                        '$api/${picEx[index].j_img_cleaning_name}',
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
                                                   ))),
                                           Expanded(
@@ -675,17 +687,66 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  Text(
-                                                      picEx[index]
-                                                          .j_img_cleaning_des,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 14,
-                                                          color: Color(
-                                                              0xff2A302C))),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet<
+                                                          void>(
+                                                        context: context,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return SafeArea(
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              child: Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              10)),
+                                                                  color: Color(
+                                                                      0xffEDFAEA),
+                                                                ),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          10),
+                                                                  child: Text(
+                                                                      picEx[index]
+                                                                          .j_img_cleaning_des,
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              Color(0xff2A302C))),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                        picEx[index]
+                                                            .j_img_cleaning_des,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xff2A302C))),
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -744,21 +805,43 @@ class _cleanphotopageState extends State<cleanphotopage> {
                           return GestureDetector(
                             onTap: (widget.status == 3)
                                 ? () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) => Dialog(
-                                            elevation: 0,
-                                            backgroundColor: Colors.transparent,
-                                            child: PhotoView(
-                                              tightMode: true,
-                                              minScale: 0.25,
-                                              backgroundDecoration:
-                                                  BoxDecoration(
-                                                      color:
-                                                          Colors.transparent),
-                                              imageProvider: NetworkImage(
-                                                  '$api/${pic[index].j_img_name}'),
-                                            )));
+                                    Navigator.push(
+                                        context,
+                                        HeroDialogRoute(
+                                            builder: (BuildContext context) =>
+                                                Dialog(
+                                                    elevation: 0,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child: Hero(
+                                                      tag: 'pic$index',
+                                                      child: PhotoView(
+                                                        tightMode: true,
+                                                        backgroundDecoration:
+                                                            BoxDecoration(
+                                                                color: Colors
+                                                                    .transparent),
+                                                        imageProvider:
+                                                            NetworkImage(
+                                                          '$api/${pic[index].j_img_name}',
+                                                        ),
+                                                      ),
+                                                    ))));
+                                    // showDialog(
+                                    //     context: context,
+                                    //     builder: (_) => Dialog(
+                                    //         elevation: 0,
+                                    //         backgroundColor: Colors.transparent,
+                                    //         child: PhotoView(
+                                    //           tightMode: true,
+                                    //           // minScale: 0.25,
+                                    //           backgroundDecoration:
+                                    //               BoxDecoration(
+                                    //                   color:
+                                    //                       Colors.transparent),
+                                    //           imageProvider: NetworkImage(
+                                    //               '$api/${pic[index].j_img_name}'),
+                                    //         )));
                                   }
                                 : () {
                                     (pic[index].j_img_name.isEmpty)
@@ -802,39 +885,54 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                                 title: Text('Cancel')),
                                           )
                                         : (pic[index].onApi == 1)
-                                            ? showDialog(
-                                                context: context,
-                                                builder: (_) => Dialog(
-                                                    elevation: 0,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    child: PhotoView(
-                                                      tightMode: true,
-                                                      minScale: 0.25,
-                                                      backgroundDecoration:
-                                                          BoxDecoration(
-                                                              color: Colors
-                                                                  .transparent),
-                                                      imageProvider: NetworkImage(
-                                                          '$api/${pic[index].j_img_name}'),
-                                                    )))
-                                            : showDialog(
-                                                context: context,
-                                                builder: (_) => Dialog(
-                                                    elevation: 0,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    child: PhotoView(
-                                                      tightMode: true,
-                                                      minScale: 0.25,
-                                                      backgroundDecoration:
-                                                          BoxDecoration(
-                                                              color: Colors
-                                                                  .transparent),
-                                                      imageProvider: FileImage(
-                                                          File(pic[index]
-                                                              .j_img_name)),
-                                                    )));
+                                            ? Navigator.push(
+                                                context,
+                                                HeroDialogRoute(
+                                                    builder: (BuildContext
+                                                            context) =>
+                                                        Dialog(
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            child: Hero(
+                                                              tag: 'pic$index',
+                                                              child: PhotoView(
+                                                                tightMode: true,
+                                                                backgroundDecoration:
+                                                                    BoxDecoration(
+                                                                        color: Colors
+                                                                            .transparent),
+                                                                imageProvider:
+                                                                    NetworkImage(
+                                                                  '$api/${pic[index].j_img_name}',
+                                                                ),
+                                                              ),
+                                                            ))))
+                                            : Navigator.push(
+                                                context,
+                                                HeroDialogRoute(
+                                                    builder: (BuildContext
+                                                            context) =>
+                                                        Dialog(
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            child: Hero(
+                                                              tag: 'pic$index',
+                                                              child: PhotoView(
+                                                                tightMode: true,
+                                                                backgroundDecoration:
+                                                                    BoxDecoration(
+                                                                        color: Colors
+                                                                            .transparent),
+                                                                imageProvider:
+                                                                    FileImage(File(
+                                                                        pic[index]
+                                                                            .j_img_name)),
+                                                              ),
+                                                            ))));
                                   },
                             child: Column(
                               children: [
@@ -850,77 +948,78 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                     ),
                                     child: Stack(
                                       children: [
-                                        ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(13),
-                                            child:
-                                                // (pic[index].onApi == 1)
-                                                //     ?
-                                                (pic[index]
-                                                        .j_img_name
-                                                        .isNotEmpty)
-                                                    ? (pic[index].onApi == 1)
-                                                        ? Image.network(
-                                                            '$api/${pic[index].j_img_name}', // this image doesn't exist
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
+                                        Hero(
+                                          tag: 'pic$index',
+                                          child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(13),
+                                              child:
+                                                  // (pic[index].onApi == 1)
+                                                  //     ?
+                                                  (pic[index]
+                                                          .j_img_name
+                                                          .isNotEmpty)
+                                                      ? (pic[index].onApi == 1)
+                                                          ? Image.network(
+                                                              '$api/${pic[index].j_img_name}', // this image doesn't exist
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
 
-                                                            errorBuilder:
-                                                                (context, error,
-                                                                    stackTrace) {
-                                                              return Center(
-                                                                child: Icon(
-                                                                  Icons
-                                                                      .error_outline_rounded,
-                                                                  size: 40,
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .withOpacity(
-                                                                          0.3),
-                                                                ),
-                                                              );
-                                                            },
-                                                            loadingBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    Widget
-                                                                        child,
-                                                                    ImageChunkEvent?
-                                                                        loadingProgress) {
-                                                              if (loadingProgress ==
-                                                                  null) {
-                                                                return child;
-                                                              }
-                                                              return Center(
-                                                                child:
-                                                                    CircularProgressIndicator(
-                                                                  color: Colors
-                                                                      .green,
-                                                                  value: loadingProgress
-                                                                              .expectedTotalBytes !=
-                                                                          null
-                                                                      ? loadingProgress
-                                                                              .cumulativeBytesLoaded /
-                                                                          loadingProgress
-                                                                              .expectedTotalBytes!
-                                                                      : null,
-                                                                ),
-                                                              );
-                                                            },
-                                                          )
-                                                        : Image.file(
-                                                            File(pic[index]
-                                                                .j_img_name),
-                                                            fit: BoxFit.cover,
-                                                            height:
-                                                                double.infinity,
-                                                            width:
-                                                                double.infinity,
-                                                          )
-                                                    : Container()),
+                                                              errorBuilder:
+                                                                  (context,
+                                                                      error,
+                                                                      stackTrace) {
+                                                                return Center(
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .error_outline_rounded,
+                                                                    size: 40,
+                                                                    color: Colors
+                                                                        .grey
+                                                                        .withOpacity(
+                                                                            0.3),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              loadingBuilder:
+                                                                  (BuildContext
+                                                                          context,
+                                                                      Widget
+                                                                          child,
+                                                                      ImageChunkEvent?
+                                                                          loadingProgress) {
+                                                                if (loadingProgress ==
+                                                                    null) {
+                                                                  return child;
+                                                                }
+                                                                return Center(
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    value: loadingProgress.expectedTotalBytes !=
+                                                                            null
+                                                                        ? loadingProgress.cumulativeBytesLoaded /
+                                                                            loadingProgress.expectedTotalBytes!
+                                                                        : null,
+                                                                  ),
+                                                                );
+                                                              },
+                                                            )
+                                                          : Image.file(
+                                                              File(pic[index]
+                                                                  .j_img_name),
+                                                              fit: BoxFit.cover,
+                                                              height: double
+                                                                  .infinity,
+                                                              width: double
+                                                                  .infinity,
+                                                            )
+                                                      : Container()),
+                                        ),
                                         (pic[index].j_img_name.isNotEmpty)
                                             ? (widget.status == 3)
                                                 ? Container()
