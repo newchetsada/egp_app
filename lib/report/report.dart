@@ -16,14 +16,14 @@ class report extends StatefulWidget {
 
   final int jid;
   final int sid;
-  final int? ref_jidx;
+  final int? ref_jidx_repair;
   final int cusId;
   final String username;
   final int tecId;
   report(
       {required this.jid,
       required this.sid,
-      required this.ref_jidx,
+      required this.ref_jidx_repair,
       required this.cusId,
       required this.username,
       required this.tecId});
@@ -67,11 +67,12 @@ class _reportState extends State<report> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    (widget.ref_jidx == null)
+    print(widget.ref_jidx_repair);
+    (widget.ref_jidx_repair == null)
         ? null
-        : API.getPicLs(widget.ref_jidx).then((value) {
+        : API.getPicLs(widget.ref_jidx_repair).then((value) {
             setState(() {
-              ref = widget.ref_jidx;
+              ref = widget.ref_jidx_repair;
               List list1 = json.decode(value.body);
 
               groupPic = list1.map((m) => picLs.fromJson(m)).toList();
@@ -289,18 +290,18 @@ class _reportState extends State<report> {
                                     type_id: groupPic[index].type_id,
                                     sid: widget.sid,
                                     cusId: widget.cusId,
-                                    ref_jidx: ref,
+                                    ref_jidx_repair: ref,
                                     username: widget.username,
                                   ))).then((value) {
                         getWork(widget.tecId, widget.jid).then((val) {
                           var jsonResponse = json.decode(val);
-                          print(jsonResponse[0]['ref_jidx']);
-                          if (jsonResponse[0]['ref_jidx'] != null) {
+                          print(jsonResponse[0]['ref_jidx_repair']);
+                          if (jsonResponse[0]['ref_jidx_repair'] != null) {
                             API
-                                .getPicLs(jsonResponse[0]['ref_jidx'])
+                                .getPicLs(jsonResponse[0]['ref_jidx_repair'])
                                 .then((value) {
                               setState(() {
-                                ref = jsonResponse[0]['ref_jidx'];
+                                ref = jsonResponse[0]['ref_jidx_repair'];
                                 List list1 = json.decode(value.body);
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
@@ -319,18 +320,18 @@ class _reportState extends State<report> {
                                     type_id: groupPic[index].type_id,
                                     sid: widget.sid,
                                     cusId: widget.cusId,
-                                    ref_jidx: widget.ref_jidx,
+                                    ref_jidx_repair: widget.ref_jidx_repair,
                                     username: widget.username,
                                   ))).then((value) {
                         getWork(widget.tecId, widget.jid).then((val) {
                           var jsonResponse = json.decode(val);
-                          print(jsonResponse[0]['ref_jidx']);
-                          if (jsonResponse[0]['ref_jidx'] != null) {
+                          print(jsonResponse[0]['ref_jidx_repair']);
+                          if (jsonResponse[0]['ref_jidx_repair'] != null) {
                             API
-                                .getPicLs(jsonResponse[0]['ref_jidx'])
+                                .getPicLs(jsonResponse[0]['ref_jidx_repair'])
                                 .then((value) {
                               setState(() {
-                                ref = jsonResponse[0]['ref_jidx'];
+                                ref = jsonResponse[0]['ref_jidx_repair'];
                                 List list1 = json.decode(value.body);
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
@@ -488,18 +489,18 @@ class _reportState extends State<report> {
                                       type_id: 1,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           getWork(widget.tecId, widget.jid).then((val) {
                             var jsonResponse = json.decode(val);
-                            print(jsonResponse[0]['ref_jidx']);
-                            if (jsonResponse[0]['ref_jidx'] != null) {
+                            print(jsonResponse[0]['ref_jidx_repair']);
+                            if (jsonResponse[0]['ref_jidx_repair'] != null) {
                               API
-                                  .getPicLs(jsonResponse[0]['ref_jidx'])
+                                  .getPicLs(jsonResponse[0]['ref_jidx_repair'])
                                   .then((value) {
                                 setState(() {
-                                  ref = jsonResponse[0]['ref_jidx'];
+                                  ref = jsonResponse[0]['ref_jidx_repair'];
                                   List list1 = json.decode(value.body);
                                   groupPic = list1
                                       .map((m) => picLs.fromJson(m))
@@ -534,19 +535,20 @@ class _reportState extends State<report> {
                                       type_id: 2,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -582,19 +584,20 @@ class _reportState extends State<report> {
                                       type_id: 3,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -630,19 +633,20 @@ class _reportState extends State<report> {
                                       type_id: 4,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -678,19 +682,20 @@ class _reportState extends State<report> {
                                       type_id: 17,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -726,19 +731,20 @@ class _reportState extends State<report> {
                                       type_id: 5,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -774,19 +780,20 @@ class _reportState extends State<report> {
                                       type_id: 6,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -822,19 +829,20 @@ class _reportState extends State<report> {
                                       type_id: 7,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -870,19 +878,20 @@ class _reportState extends State<report> {
                                       type_id: 8,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))
@@ -918,19 +927,20 @@ class _reportState extends State<report> {
                                       type_id: 9,
                                       sid: widget.sid,
                                       cusId: widget.cusId,
-                                      ref_jidx: ref,
+                                      ref_jidx_repair: ref,
                                       username: widget.username,
                                     ))).then((value) {
                           setState(() {
                             getWork(widget.tecId, widget.jid).then((val) {
                               var jsonResponse = json.decode(val);
-                              print(jsonResponse[0]['ref_jidx']);
-                              if (jsonResponse[0]['ref_jidx'] != null) {
+                              print(jsonResponse[0]['ref_jidx_repair']);
+                              if (jsonResponse[0]['ref_jidx_repair'] != null) {
                                 API
-                                    .getPicLs(jsonResponse[0]['ref_jidx'])
+                                    .getPicLs(
+                                        jsonResponse[0]['ref_jidx_repair'])
                                     .then((value) {
                                   setState(() {
-                                    ref = jsonResponse[0]['ref_jidx'];
+                                    ref = jsonResponse[0]['ref_jidx_repair'];
                                     List list1 = json.decode(value.body);
                                     groupPic = list1
                                         .map((m) => picLs.fromJson(m))

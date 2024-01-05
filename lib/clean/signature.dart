@@ -80,11 +80,11 @@ class _signatureState extends State<signature> {
     request.fields['sign_name'] = widget.signName;
     request.fields['userName'] = widget.user;
     request.fields['filesName'] =
-        '${DateTime.now().toString()}.png'; //image.path.split('/').last;
+        '${DateTime.now().millisecondsSinceEpoch.toString()}.png'; //image.path.split('/').last;
 
     request.files.add(http.MultipartFile.fromBytes(
         'files', image.buffer.asUint8List(),
-        filename: '${DateTime.now().toString()}.png'));
+        filename: '${DateTime.now().millisecondsSinceEpoch.toString()}.png'));
 
     var response = await request.send();
 

@@ -22,14 +22,14 @@ class ReportuploadPic extends StatefulWidget {
   final int jidx;
   final int type_id;
   final int sid;
-  final int? ref_jidx;
+  final int? ref_jidx_repair;
   final int cusId;
   final String username;
   ReportuploadPic(
       {required this.jidx,
       required this.type_id,
       required this.sid,
-      required this.ref_jidx,
+      required this.ref_jidx_repair,
       required this.cusId,
       required this.username});
 }
@@ -416,14 +416,14 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                               ? 'ตู้ AC'
                                               : 'อื่นๆ';
     });
-    if (widget.ref_jidx == null) {
+    if (widget.ref_jidx_repair == null) {
       setState(() {
         lsloading = false;
       });
     } else {
-      API.getGroup(widget.ref_jidx, widget.type_id).then((value) {
+      API.getGroup(widget.ref_jidx_repair, widget.type_id).then((value) {
         setState(() {
-          ref = widget.ref_jidx;
+          ref = widget.ref_jidx_repair;
           List list = json.decode(value.body);
           groupLs = list.map((m) => Group.fromJson(m)).toList();
           lsloading = false;
@@ -1354,13 +1354,15 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                               title: Text('Camera'),
                                               onPressed: (context) {
                                                 openCamera().then((value) {
-                                                  mystate(() {
-                                                    desLs_before[index]
-                                                            .j_img_name =
-                                                        value.path;
-                                                    desLs_before[index].onApi =
-                                                        0;
-                                                  });
+                                                  if (value != null) {
+                                                    mystate(() {
+                                                      desLs_before[index]
+                                                              .j_img_name =
+                                                          value.path;
+                                                      desLs_before[index]
+                                                          .onApi = 0;
+                                                    });
+                                                  }
                                                 });
                                                 Navigator.pop(context);
                                               },
@@ -1369,13 +1371,15 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                                 title: Text('Photos'),
                                                 onPressed: (context) {
                                                   openPhoto().then((value) {
-                                                    mystate(() {
-                                                      desLs_before[index]
-                                                              .j_img_name =
-                                                          value.path;
-                                                      desLs_before[index]
-                                                          .onApi = 0;
-                                                    });
+                                                    if (value != null) {
+                                                      mystate(() {
+                                                        desLs_before[index]
+                                                                .j_img_name =
+                                                            value.path;
+                                                        desLs_before[index]
+                                                            .onApi = 0;
+                                                      });
+                                                    }
                                                   });
 
                                                   Navigator.pop(context);

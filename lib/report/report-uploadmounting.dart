@@ -23,14 +23,14 @@ class ReportuploadPicMounting extends StatefulWidget {
   final int jidx;
   final int type_id;
   final int sid;
-  final int? ref_jidx;
+  final int? ref_jidx_repair;
   final int cusId;
   final String username;
   ReportuploadPicMounting(
       {required this.jidx,
       required this.type_id,
       required this.sid,
-      required this.ref_jidx,
+      required this.ref_jidx_repair,
       required this.cusId,
       required this.username});
 }
@@ -399,14 +399,14 @@ class _ReportuploadPicMountingState extends State<ReportuploadPicMounting> {
                                           ? 'สายไฟ'
                                           : 'อื่นๆ';
     });
-    if (widget.ref_jidx == null) {
+    if (widget.ref_jidx_repair == null) {
       setState(() {
         lsloading = false;
       });
     } else {
-      API.getGroup(widget.ref_jidx, widget.type_id).then((value) {
+      API.getGroup(widget.ref_jidx_repair, widget.type_id).then((value) {
         setState(() {
-          ref = widget.ref_jidx;
+          ref = widget.ref_jidx_repair;
 
           List list = json.decode(value.body);
           groupLs = list.map((m) => Group.fromJson(m)).toList();

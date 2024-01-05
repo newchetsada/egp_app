@@ -1477,6 +1477,7 @@ class _researchState extends State<research> {
                                   color: Color(0xff464646))),
                           Text(widget.tel,
                               style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                   color: Color(0xff464646)))

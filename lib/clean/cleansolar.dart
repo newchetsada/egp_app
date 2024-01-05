@@ -1533,6 +1533,7 @@ class _cleansolarState extends State<cleansolar> {
                                   color: Color(0xff464646))),
                           Text(widget.tel,
                               style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                   color: Color(0xff464646)))
@@ -1578,7 +1579,8 @@ class _cleansolarState extends State<cleansolar> {
                                 onPressed: () {
                                   getWork(iduser, widget.jid).then((value) {
                                     var jsonResponse = json.decode(value);
-                                    print(jsonResponse[0]['cus_id']);
+                                    print(
+                                        'refid = ${jsonResponse[0]['ref_jidx_repair']}');
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -1588,8 +1590,8 @@ class _cleansolarState extends State<cleansolar> {
                                                 username: userName,
                                                 cusId: jsonResponse[0]
                                                     ['cus_id'],
-                                                ref_jidx: jsonResponse[0]
-                                                    ['ref_jidx'],
+                                                ref_jidx_repair: jsonResponse[0]
+                                                    ['ref_jidx_repair'],
                                                 tecId: iduser ?? 0,
                                               )),
                                     );

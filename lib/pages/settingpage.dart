@@ -281,59 +281,65 @@ class _settingPageState extends State<settingPage> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        height: 70,
-                                        width: 70,
-                                        child: (pic.isEmpty)
-                                            ? Icon(
-                                                EvaIcons.peopleOutline,
-                                                size: 70,
-                                                color: Color(0xff57A946)
-                                                    .withOpacity(0.5),
-                                              )
-                                            : ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                child: Image.network(
-                                                    fit: BoxFit.cover,
-                                                    height: double.infinity,
-                                                    width: double.infinity,
-                                                    '$api/$pic'),
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 70,
+                                          width: 70,
+                                          child: (pic.isEmpty)
+                                              ? Icon(
+                                                  EvaIcons.peopleOutline,
+                                                  size: 70,
+                                                  color: Color(0xff57A946)
+                                                      .withOpacity(0.5),
+                                                )
+                                              : ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                  child: Image.network(
+                                                      fit: BoxFit.cover,
+                                                      height: double.infinity,
+                                                      width: double.infinity,
+                                                      '$api/$pic'),
+                                                ),
+                                        ),
+                                        // Icon(
+                                        //   CupertinoEvaIcons.peopleOutline_alt_circle,
+                                        //   size: 70,
+                                        //   color: Color(0xff57A946).withOpacity(0.5),
+                                        // ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '$tech_fname $tech_lname',
+                                                style: TextStyle(
+                                                    fontSize: 22,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Color(0xff57A946)),
                                               ),
-                                      ),
-                                      // Icon(
-                                      //   CupertinoEvaIcons.peopleOutline_alt_circle,
-                                      //   size: 70,
-                                      //   color: Color(0xff57A946).withOpacity(0.5),
-                                      // ),
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$tech_fname $tech_lname',
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xff57A946)),
+                                              Text(
+                                                'แก้ไขโปรไฟล์',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Color(0xff2A302C)),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            'แก้ไขโปรไฟล์',
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: Color(0xff2A302C)),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   GestureDetector(
                                     onTap: () {
