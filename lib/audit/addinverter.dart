@@ -341,7 +341,7 @@ class _addinverterState extends State<addinverter> {
   //   }
   // }
 
-  updateRemark(id, type, sub, note, ispass) async {
+  updateRemark(id, type, sub, note, ispass, subno) async {
     var response = await http.post(
       Uri.parse('$api/api/mobile/uploadJobImageChecklistDetailIn'),
       headers: <String, String>{
@@ -359,7 +359,8 @@ class _addinverterState extends State<addinverter> {
         'subTypeUnit': _selectedValue,
         'check': ispass,
         'userName': userName,
-        'sinsId': widget.sin
+        'sinsId': widget.sin,
+        'subTypeNo': subno
       }),
     );
     if (response.statusCode == 200) {
@@ -570,8 +571,13 @@ class _addinverterState extends State<addinverter> {
                                 if (headpic.isNotEmpty) {
                                   headloopdelete().then((value) {
                                     headloopupload("80").then((value) {
-                                      updateRemark(widget.jidx, widget.typeId,
-                                              80, headremark.text, headpass)
+                                      updateRemark(
+                                              widget.jidx,
+                                              widget.typeId,
+                                              80,
+                                              headremark.text,
+                                              headpass,
+                                              subtypeno)
                                           .then((value) {
                                         Navigator.pop(context);
                                         Navigator.pop(context);
@@ -581,16 +587,26 @@ class _addinverterState extends State<addinverter> {
                                 } else {
                                   headloopdelete().then((value) {
                                     if (isemp == 0) {
-                                      updateRemark(widget.jidx, widget.typeId,
-                                              80, headremark.text, headpass)
+                                      updateRemark(
+                                              widget.jidx,
+                                              widget.typeId,
+                                              80,
+                                              headremark.text,
+                                              headpass,
+                                              subtypeno)
                                           .then((value) {
                                         Navigator.pop(context);
                                         Navigator.pop(context);
                                       });
                                     } else {
                                       uploadPic(null, "80", "").then((value) {
-                                        updateRemark(widget.jidx, widget.typeId,
-                                                80, headremark.text, headpass)
+                                        updateRemark(
+                                                widget.jidx,
+                                                widget.typeId,
+                                                80,
+                                                headremark.text,
+                                                headpass,
+                                                subtypeno)
                                             .then((value) {
                                           Navigator.pop(context);
                                           Navigator.pop(context);
@@ -602,8 +618,13 @@ class _addinverterState extends State<addinverter> {
                               } else if (headpass == 1 && headpic.isNotEmpty) {
                                 headloopdelete().then((value) {
                                   headloopupload("80").then((value) {
-                                    updateRemark(widget.jidx, widget.typeId, 80,
-                                            headremark.text, headpass)
+                                    updateRemark(
+                                            widget.jidx,
+                                            widget.typeId,
+                                            80,
+                                            headremark.text,
+                                            headpass,
+                                            subtypeno)
                                         .then((value) {
                                       Navigator.pop(context);
                                       Navigator.pop(context);
@@ -1116,7 +1137,8 @@ class _addinverterState extends State<addinverter> {
                               setState(() {
                                 subtypeno =
                                     groupSub[index].sub_type_no.toString();
-                                print(groupSub[index].sub_type_no);
+                                print(
+                                    'sub_type_no : ${groupSub[index].sub_type_no}');
                               });
                               API
                                   .getPicLs(
@@ -1847,7 +1869,8 @@ class _addinverterState extends State<addinverter> {
                                                       widget.typeId,
                                                       subb,
                                                       remark.text,
-                                                      pass)
+                                                      pass,
+                                                      subtypeno)
                                                   .then((value) {
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
@@ -1862,7 +1885,8 @@ class _addinverterState extends State<addinverter> {
                                                       widget.typeId,
                                                       subb,
                                                       remark.text,
-                                                      pass)
+                                                      pass,
+                                                      subtypeno)
                                                   .then((value) {
                                                 Navigator.pop(context);
                                                 Navigator.pop(context);
@@ -1876,7 +1900,8 @@ class _addinverterState extends State<addinverter> {
                                                         widget.typeId,
                                                         subb,
                                                         remark.text,
-                                                        pass)
+                                                        pass,
+                                                        subtypeno)
                                                     .then((value) {
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
@@ -1893,7 +1918,8 @@ class _addinverterState extends State<addinverter> {
                                                     widget.typeId,
                                                     subb,
                                                     remark.text,
-                                                    pass)
+                                                    pass,
+                                                    subtypeno)
                                                 .then((value) {
                                               Navigator.pop(context);
                                               Navigator.pop(context);
