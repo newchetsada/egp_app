@@ -863,7 +863,7 @@ class SubLs {
       sid: json['sid'],
       brand: json['brand'] ?? '',
       model: json['model'] ?? '',
-      size: json['size'],
+      size: (json['size'] == null) ? 0.0 : json['size'].toDouble(),
       sn: json['sn'] ?? '',
       acc_type: json['acc_type'],
       acc_type_name: json['acc_type_name'] ?? '',

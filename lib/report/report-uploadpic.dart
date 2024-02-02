@@ -1592,6 +1592,9 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                             border: Border.all(color: Color(0xffD6EFB4)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: before_note,
                             keyboardType: TextInputType.multiline,

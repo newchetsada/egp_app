@@ -237,6 +237,7 @@ class _acauditState extends State<acaudit> {
   }
 
   updateRemark(id, type, sub, note) async {
+    print(double.parse(av.text));
     var response = await http.post(
       Uri.parse('$api/api/mobile/uploadJobImageChecklistDetailIn'),
       headers: <String, String>{
@@ -268,6 +269,7 @@ class _acauditState extends State<acaudit> {
   void initState() {
     super.initState();
     getUser();
+    print('acaudit page');
     API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
       setState(() {
         List list = json.decode(response.body);
@@ -649,6 +651,10 @@ class _acauditState extends State<acaudit> {
                                 ),
                                 child: TextField(
                                   // textInputAction: TextInputAction.done,
+                                  onTapOutside: (b) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   controller: av,
                                   readOnly: (widget.status == 3) ? true : false,
                                   keyboardType: TextInputType.numberWithOptions(
@@ -1223,6 +1229,9 @@ class _acauditState extends State<acaudit> {
                             border: Border.all(color: Color(0xffAED76E)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: remark,
                             readOnly: (widget.status == 3) ? true : false,

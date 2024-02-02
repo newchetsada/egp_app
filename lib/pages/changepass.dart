@@ -180,6 +180,9 @@ class _changepassState extends State<changepass> {
                   height: 5,
                 ),
                 TextFormField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: old,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -210,6 +213,9 @@ class _changepassState extends State<changepass> {
                   height: 5,
                 ),
                 TextFormField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: newpass,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -240,6 +246,9 @@ class _changepassState extends State<changepass> {
                   height: 5,
                 ),
                 TextFormField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: newagain,
                   validator: (value) {
                     if (value != newpass.text) {

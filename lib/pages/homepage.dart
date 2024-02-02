@@ -591,8 +591,12 @@ class _homePageState extends State<homePage> {
                     : jsonResponse[0]['amount'].toString();
                 j_detail = jsonResponse[0]['j_detail'] ?? '';
                 remark_tech = jsonResponse[0]['remark_tech'] ?? '';
-                lat = jsonResponse[0]['lat'] ?? 0;
-                lon = jsonResponse[0]['lon'] ?? 0;
+                lat = (jsonResponse[0]['lat'] == null)
+                    ? 0.0
+                    : jsonResponse[0]['lat'].toDouble();
+                lon = (jsonResponse[0]['lon'] == null)
+                    ? 0.0
+                    : jsonResponse[0]['lon'].toDouble();
                 site_clener = jsonResponse[0]['site_clener'] ?? '';
                 // fullname =
                 //     '${jsonResponse[0]['tech_fname']} ${jsonResponse[0]['tech_lname']}';

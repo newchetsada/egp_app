@@ -1896,6 +1896,9 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                             border: Border.all(color: Color(0xffD6EFB4)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: before_note,
                             readOnly: (widget.status == 3) ? true : false,
@@ -2701,6 +2704,9 @@ class _uploadPicMountingState extends State<uploadPicMounting> {
                             border: Border.all(color: Color(0xffD6EFB4)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: after_note,
                             readOnly: (widget.status == 3) ? true : false,

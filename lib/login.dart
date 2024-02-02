@@ -69,6 +69,9 @@ class _loginState extends State<login> {
                   height: 20,
                 ),
                 TextFormField(
+                    onTapOutside: (b) {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
                     controller: user,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -88,6 +91,9 @@ class _loginState extends State<login> {
                   height: 10,
                 ),
                 TextFormField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: pass,
                   obscureText: _obscureText,
                   validator: (value) {

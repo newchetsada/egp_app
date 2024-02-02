@@ -59,7 +59,7 @@ class _addinverterState extends State<addinverter> {
 
   var headpic = <Album>[];
   var headremark = TextEditingController();
-  String subtypeno = '';
+  int? subtypeno;
   int? isemp;
 
   String userName = "Loading...";
@@ -363,8 +363,10 @@ class _addinverterState extends State<addinverter> {
         'subTypeNo': subno
       }),
     );
+    print('up remark : ${response.statusCode}');
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
+
       print(jsonResponse);
       return jsonResponse;
     }
@@ -380,7 +382,7 @@ class _addinverterState extends State<addinverter> {
         .then((value) {
       setState(() {
         List headlist = json.decode(value.body);
-        print(headlist);
+        print('head : $headlist');
         var headpicdetail = headlist.map((m) => Album.fromJson(m)).toList();
 
         headpic = headlist.map((m) => Album.fromJson(m)).toList();
@@ -398,9 +400,11 @@ class _addinverterState extends State<addinverter> {
       });
     });
     API.getSubLs(widget.jidx, widget.typeId, widget.sin).then((response) {
+      print('list : ${response.statusCode}');
+
       setState(() {
         List list = json.decode(response.body);
-        print(list);
+        print('list : $list');
         groupSub = list.map((m) => SubLs.fromJson(m)).toList();
         // contactloading = false;
       });
@@ -416,7 +420,7 @@ class _addinverterState extends State<addinverter> {
           var jj = json.decode(value);
           print(jj);
           setState(() {
-            subtypeno = jj['subTypeNo'].toString();
+            subtypeno = jj['subTypeNo'];
           });
         });
         // await Future.delayed(const Duration(seconds: 3));
@@ -1101,6 +1105,9 @@ class _addinverterState extends State<addinverter> {
                 border: Border.all(color: Color(0xffAED76E)),
               ),
               child: TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: headremark,
                 // textInputAction: TextInputAction.done,
                 readOnly: (widget.status == 3) ? true : false,
@@ -1135,8 +1142,7 @@ class _addinverterState extends State<addinverter> {
                             onTap: () {
                               loading();
                               setState(() {
-                                subtypeno =
-                                    groupSub[index].sub_type_no.toString();
+                                subtypeno = groupSub[index].sub_type_no;
                                 print(
                                     'sub_type_no : ${groupSub[index].sub_type_no}');
                               });
@@ -1292,6 +1298,10 @@ class _addinverterState extends State<addinverter> {
                                   border: Border.all(color: Color(0xffAED76E)),
                                 ),
                                 child: TextField(
+                                  onTapOutside: (b) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   // textInputAction: TextInputAction.done,
                                   controller: av,
                                   readOnly: (widget.status == 3) ? true : false,
@@ -1831,6 +1841,9 @@ class _addinverterState extends State<addinverter> {
                             border: Border.all(color: Color(0xffAED76E)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: remark,
                             readOnly: (widget.status == 3) ? true : false,

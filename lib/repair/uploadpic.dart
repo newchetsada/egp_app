@@ -1728,6 +1728,9 @@ class _uploadPicState extends State<uploadPic> {
                             keyboardType: TextInputType.multiline,
                             minLines: 1,
                             maxLines: 5,
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             decoration: InputDecoration(
                               hintText: hint,
                               hintStyle: TextStyle(
@@ -2101,6 +2104,9 @@ class _uploadPicState extends State<uploadPic> {
                             border: Border.all(color: Color(0xffD6EFB4)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: after_note,
                             readOnly: (widget.status == 3) ? true : false,

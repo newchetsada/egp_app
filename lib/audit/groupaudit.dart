@@ -235,11 +235,12 @@ class _groupauditState extends State<groupaudit> {
         'typeId': type,
         'subTypeId': sub,
         'remark': note,
-        'measuredValue': '',
+        'measuredValue': null,
         'check': pass,
         'userName': userName,
       }),
     );
+    print('upremark : ${response.statusCode}');
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
       print(jsonResponse);
@@ -250,6 +251,7 @@ class _groupauditState extends State<groupaudit> {
   @override
   void initState() {
     super.initState();
+    print('groupaud');
     getUser();
 
     if (widget.choice == 0) {
@@ -898,6 +900,10 @@ class _groupauditState extends State<groupaudit> {
                                   border: Border.all(color: Color(0xffAED76E)),
                                 ),
                                 child: TextField(
+                                  onTapOutside: (b) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
                                   controller: remark,
                                   // textInputAction: TextInputAction.done,
                                   readOnly: (widget.status == 3) ? true : false,
@@ -1522,6 +1528,9 @@ class _groupauditState extends State<groupaudit> {
                             border: Border.all(color: Color(0xffAED76E)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: remark,
                             readOnly: (widget.status == 3) ? true : false,

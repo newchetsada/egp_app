@@ -2266,6 +2266,9 @@ class _cleansolarState extends State<cleansolar> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: remarkEnd,
                   keyboardType: TextInputType.multiline,
                   minLines: 2,
@@ -2794,6 +2797,9 @@ class _cleansolarState extends State<cleansolar> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: remarkEnd,
                   keyboardType: TextInputType.multiline,
                   minLines: 2,
@@ -2865,6 +2871,9 @@ class _cleansolarState extends State<cleansolar> {
                           border: Border.all(color: Color(0xffAED76E)),
                         ),
                         child: TextField(
+                          onTapOutside: (b) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
                           controller: putname,
                           // textInputAction: TextInputAction.done,
 

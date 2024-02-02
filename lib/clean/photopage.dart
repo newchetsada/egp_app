@@ -987,6 +987,9 @@ class _photopageState extends State<photopage> {
                                 Border.all(color: Colors.grey.withOpacity(0.3)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             controller: remark,
                             // textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.multiline,

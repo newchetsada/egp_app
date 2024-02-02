@@ -642,6 +642,9 @@ class _groupresearchState extends State<groupresearch> {
                       border: Border.all(color: Color(0xffAED76E)),
                     ),
                     child: TextField(
+                      onTapOutside: (b) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
                       controller: remark,
                       // textInputAction: TextInputAction.done,
                       readOnly: (widget.status == 3) ? true : false,
@@ -1132,6 +1135,9 @@ class _groupresearchState extends State<groupresearch> {
                             border: Border.all(color: Color(0xffAED76E)),
                           ),
                           child: TextField(
+                            onTapOutside: (b) {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                            },
                             // textInputAction: TextInputAction.done,
                             controller: remark,
                             readOnly: (widget.status == 3) ? true : false,

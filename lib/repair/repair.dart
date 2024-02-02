@@ -1011,6 +1011,9 @@ class _repairState extends State<repair> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: remarkEnd,
                   keyboardType: TextInputType.multiline,
                   minLines: 2,
@@ -1945,6 +1948,19 @@ class _repairState extends State<repair> {
                               List list1 = json.decode(value.body);
                               groupPic =
                                   list1.map((m) => picLs.fromJson(m)).toList();
+                              ispass = 0;
+                              for (var i = 0; i < groupPic.length; i++) {
+                                if (groupPic[i].before_suc ==
+                                    groupPic[i].after_suc) {
+                                  ispass = ispass + 1;
+                                }
+                              }
+                              print(ispass);
+                              if (ispass == groupPic.length) {
+                                totalpass = true;
+                              } else {
+                                totalpass = false;
+                              }
                             });
                           });
                         });
@@ -1980,6 +1996,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2017,6 +2046,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2054,6 +2096,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2091,6 +2146,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2128,6 +2196,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2165,6 +2246,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2202,6 +2296,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2239,6 +2346,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2276,6 +2396,19 @@ class _repairState extends State<repair> {
                                 groupPic = list1
                                     .map((m) => picLs.fromJson(m))
                                     .toList();
+                                ispass = 0;
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].before_suc ==
+                                      groupPic[i].after_suc) {
+                                    ispass = ispass + 1;
+                                  }
+                                }
+                                print(ispass);
+                                if (ispass == groupPic.length) {
+                                  totalpass = true;
+                                } else {
+                                  totalpass = false;
+                                }
                               });
                             });
                           });
@@ -2937,6 +3070,9 @@ class _repairState extends State<repair> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   keyboardType: TextInputType.multiline,
                   controller: remarkEnd,
                   minLines: 2,
@@ -3073,6 +3209,9 @@ class _repairState extends State<repair> {
                           border: Border.all(color: Color(0xffAED76E)),
                         ),
                         child: TextField(
+                          onTapOutside: (b) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
                           controller: putname,
                           // textInputAction: TextInputAction.done,
 

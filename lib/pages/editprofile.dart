@@ -45,10 +45,12 @@ class _editprofileState extends State<editprofile> {
   var fname = TextEditingController();
   var lname = TextEditingController();
   var email = TextEditingController();
-  var tel = TextEditingController();
+  // var tel = TextEditingController();
   var line = TextEditingController();
   var position = TextEditingController();
   var companame = TextEditingController();
+  List<TextEditingController> _controllers = [];
+  List<TextField> _fields = [];
 
   openCamera() async {
     try {
@@ -85,6 +87,10 @@ class _editprofileState extends State<editprofile> {
   }
 
   updatePro(File? image) async {
+    String tell = _controllers
+        .where((element) => element.text != "")
+        .fold("", (acc, element) => acc += "${element.text}, ");
+    print(tell);
     var request = http.MultipartRequest(
         'POST', Uri.parse('$api/api/master/updateTechnician'));
     request.headers['X-API-Key'] = 'evdplusm8DdW+Wd3UCweHj';
@@ -93,7 +99,8 @@ class _editprofileState extends State<editprofile> {
     request.fields['fname'] = fname.text;
     request.fields['lname'] = lname.text;
     request.fields['email'] = email.text;
-    request.fields['tel'] = tel.text;
+    request.fields['tel'] = tell.substring(0, tell.length - 2);
+
     request.fields['line'] = line.text;
     request.fields['position'] = position.text;
     request.fields['company'] = companame.text;
@@ -118,14 +125,24 @@ class _editprofileState extends State<editprofile> {
   @override
   void initState() {
     super.initState();
+
     setState(() {
       fname.text = widget.fname;
       lname.text = widget.lname;
       email.text = widget.email;
-      tel.text = widget.tel;
+      // tel.text = widget.tel;
       line.text = widget.line;
       position.text = widget.position;
       companame.text = widget.companame;
+      if (widget.tel.isNotEmpty) {
+        var alltel = widget.tel.split(', ');
+        print(alltel.length);
+        for (var i = 0; i < alltel.length; i++) {
+          addTel(alltel[i]);
+        }
+      } else {
+        addTel('');
+      }
     });
   }
 
@@ -147,6 +164,34 @@ class _editprofileState extends State<editprofile> {
             ),
           );
         });
+  }
+
+  addTel(number) {
+    final controller = TextEditingController();
+    final field = TextField(
+      onTapOutside: (b) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      controller: controller,
+      keyboardType: TextInputType.number,
+      maxLength: 10,
+
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.digitsOnly
+      ], // Only numbers can be entered
+
+      decoration: InputDecoration(
+          counterText: "",
+          contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
+          enabledBorder: myinputborder(),
+          focusedBorder: myinputborder()),
+    );
+
+    setState(() {
+      controller.text = number;
+      _controllers.add(controller);
+      _fields.add(field);
+    });
   }
 
   @override
@@ -210,6 +255,11 @@ class _editprofileState extends State<editprofile> {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       });
+                      // String text = _controllers
+                      //     .where((element) => element.text != "")
+                      //     .fold(
+                      //         "", (acc, element) => acc += "${element.text}, ");
+                      // print(text);
                     },
                     style: ElevatedButton.styleFrom(
                       // elevation: 0,
@@ -346,6 +396,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: fname,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
@@ -367,6 +420,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: lname,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
@@ -388,6 +444,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: email,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
@@ -405,20 +464,92 @@ class _editprofileState extends State<editprofile> {
                   color: Color(0xff9DC75B),
                 ),
               ),
-              SizedBox(
-                height: 5,
+
+              // _addTile(),
+              ListView.builder(
+                primary: false,
+                shrinkWrap: true,
+                itemCount: _fields.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            child: _fields[index],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        (index == _fields.length - 1)
+                            ? GestureDetector(
+                                onTap: () {
+                                  addTel('');
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        color: Color(0xff9DC75B),
+                                      )),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 22,
+                                    color: Color(0xff9DC75B),
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _controllers.removeAt(index);
+                                    _fields.removeAt(index);
+                                  });
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(50),
+                                      border: Border.all(
+                                        color: Color.fromARGB(255, 199, 91, 91),
+                                      )),
+                                  child: Icon(
+                                    Icons.delete,
+                                    size: 22,
+                                    color: Color.fromARGB(255, 199, 91, 91),
+                                  ),
+                                ),
+                              )
+                      ],
+                    ),
+                  );
+                },
               ),
-              TextField(
-                controller: tel,
-                keyboardType: TextInputType.number,
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.digitsOnly
-                ], // Only numbers can be entered
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
-                    enabledBorder: myinputborder(),
-                    focusedBorder: myinputborder()),
-              ),
+              // TextField(
+              //   onTapOutside: (b) {
+              //     FocusManager.instance.primaryFocus?.unfocus();
+              //   },
+              //   controller: tel,
+              //   keyboardType: TextInputType.number,
+              //   inputFormatters: <TextInputFormatter>[
+              //     // FilteringTextInputFormatter.digitsOnly
+              //     // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              //     // LengthLimitingTextInputFormatter(4),
+              //     // CardFormatter(sample: 'XXXXXXXXXX-XXXXXXXXXX', separator: '-')
+              //   ], // Only numbers can be entered
+              //   onChanged: (value) {
+              //    tel.text.split(', ').
+              //   },
+              //   decoration: InputDecoration(
+              //       contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
+              //       enabledBorder: myinputborder(),
+              //       focusedBorder: myinputborder()),
+              // ),
               SizedBox(
                 height: 10,
               ),
@@ -434,6 +565,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: line,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
@@ -455,6 +589,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: position,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),
@@ -476,6 +613,9 @@ class _editprofileState extends State<editprofile> {
                 height: 5,
               ),
               TextField(
+                onTapOutside: (b) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
                 controller: companame,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(15, 17, 15, 17),

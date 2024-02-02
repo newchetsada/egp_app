@@ -503,7 +503,8 @@ class _researchState extends State<research> {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                   color: Color(0xff57A946))),
-                          Text('สาขา : ${widget.site_name}',
+                          Text(
+                              'สาขา : ${(widget.site_name == "") ? '-' : widget.site_name}',
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
@@ -1040,90 +1041,104 @@ class _researchState extends State<research> {
                               },
                             ),
                           ),
-                SizedBox(
-                  height: 20,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    openMap(widget.lat, widget.lon);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        border: Border.all(color: Color(0xffD6EFB4), width: 1)),
-                    height: 50,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on_rounded,
-                                  color: Color(0xff57A946),
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Expanded(
-                                  child: Text(widget.cus_address,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: Color(0xff646464))),
-                                ),
-                              ],
+
+                (widget.type == 3)
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: GestureDetector(
+                          onTap: () {
+                            openMap(widget.lat, widget.lon);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10)),
+                                border: Border.all(
+                                    color: Color(0xffD6EFB4), width: 1)),
+                            height: 50,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on_rounded,
+                                          color: Color(0xff57A946),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Expanded(
+                                          child: Text(widget.cus_address,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                  color: Color(0xff646464))),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // SizedBox(
+                                  //   width: 5,
+                                  // ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    color: Color(0xff57A946),
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          // SizedBox(
-                          //   width: 5,
-                          // ),
-                          Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            color: Color(0xff57A946),
-                            size: 20,
+                        ),
+                      ),
+                (widget.type == 3)
+                    ? Container()
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 20,
                           ),
+                          Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xff2A302C))),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                              'วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xff2A302C))),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text('ขนาดการติดตั้ง : ${widget.power_peak} kW',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xff2A302C))),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text('จำนวนแผง : ${widget.amount} PV',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xff2A302C))),
                         ],
                       ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-
-                Text('วันเดือนปี ติดตั้งแผง : ${widget.install_date}',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xff2A302C))),
-                SizedBox(
-                  height: 10,
-                ),
-                Text('วันเดือนปี หมดระยะเวลาประกัน : ${widget.warranty_expire}',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xff2A302C))),
-                SizedBox(
-                  height: 10,
-                ),
-                Text('ขนาดการติดตั้ง : ${widget.power_peak} kW',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xff2A302C))),
-                SizedBox(
-                  height: 10,
-                ),
-                Text('จำนวนแผง : ${widget.amount} PV',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xff2A302C))),
                 SizedBox(
                   height: 10,
                 ),
@@ -1190,196 +1205,196 @@ class _researchState extends State<research> {
                     : Container(),
 
                 // DottedLine(dashColor: Color(0xffD5D5D5)),
-                Text('แผนผังไซต์งาน',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Color(0xff58A946))),
-                SizedBox(
-                  height: 10,
-                ),
-                (widget.sitepic.isEmpty)
-                    ? AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            'assets/nolayer.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ))
-                    : AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: ListView.builder(
-                          itemCount: widget.sitepic.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  EdgeInsets.only(left: (index == 0) ? 0 : 10),
-                              child: AspectRatio(
-                                aspectRatio: 16 / 11,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
-                                    color: (widget.sitepic[index]
-                                                    ['site_img_des'] ==
-                                                null ||
-                                            widget.sitepic[index]
-                                                    ['site_img_des'] ==
-                                                '')
-                                        ? Colors.transparent
-                                        : Color(0xffEDFAEA),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      AspectRatio(
-                                          aspectRatio: 16 / 9,
-                                          child: GestureDetector(
-                                              onTap: (widget.sitepic.isEmpty)
-                                                  ? null
-                                                  : () {
-                                                      Navigator.push(
-                                                          context,
-                                                          HeroDialogRoute(
-                                                              builder: (BuildContext
-                                                                      context) =>
-                                                                  Dialog(
-                                                                      elevation:
-                                                                          0,
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .transparent,
-                                                                      child:
-                                                                          Hero(
-                                                                        tag:
-                                                                            'pic$index',
-                                                                        child:
-                                                                            PhotoView(
-                                                                          tightMode:
-                                                                              true,
-                                                                          backgroundDecoration:
-                                                                              BoxDecoration(color: Colors.transparent),
-                                                                          imageProvider:
-                                                                              NetworkImage('$api/${widget.sitepic[index]['site_img_name']}'),
-                                                                        ),
-                                                                      ))));
-                                                    },
-                                              child: Hero(
-                                                tag: 'pic$index',
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  child: Image.network(
-                                                    '$api/${widget.sitepic[index]['site_img_name']}',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ))),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  showModalBottomSheet<void>(
-                                                    context: context,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return SafeArea(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10),
-                                                          child: Container(
-                                                            width:
-                                                                double.infinity,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
-                                                                      .circular(
-                                                                          10)),
-                                                              color: Color(
-                                                                  0xffEDFAEA),
-                                                            ),
+                (widget.type == 3)
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text('แผนผังไซต์งาน',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                color: Color(0xff58A946))),
+                      ),
+
+                (widget.type == 3)
+                    ? Container()
+                    : (widget.sitepic.isEmpty)
+                        ? AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                'assets/nolayer.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ))
+                        : AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: ListView.builder(
+                              itemCount: widget.sitepic.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      left: (index == 0) ? 0 : 10),
+                                  child: AspectRatio(
+                                    aspectRatio: 16 / 11,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
+                                        color: (widget.sitepic[index]
+                                                        ['site_img_des'] ==
+                                                    null ||
+                                                widget.sitepic[index]
+                                                        ['site_img_des'] ==
+                                                    '')
+                                            ? Colors.transparent
+                                            : Color(0xffEDFAEA),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          AspectRatio(
+                                              aspectRatio: 16 / 9,
+                                              child: GestureDetector(
+                                                  onTap:
+                                                      (widget.sitepic.isEmpty)
+                                                          ? null
+                                                          : () {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  HeroDialogRoute(
+                                                                      builder: (BuildContext context) => Dialog(
+                                                                          elevation: 0,
+                                                                          backgroundColor: Colors.transparent,
+                                                                          child: Hero(
+                                                                            tag:
+                                                                                'pic$index',
+                                                                            child:
+                                                                                PhotoView(
+                                                                              tightMode: true,
+                                                                              backgroundDecoration: BoxDecoration(color: Colors.transparent),
+                                                                              imageProvider: NetworkImage('$api/${widget.sitepic[index]['site_img_name']}'),
+                                                                            ),
+                                                                          ))));
+                                                            },
+                                                  child: Hero(
+                                                    tag: 'pic$index',
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: Image.network(
+                                                        '$api/${widget.sitepic[index]['site_img_name']}',
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ))),
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      showModalBottomSheet<
+                                                          void>(
+                                                        context: context,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return SafeArea(
                                                             child: Padding(
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(10),
-                                                              child: Text(
-                                                                  widget.sitepic[
-                                                                              index]
-                                                                          [
-                                                                          'site_img_des'] ??
-                                                                      '',
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
+                                                              child: Container(
+                                                                width: double
+                                                                    .infinity,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              10)),
+                                                                  color: Color(
+                                                                      0xffEDFAEA),
+                                                                ),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          10),
+                                                                  child: Text(
+                                                                      widget.sitepic[index]
+                                                                              [
+                                                                              'site_img_des'] ??
+                                                                          '',
+                                                                      style: TextStyle(
+                                                                          fontWeight: FontWeight
                                                                               .w500,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color: Color(
-                                                                          0xff2A302C))),
+                                                                          fontSize:
+                                                                              14,
+                                                                          color:
+                                                                              Color(0xff2A302C))),
+                                                                ),
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ),
+                                                          );
+                                                        },
                                                       );
                                                     },
-                                                  );
-                                                },
-                                                child: Text(
-                                                    widget.sitepic[index]
-                                                            ['site_img_des'] ??
-                                                        '',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 14,
-                                                        color:
-                                                            Color(0xff2A302C))),
+                                                    child: Text(
+                                                        widget.sitepic[index][
+                                                                'site_img_des'] ??
+                                                            '',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 14,
+                                                            color: Color(
+                                                                0xff2A302C))),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
+                                          // Padding(
+                                          //   padding: const EdgeInsets.symmetric(
+                                          //       vertical: 5),
+                                          //   child: Expanded(
+                                          //     child: Row(
+                                          //       children: [
+                                          //         Text(
+                                          //             // widget.sitepic[index]
+                                          //             //         ['site_img_des'] ??
+                                          //             'fwagfsebgifuoasjpkugykuguviohovigydfisuhigyfdusijdhguiyidfsjihgd',
+                                          //             overflow: TextOverflow.ellipsis,
+                                          //             style: TextStyle(
+                                          //                 fontWeight: FontWeight.w500,
+                                          //                 fontSize: 14,
+                                          //                 color: Color(0xff2A302C))),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                        ],
                                       ),
-                                      // Padding(
-                                      //   padding: const EdgeInsets.symmetric(
-                                      //       vertical: 5),
-                                      //   child: Expanded(
-                                      //     child: Row(
-                                      //       children: [
-                                      //         Text(
-                                      //             // widget.sitepic[index]
-                                      //             //         ['site_img_des'] ??
-                                      //             'fwagfsebgifuoasjpkugykuguviohovigydfisuhigyfdusijdhguiyidfsjihgd',
-                                      //             overflow: TextOverflow.ellipsis,
-                                      //             style: TextStyle(
-                                      //                 fontWeight: FontWeight.w500,
-                                      //                 fontSize: 14,
-                                      //                 color: Color(0xff2A302C))),
-                                      //       ],
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                                );
+                              },
+                            ),
+                          ),
               ],
             ),
           ),
@@ -2111,6 +2126,9 @@ class _researchState extends State<research> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: remarkEnd,
                   keyboardType: TextInputType.multiline,
                   minLines: 2,
@@ -2554,6 +2572,9 @@ class _researchState extends State<research> {
                   border: Border.all(color: Color(0xffD6EFB4)),
                 ),
                 child: TextField(
+                  onTapOutside: (b) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   controller: remarkEnd,
                   keyboardType: TextInputType.multiline,
                   minLines: 2,
@@ -2625,6 +2646,9 @@ class _researchState extends State<research> {
                           border: Border.all(color: Color(0xffAED76E)),
                         ),
                         child: TextField(
+                          onTapOutside: (b) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
                           controller: putname,
                           // textInputAction: TextInputAction.done,
 

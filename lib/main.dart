@@ -104,7 +104,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+      // behavior: HitTestBehavior.opaque,
       onTap: () {
         FocusScopeNode currentFocus = FocusScope.of(context);
 
@@ -116,6 +116,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'EGP',
         theme: ThemeData(
+          useMaterial3: false,
           fontFamily: 'Noto Sans Thai',
           primarySwatch: Colors.blue,
         ),

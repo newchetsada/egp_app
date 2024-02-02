@@ -1136,6 +1136,9 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                     color: Colors.grey.withOpacity(0.3)),
                               ),
                               child: TextField(
+                                onTapOutside: (b) {
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                },
                                 controller: remark,
                                 // textInputAction: TextInputAction.done,
                                 keyboardType: TextInputType.multiline,
