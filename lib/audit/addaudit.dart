@@ -184,6 +184,7 @@ class _addauditState extends State<addaudit> {
   @override
   void initState() {
     super.initState();
+    print('addau');
     getUser();
     print(widget.typeId);
     API.getSubLs(widget.sid, widget.jidx, widget.typeId).then((response) {

@@ -40,6 +40,7 @@ class _groupauditState extends State<groupaudit> {
   List deleteLs = [];
   int? pass;
   int? isemp;
+  int? havepic;
 
   String userName = "Loading...";
   int? iduser;
@@ -194,7 +195,7 @@ class _groupauditState extends State<groupaudit> {
     var response = await request.send();
 
     response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
+      print('uppic : $value');
     });
     // print(response.body);
     // return response.body;
@@ -272,6 +273,8 @@ class _groupauditState extends State<groupaudit> {
           var picdetail = list.map((m) => Album.fromJson(m)).toList();
           pic = list.map((m) => Album.fromJson(m)).toList();
           pic = pic.where((element) => element.j_img_name.isNotEmpty).toList();
+          havepic = (list.map((m) => Album.fromJson(m)).toList().length);
+          deleteLs.clear();
           if (picdetail.isEmpty) {
             remark.text = '';
             pass = null;
@@ -302,6 +305,7 @@ class _groupauditState extends State<groupaudit> {
       await deletePic(deleteLs[i]);
       // await Future.delayed(const Duration(seconds: 3));
     }
+    return deleteLs.length;
   }
 
   @override
@@ -355,15 +359,8 @@ class _groupauditState extends State<groupaudit> {
                                       });
                                     });
                                   } else {
-                                    loopdelete().then((value) {
-                                      if (isemp == 0) {
-                                        updateRemark(widget.jidx, widget.typeId,
-                                                null, remark.text)
-                                            .then((value) {
-                                          Navigator.pop(context);
-                                          Navigator.pop(context);
-                                        });
-                                      } else {
+                                    loopdelete().then((valuede) {
+                                      if (havepic == valuede) {
                                         uploadPic(null, "").then((value) {
                                           updateRemark(
                                                   widget.jidx,
@@ -374,6 +371,13 @@ class _groupauditState extends State<groupaudit> {
                                             Navigator.pop(context);
                                             Navigator.pop(context);
                                           });
+                                        });
+                                      } else {
+                                        updateRemark(widget.jidx, widget.typeId,
+                                                null, remark.text)
+                                            .then((value) {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
                                         });
                                       }
                                     });
@@ -953,6 +957,11 @@ class _groupauditState extends State<groupaudit> {
                                           .where((element) =>
                                               element.j_img_name.isNotEmpty)
                                           .toList();
+                                      havepic = (list
+                                          .map((m) => Album.fromJson(m))
+                                          .toList()
+                                          .length);
+                                      deleteLs.clear();
                                       if (picdetail.isEmpty) {
                                         remark.text = '';
                                         pass = null;
@@ -1578,18 +1587,9 @@ class _groupauditState extends State<groupaudit> {
                                             });
                                           });
                                         } else {
-                                          loopdelete().then((value) {
-                                            if (isemp == 0) {
-                                              updateRemark(
-                                                      widget.jidx,
-                                                      widget.typeId,
-                                                      subb,
-                                                      remark.text)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              });
-                                            } else {
+                                          loopdelete().then((valuedel) {
+                                            print(valuedel);
+                                            if (valuedel == havepic) {
                                               uploadPic(null, subb.toString())
                                                   .then((value) {
                                                 updateRemark(
@@ -1601,6 +1601,16 @@ class _groupauditState extends State<groupaudit> {
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 });
+                                              });
+                                            } else {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
                                               });
                                             }
                                           });

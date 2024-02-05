@@ -50,6 +50,7 @@ class _acauditState extends State<acaudit> {
   String? _selectedValue;
   List brandls = ['V', 'A', 'Ohm', 'W/m2'];
   int? isemp;
+  int? havepic;
 
   String userName = "Loading...";
   int? iduser;
@@ -237,7 +238,7 @@ class _acauditState extends State<acaudit> {
   }
 
   updateRemark(id, type, sub, note) async {
-    print(double.parse(av.text));
+    // print(double.parse(av.text));
     var response = await http.post(
       Uri.parse('$api/api/mobile/uploadJobImageChecklistDetailIn'),
       headers: <String, String>{
@@ -251,7 +252,7 @@ class _acauditState extends State<acaudit> {
         'typeId': type,
         'subTypeId': sub,
         'remark': note,
-        'measuredValue': (av.text == '') ? 0.0 : double.parse(av.text),
+        'measuredValue': (av.text == '') ? null : double.parse(av.text),
         'subTypeUnit': _selectedValue,
         'check': pass,
         'userName': userName,
@@ -296,6 +297,7 @@ class _acauditState extends State<acaudit> {
       await deletePic(deleteLs[i]);
       // await Future.delayed(const Duration(seconds: 3));
     }
+    return deleteLs.length;
   }
 
   @override
@@ -508,6 +510,11 @@ class _acauditState extends State<acaudit> {
                                     .where((element) =>
                                         element.j_img_name.isNotEmpty)
                                     .toList();
+                                havepic = list
+                                    .map((m) => Album.fromJson(m))
+                                    .toList()
+                                    .length;
+                                deleteLs.clear();
                                 if (picdetail.isEmpty) {
                                   remark.text = '';
                                   pass = null;
@@ -1279,69 +1286,16 @@ class _acauditState extends State<acaudit> {
                                       // }
 
                                       loading();
-                                      if (av.text == '' ||
-                                          _selectedValue == null ||
-                                          pass == null) {
-                                        Navigator.pop(context);
-                                        pop('กรุณากรอกข้อมูล');
-                                      } else if (pass == 0) {
-                                        if (pic.isNotEmpty) {
-                                          loopdelete().then((value) {
-                                            loopupload(subb).then((value) {
-                                              updateRemark(
-                                                      widget.jidx,
-                                                      widget.typeId,
-                                                      subb,
-                                                      remark.text)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              });
-                                            });
-                                          });
-                                        } else {
-                                          loopdelete().then((value) {
-                                            if (isemp == 0) {
-                                              updateRemark(
-                                                      widget.jidx,
-                                                      widget.typeId,
-                                                      subb,
-                                                      remark.text)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              });
-                                            } else {
-                                              uploadPic(null, subb.toString())
-                                                  .then((value) {
-                                                updateRemark(
-                                                        widget.jidx,
-                                                        widget.typeId,
-                                                        subb,
-                                                        remark.text)
-                                                    .then((value) {
-                                                  Navigator.pop(context);
-                                                  Navigator.pop(context);
-                                                });
-                                              });
-                                            }
-                                          });
-                                        }
-                                      } else if (pass == 1 && pic.isNotEmpty) {
-                                        loopdelete().then((value) {
-                                          loopupload(subb).then((value) {
-                                            updateRemark(
-                                                    widget.jidx,
-                                                    widget.typeId,
-                                                    subb,
-                                                    remark.text)
-                                                .then((value) {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                            });
-                                          });
-                                        });
-                                      } else if (pass == 2) {
+                                      if (pass == 2) {
+                                        _selectedValue = null;
+                                        av.text = '';
+                                        // print('อัพเลย');
+                                        // updateRemark(widget.jidx, widget.typeId,
+                                        //         subb, remark.text)
+                                        //     .then((value) {
+                                        //   Navigator.pop(context);
+                                        //   Navigator.pop(context);
+                                        // });
                                         loopdelete().then((value) {
                                           if (isemp == 2) {
                                             updateRemark(
@@ -1369,9 +1323,103 @@ class _acauditState extends State<acaudit> {
                                           }
                                         });
                                       } else {
-                                        Navigator.pop(context);
+                                        if (av.text == '' ||
+                                            _selectedValue == null ||
+                                            pass == null) {
+                                          Navigator.pop(context);
+                                          pop('กรุณากรอกข้อมูล');
+                                        } else if (pass == 0) {
+                                          if (pic.isNotEmpty) {
+                                            loopdelete().then((value) {
+                                              loopupload(subb).then((value) {
+                                                updateRemark(
+                                                        widget.jidx,
+                                                        widget.typeId,
+                                                        subb,
+                                                        remark.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
+                                              });
+                                            });
+                                          } else {
+                                            loopdelete().then((valuede) {
+                                              if (havepic == valuede) {
+                                                uploadPic(null, subb.toString())
+                                                    .then((value) {
+                                                  updateRemark(
+                                                          widget.jidx,
+                                                          widget.typeId,
+                                                          subb,
+                                                          remark.text)
+                                                      .then((value) {
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                  });
+                                                });
+                                              } else {
+                                                updateRemark(
+                                                        widget.jidx,
+                                                        widget.typeId,
+                                                        subb,
+                                                        remark.text)
+                                                    .then((value) {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                });
+                                              }
+                                            });
+                                          }
+                                        } else if (pass == 1 &&
+                                            pic.isNotEmpty) {
+                                          loopdelete().then((value) {
+                                            loopupload(subb).then((value) {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              });
+                                            });
+                                          });
+                                        }
+                                        // else if (pass == 2) {
+                                        //   loopdelete().then((value) {
+                                        //     if (isemp == 2) {
+                                        //       updateRemark(
+                                        //               widget.jidx,
+                                        //               widget.typeId,
+                                        //               subb,
+                                        //               remark.text)
+                                        //           .then((value) {
+                                        //         Navigator.pop(context);
+                                        //         Navigator.pop(context);
+                                        //       });
+                                        //     } else {
+                                        //       uploadPic(null, subb.toString())
+                                        //           .then((value) {
+                                        //         updateRemark(
+                                        //                 widget.jidx,
+                                        //                 widget.typeId,
+                                        //                 subb,
+                                        //                 remark.text)
+                                        //             .then((value) {
+                                        //           Navigator.pop(context);
+                                        //           Navigator.pop(context);
+                                        //         });
+                                        //       });
+                                        //     }
+                                        //   });
+                                        // }
+                                        else {
+                                          Navigator.pop(context);
 
-                                        pop('กรุณาอัพโหลดรูปภาพ');
+                                          pop('กรุณาอัพโหลดรูปภาพ');
+                                        }
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(

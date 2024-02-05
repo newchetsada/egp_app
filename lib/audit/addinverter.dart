@@ -56,9 +56,12 @@ class _addinverterState extends State<addinverter> {
 
   int? headpass;
   List headdeleteLs = [];
+  int? havepic;
 
   var headpic = <Album>[];
   var headremark = TextEditingController();
+  int? headhavepic;
+
   int? subtypeno;
   int? isemp;
 
@@ -376,6 +379,7 @@ class _addinverterState extends State<addinverter> {
   void initState() {
     super.initState();
     getUser();
+    print('addinverter');
     print('jidx:${widget.jidx} typeId:${widget.typeId} sin:${widget.sin}');
     API
         .getPicLs(widget.jidx, widget.typeId, 80, null, widget.sin)
@@ -388,6 +392,8 @@ class _addinverterState extends State<addinverter> {
         headpic = headlist.map((m) => Album.fromJson(m)).toList();
         headpic =
             headpic.where((element) => element.j_img_name.isNotEmpty).toList();
+        headhavepic = headlist.map((m) => Album.fromJson(m)).toList().length;
+        headdeleteLs.clear();
         if (headpicdetail.isEmpty) {
           headremark.text = '';
           headpass = null;
@@ -434,6 +440,7 @@ class _addinverterState extends State<addinverter> {
       await deletePic(deleteLs[i]);
       // await Future.delayed(const Duration(seconds: 3));
     }
+    return deleteLs.length;
   }
 
   headloopdelete() async {
@@ -442,6 +449,7 @@ class _addinverterState extends State<addinverter> {
       await deletePic(headdeleteLs[i]);
       // await Future.delayed(const Duration(seconds: 3));
     }
+    return headdeleteLs.length;
   }
 
   headloopupload(subid) async {
@@ -589,20 +597,8 @@ class _addinverterState extends State<addinverter> {
                                     });
                                   });
                                 } else {
-                                  headloopdelete().then((value) {
-                                    if (isemp == 0) {
-                                      updateRemark(
-                                              widget.jidx,
-                                              widget.typeId,
-                                              80,
-                                              headremark.text,
-                                              headpass,
-                                              subtypeno)
-                                          .then((value) {
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
-                                      });
-                                    } else {
+                                  headloopdelete().then((valuede) {
+                                    if (valuede == headhavepic) {
                                       uploadPic(null, "80", "").then((value) {
                                         updateRemark(
                                                 widget.jidx,
@@ -615,6 +611,18 @@ class _addinverterState extends State<addinverter> {
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                         });
+                                      });
+                                    } else {
+                                      updateRemark(
+                                              widget.jidx,
+                                              widget.typeId,
+                                              80,
+                                              headremark.text,
+                                              headpass,
+                                              subtypeno)
+                                          .then((value) {
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                       });
                                     }
                                   });
@@ -1167,6 +1175,11 @@ class _addinverterState extends State<addinverter> {
                                       .where((element) =>
                                           element.j_img_name.isNotEmpty)
                                       .toList();
+                                  havepic = (list
+                                      .map((m) => Album.fromJson(m))
+                                      .toList()
+                                      .length);
+                                  deleteLs.clear();
                                   if (picdeail.isEmpty) {
                                     remark.text = '';
                                     pass = null;
@@ -1891,20 +1904,8 @@ class _addinverterState extends State<addinverter> {
                                             });
                                           });
                                         } else {
-                                          loopdelete().then((value) {
-                                            if (isemp == 0) {
-                                              updateRemark(
-                                                      widget.jidx,
-                                                      widget.typeId,
-                                                      subb,
-                                                      remark.text,
-                                                      pass,
-                                                      subtypeno)
-                                                  .then((value) {
-                                                Navigator.pop(context);
-                                                Navigator.pop(context);
-                                              });
-                                            } else {
+                                          loopdelete().then((valuedel) {
+                                            if (valuedel == havepic) {
                                               uploadPic(null, subb.toString(),
                                                       subtypeno)
                                                   .then((value) {
@@ -1919,6 +1920,18 @@ class _addinverterState extends State<addinverter> {
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 });
+                                              });
+                                            } else {
+                                              updateRemark(
+                                                      widget.jidx,
+                                                      widget.typeId,
+                                                      subb,
+                                                      remark.text,
+                                                      pass,
+                                                      subtypeno)
+                                                  .then((value) {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
                                               });
                                             }
                                           });
