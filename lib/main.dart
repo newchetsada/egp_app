@@ -76,12 +76,12 @@ void main() async {
   print(remoteConfig.getInt('ios'));
   bool up = false;
   if (defaultTargetPlatform == TargetPlatform.android) {
-    if (remoteConfig.getInt('android') > 100) {
+    if (remoteConfig.getInt('android') > 101) {
       print('ver android update');
       up = true;
     }
   } else {
-    if (remoteConfig.getInt('ios') > 100) {
+    if (remoteConfig.getInt('ios') > 101) {
       print('ver ios update');
       up = true;
     }
