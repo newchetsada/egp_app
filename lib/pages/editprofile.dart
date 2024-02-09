@@ -99,7 +99,8 @@ class _editprofileState extends State<editprofile> {
     request.fields['fname'] = fname.text;
     request.fields['lname'] = lname.text;
     request.fields['email'] = email.text;
-    request.fields['tel'] = tell.substring(0, tell.length - 2);
+    request.fields['tel'] =
+        (tell.isEmpty) ? '' : tell.substring(0, tell.length - 2);
 
     request.fields['line'] = line.text;
     request.fields['position'] = position.text;
