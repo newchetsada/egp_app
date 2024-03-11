@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:egp_app/config.dart';
@@ -45,6 +47,8 @@ class _uploadPicState extends State<uploadPic> {
   String hint = '';
 
   String afhint = '';
+  var adminremark = TextEditingController();
+  List adminPic = [];
 
   var before_note = TextEditingController();
   var after_note = TextEditingController();
@@ -839,6 +843,8 @@ class _uploadPicState extends State<uploadPic> {
           nothavedevice_f = false;
           hint = '';
           afhint = '';
+          adminremark.text = '';
+          adminPic.clear();
 
           deleteLs.clear();
           gg = realgroup.toString();
@@ -891,9 +897,18 @@ class _uploadPicState extends State<uploadPic> {
                     break;
                   }
                 }
+                API.RepairAdmin(widget.jidx, widget.type_id, realgroup)
+                    .then((admin) {
+                  var adminpic = json.decode(admin.body);
+                  setState(() {
+                    adminremark.text = adminpic['j_img_repair_remark'];
+                    adminPic = adminpic['images'];
+                  });
+                  print(adminpic['j_img_repair_remark']);
 
-                Navigator.pop(context);
-                beforeSheet(realgroup, group);
+                  Navigator.pop(context);
+                  beforeSheet(realgroup, group);
+                });
               });
             });
           });
@@ -928,7 +943,7 @@ class _uploadPicState extends State<uploadPic> {
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
-                          color: Color(0xff9DC75B))),
+                          color: Color.fromARGB(255, 160, 162, 158))),
                   SizedBox(
                     height: 5,
                   ),
@@ -1216,6 +1231,109 @@ class _uploadPicState extends State<uploadPic> {
                                     fontSize: 16,
                                     color: Color(0xff2A302C))),
                           ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        (adminPic.isEmpty)
+                            ? Container()
+                            : Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: SizedBox(
+                                  height: 170,
+                                  child: ListView.builder(
+                                    itemCount: adminPic.length,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                            left: (index == 0) ? 0 : 10),
+                                        child: AspectRatio(
+                                            aspectRatio: 4 / 3,
+                                            child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      HeroDialogRoute(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              Dialog(
+                                                                  elevation: 0,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .transparent,
+                                                                  child: Hero(
+                                                                    tag:
+                                                                        'ex$index',
+                                                                    child:
+                                                                        PhotoView(
+                                                                      tightMode:
+                                                                          true,
+                                                                      backgroundDecoration:
+                                                                          BoxDecoration(
+                                                                              color: Colors.transparent),
+                                                                      imageProvider:
+                                                                          NetworkImage(
+                                                                        '$api/${adminPic[index]['j_img_name']}',
+                                                                      ),
+                                                                    ),
+                                                                  ))));
+                                                },
+                                                child: Hero(
+                                                  tag: 'ex$index',
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    child: Image.network(
+                                                      '$api/${adminPic[index]['j_img_name']}',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ))),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                        Row(
+                          children: [
+                            Text('หมายเหตุแจ้งซ่อม',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    color: Color(0xff9DC75B))),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Container(
+                          // height: 100,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Color(0xffffffff),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(color: Color(0xffD6EFB4)),
+                          ),
+                          child: TextField(
+                            // textInputAction: TextInputAction.done,
+                            controller: adminremark,
+                            readOnly: true,
+                            keyboardType: TextInputType.multiline,
+                            minLines: 1,
+                            maxLines: 5,
+
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(
+                                  fontSize: 14, color: Colors.grey[300]),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
                         ),
                         (widget.type_id == 1 || widget.type_id == 3)
                             ? Padding(
@@ -2288,6 +2406,22 @@ class API {
         'typeId': typeId,
         'groupNo': groupNo,
         'imgType': imgType,
+      }),
+    );
+    return response;
+  }
+
+  static Future RepairAdmin(idd, typeId, groupNo) async {
+    final response = await http.post(
+      Uri.parse('$api/api/mobile/getJobGroupRepairIAdminImageLs'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+        'typeId': typeId,
+        'groupNo': groupNo
       }),
     );
     return response;

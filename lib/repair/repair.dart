@@ -289,8 +289,12 @@ class _repairState extends State<repair> {
         'userName': userName,
       }),
     );
+    print('stratCode : ${response.statusCode}');
+
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
+      print('strat : ${jsonResponse}');
+
       return jsonResponse;
     }
   }
