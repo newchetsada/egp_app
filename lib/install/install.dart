@@ -6,6 +6,9 @@ import 'package:egp_app/clean/cleanphotopage.dart';
 // import 'package:egp_app/clean/photopage.dart';
 // import 'package:egp_app/clean/photopage.dart';
 import 'package:egp_app/clean/signature.dart';
+import 'package:egp_app/install/indetail.dart';
+import 'package:egp_app/install/insub.dart';
+import 'package:egp_app/install/inup.dart';
 import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:egp_app/report/report.dart';
@@ -21,6 +24,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:http/http.dart' as http;
@@ -133,36 +137,30 @@ class _installState extends State<install> {
         List list = json.decode(response.body);
         contact = list.map((m) => Album.fromJson(m)).toList();
         remarkEnd.text = widget.j_remark_complete;
-        contactloading = false;
+        // contactloading = false;
+      });
+      API.getGroupLs(idd).then((value) {
+        setState(() {
+          List list1 = json.decode(value.body);
+
+          groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+          // ispass = 0;
+          // for (var i = 0; i < groupPic.length; i++) {
+          //   if (groupPic[i].amount_sub_type_true ==
+          //       groupPic[i].amount_sub_type_all) {
+          //     ispass = ispass + 1;
+          //   }
+          // }
+          // if (ispass == groupPic.length) {
+          //   totalpass = true;
+          // } else {
+          //   totalpass = false;
+          // }
+
+          contactloading = false;
+        });
       });
     });
-  }
-
-  Future getcountphoto(jidx) async {
-    try {
-      var response = await http.post(
-        Uri.parse('$api/api/mobile/getJobHeaderImageForClean'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
-        },
-        body: jsonEncode(<dynamic, dynamic>{
-          'jidx': jidx,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        var jsonResponse = json.decode(response.body);
-
-        setState(() {
-          before_taken = jsonResponse[0]['before_taken'];
-          after_taken = jsonResponse[0]['after_taken'];
-          total_taken = jsonResponse[0]['total_taken'];
-        });
-      }
-    } catch (error) {
-      print(error);
-    }
   }
 
   Future getsign1(jidx) async {
@@ -373,7 +371,6 @@ class _installState extends State<install> {
     });
     getUser();
     _getAPI(widget.jid);
-    getcountphoto(widget.jid);
     getsign1(widget.jid);
     getsign2(widget.jid);
 
@@ -555,7 +552,7 @@ class _installState extends State<install> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text('ล้างแผง',
+                          Text('ติดตั้งโซล่าเซลล์',
                               style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
@@ -1555,6 +1552,8 @@ class _installState extends State<install> {
     );
   }
 
+  var groupPic = <GroupLs>[];
+
   Widget photoPage() {
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -1565,61 +1564,6 @@ class _installState extends State<install> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              (widget.j_status == 3)
-                  ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 20, left: 30, right: 30),
-                            child: SizedBox(
-                              height: 50,
-                              // width: 160,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  getWork(iduser, widget.jid).then((value) {
-                                    var jsonResponse = json.decode(value);
-                                    print(
-                                        'refid = ${jsonResponse[0]['ref_jidx_repair']}');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => report(
-                                                jid: widget.jid,
-                                                sid: widget.sid,
-                                                username: userName,
-                                                cusId: jsonResponse[0]
-                                                    ['cus_id'],
-                                                ref_jidx_repair: jsonResponse[0]
-                                                    ['ref_jidx_repair'],
-                                                tecId: iduser ?? 0,
-                                              )),
-                                    );
-                                  });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Color(0xff2A302C),
-                                  shadowColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Text(
-                                  'แจ้งซ่อม',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xffAED76E)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1667,288 +1611,185 @@ class _installState extends State<install> {
       body: ListView(
         // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
-                child: GridView.count(
-                    shrinkWrap: true,
-                    childAspectRatio: 0.75,
-                    primary: false,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 10,
-                    crossAxisCount: 2,
+          Padding(
+            padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => indetail(
+                              jidx: widget.jid,
+                            )));
+              },
+              child: Container(
+                height: 65,
+                decoration:
+                    //  (groupPic[0].percent > 99)
+                    //     ? BoxDecoration(
+                    //         gradient: LinearGradient(
+                    //           begin: Alignment.topCenter,
+                    //           end: Alignment.bottomCenter,
+                    //           colors: [
+                    //             Color(0xffE1F5DC),
+                    //             Color(0xffD6EFB4),
+                    //           ],
+                    //         ),
+                    //         borderRadius: BorderRadius.circular(15),
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //             color: Color(0xffAED76E).withOpacity(0.1),
+                    //             blurRadius: 10,
+                    //             spreadRadius: 0,
+                    //             offset: Offset(0, 0), // Shadow position
+                    //           ),
+                    //         ],
+                    //       )
+                    //     :
+                    BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Color(0xffAED76E)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xffAED76E).withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 0,
+                      offset: Offset(0, 0), // Shadow position
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => cleanphotopage(
-                                      type: 0,
-                                      limit: total_taken,
-                                      jidx: widget.jid,
-                                      status: widget.j_status,
-                                    )),
-                          ).then((value) {
-                            // print('dasdasdas');
-                            setState(() {
-                              getcountphoto(widget.jid);
-                            });
-                          });
-                          ;
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: (before_taken == total_taken)
-                              ? BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xffE1F5DC),
-                                      Color(0xffD6EFB4),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                )
-                              : BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Color(0xffAED76E)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Icon(
-                                            EvaIcons.image2,
-                                            color: Color(0xff2A302C),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป ก่อนล้างแผง',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14,
-                                                  color: Color(0xff2A302C))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff2A302C),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                  '$before_taken/$total_taken',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Color(0xff2A302C))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => cleanphotopage(
-                                      type: 1,
-                                      limit: total_taken,
-                                      jidx: widget.jid,
-                                      status: widget.j_status,
-                                    )),
-                          ).then((value) {
-                            setState(() {
-                              getcountphoto(widget.jid);
-                            });
-                          });
-                        },
-                        child: Container(
-                          height: 80,
-                          width: double.infinity,
-                          decoration: (after_taken == total_taken)
-                              ? BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xffE1F5DC),
-                                      Color(0xffD6EFB4),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                )
-                              : BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Color(0xffAED76E)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Icon(
-                                            EvaIcons.image2,
-                                            color: Color(0xff2A302C),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('ถ่ายรูป หลังล้างแผง',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14,
-                                                  color: Color(0xff2A302C))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            height: 30,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                              // border: Border.all(width: 3),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(13),
-                                              ),
-                                              color: Color(0xff2A302C),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                  '$after_taken/$total_taken',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: Colors.white)),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text('รูปถ่ายทั้งหมด',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12,
-                                                  color: Color(0xff2A302C))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ]),
+                      Text('รายละเอียด ติดตั้งระบบโซล่าเซลล์',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Color(0xff2A302C),
+                          )),
+                    ],
+                  ),
+                ),
               ),
-            ],
+            ),
           ),
+          Padding(
+              padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+              child: GridView.count(
+                shrinkWrap: true,
+                childAspectRatio: 0.8,
+                primary: false,
+                crossAxisSpacing: 30,
+                mainAxisSpacing: 20,
+                crossAxisCount: 2,
+                children: List.generate(groupPic.length, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      if (groupPic[index].sub_type == true) {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: ((context) => insub())));
+                      } else {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: ((context) => inup())));
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: (groupPic[index].percent > 99)
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xffE1F5DC),
+                                  Color(0xffD6EFB4),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            )
+                          : BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(color: Color(0xffAED76E)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xffAED76E).withOpacity(0.1),
+                                  blurRadius: 10,
+                                  spreadRadius: 0,
+                                  offset: Offset(0, 0), // Shadow position
+                                ),
+                              ],
+                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: SfCircularChart(
+                                  centerX: '30%',
+                                  series: <CircularSeries>[
+                                    RadialBarSeries<dynamic, dynamic>(
+                                        // dataSource: chartData,
+                                        radius: '95%',
+                                        innerRadius: '55%',
+                                        trackColor: Color(0xffE1F5DC),
+                                        maximumValue: 100,
+                                        dataSource: [0],
+                                        xValueMapper: (data, _) => '',
+                                        yValueMapper: (data, _) =>
+                                            (groupPic[index].percent == 0)
+                                                ? 0
+                                                : (groupPic[index].percent + 1),
+                                        pointColorMapper: (data, _) =>
+                                            Color(0xff57A946),
+                                        cornerStyle: CornerStyle.bothCurve)
+                                  ]),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${groupPic[index].percent} %',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 20,
+                                        color: Color(0xff2A302C),
+                                      )),
+                                  Text(groupPic[index].name ?? '',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: Color(0xff2A302C),
+                                      )),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              )),
         ],
       ),
     );
@@ -2378,7 +2219,7 @@ class _installState extends State<install> {
                       ).then((value) {
                         // print('dasdasdas');
                         setState(() {
-                          getcountphoto(widget.jid);
+                          // getcountphoto(widget.jid);
                         });
                       });
                       ;
@@ -2507,7 +2348,7 @@ class _installState extends State<install> {
                                 )),
                       ).then((value) {
                         setState(() {
-                          getcountphoto(widget.jid);
+                          // getcountphoto(widget.jid);
                         });
                       });
                     },
@@ -2982,6 +2823,21 @@ class API {
     );
     return response;
   }
+
+  static Future getGroupLs(idd) async {
+    final response = await http.post(
+      Uri.parse('$api/api/mobile/getJobHeaderImageForInstall'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+      }),
+    );
+
+    return response;
+  }
 }
 
 class Album {
@@ -3001,6 +2857,31 @@ class Album {
           '${json['j_cont_fname'] ?? ''} ${json['j_cont_lname'] ?? ''}',
       j_cont_position: json['j_cont_position'] ?? '',
       j_cont_tel: json['j_cont_tel'] ?? '',
+    );
+  }
+}
+
+class GroupLs {
+  final int? j_task_id;
+  final int? no;
+  final String? name;
+  final double percent;
+  final bool sub_type;
+
+  const GroupLs(
+      {required this.j_task_id,
+      required this.no,
+      required this.name,
+      required this.percent,
+      required this.sub_type});
+
+  factory GroupLs.fromJson(Map<String, dynamic> json) {
+    return GroupLs(
+      j_task_id: json['j_task_id'],
+      no: json['no'],
+      name: json['type_install_name'],
+      percent: json['percent'] ?? 0.0,
+      sub_type: json['sub_type'],
     );
   }
 }

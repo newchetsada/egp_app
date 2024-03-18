@@ -57,6 +57,7 @@ dependencies:
   photo_view: ^0.14.0
   internet_connection_checker: ^1.0.0+1
   firebase_remote_config: ^4.3.6
+  syncfusion_flutter_charts: ^24.2.9
 
 
 

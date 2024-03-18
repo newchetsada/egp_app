@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:egp_app/clean/cleansolar.dart';
+import 'package:egp_app/install/install.dart';
 import 'package:egp_app/login.dart';
 import 'package:egp_app/pages/settingpage.dart';
 import 'package:egp_app/repair/repair.dart';
@@ -684,37 +685,72 @@ class _homePageState extends State<homePage> {
                                       amount: amount,
                                       type: type,
                                     ))).then((value) => _ref())
-                        : Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => research(
-                                      jid: id,
-                                      j_start_date: j_start_date,
-                                      j_send_date: j_send_date,
-                                      cus_name: cus_name,
-                                      cus_address: cus_address,
-                                      install_date: install_date,
-                                      warranty_expire: warranty_expire,
-                                      power_peak: power_peak,
-                                      j_detail: j_detail,
-                                      remark_tech: remark_tech,
-                                      lat: lat,
-                                      lon: lon,
-                                      site_name: site_name,
-                                      fullname: fullname,
-                                      position: position,
-                                      tel: tel,
-                                      j_status: j_status,
-                                      ppe_flag: ppe_flag,
-                                      j_remark_complete: j_remark_complete,
-                                      type: type,
-                                      pic: site_layout,
-                                      sid: sid,
-                                      sitepic: sitepic,
-                                      belt_flag: belt_flag,
-                                      amount: amount,
-                                    )),
-                          ).then((value) => _ref());
+                        : (type == 3 || type == 4)
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => research(
+                                          jid: id,
+                                          j_start_date: j_start_date,
+                                          j_send_date: j_send_date,
+                                          cus_name: cus_name,
+                                          cus_address: cus_address,
+                                          install_date: install_date,
+                                          warranty_expire: warranty_expire,
+                                          power_peak: power_peak,
+                                          j_detail: j_detail,
+                                          remark_tech: remark_tech,
+                                          lat: lat,
+                                          lon: lon,
+                                          site_name: site_name,
+                                          fullname: fullname,
+                                          position: position,
+                                          tel: tel,
+                                          j_status: j_status,
+                                          ppe_flag: ppe_flag,
+                                          j_remark_complete: j_remark_complete,
+                                          type: type,
+                                          pic: site_layout,
+                                          sid: sid,
+                                          sitepic: sitepic,
+                                          belt_flag: belt_flag,
+                                          amount: amount,
+                                        )),
+                              ).then((value) => _ref())
+                            : (type == 5)
+                                ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => install(
+                                              jid: id,
+                                              j_start_date: j_start_date,
+                                              j_send_date: j_send_date,
+                                              cus_name: cus_name,
+                                              cus_address: cus_address,
+                                              install_date: install_date,
+                                              warranty_expire: warranty_expire,
+                                              power_peak: power_peak,
+                                              j_detail: j_detail,
+                                              remark_tech: remark_tech,
+                                              lat: lat,
+                                              lon: lon,
+                                              site_name: site_name,
+                                              fullname: fullname,
+                                              position: position,
+                                              tel: tel,
+                                              j_status: j_status,
+                                              ppe_flag: ppe_flag,
+                                              j_remark_complete:
+                                                  j_remark_complete,
+                                              sid: sid ?? 0,
+                                              pic: site_layout,
+                                              sitepic: sitepic,
+                                              belt_flag: belt_flag,
+                                              amount: amount,
+                                              type: type,
+                                            )),
+                                  ).then((value) => _ref())
+                                : null;
           });
         },
         child: Container(
@@ -753,7 +789,9 @@ class _homePageState extends State<homePage> {
                                     ? 'ซ่อมบำรุง'
                                     : (type == 3)
                                         ? 'สำราจสถานที่'
-                                        : 'ตรวจสอบประจำปี',
+                                        : (type == 4)
+                                            ? 'ตรวจสอบประจำปี'
+                                            : 'ติดตั้งโซล่าเซลล์',
                             style: TextStyle(
                                 color: Color(0xff9DC75B),
                                 fontSize: 16,
