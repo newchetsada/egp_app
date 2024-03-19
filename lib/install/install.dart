@@ -107,6 +107,7 @@ class _installState extends State<install> {
   int after_taken = 0;
   int total_taken = 0;
   int workstatus = 0;
+  bool daydetail = false;
 
   var remarkEnd = TextEditingController();
 
@@ -141,7 +142,10 @@ class _installState extends State<install> {
       });
       API.getGroupLs(idd).then((value) {
         setState(() {
-          List list1 = json.decode(value.body);
+          var data = json.decode(value.body);
+          print(data['detail']);
+          daydetail = data['detail'];
+          List list1 = json.decode(value.body)['type'];
 
           groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
           // ispass = 0;
@@ -1620,45 +1624,44 @@ class _installState extends State<install> {
                     MaterialPageRoute(
                         builder: (context) => indetail(
                               jidx: widget.jid,
+                              userName: userName,
                             )));
               },
               child: Container(
                 height: 65,
-                decoration:
-                    //  (groupPic[0].percent > 99)
-                    //     ? BoxDecoration(
-                    //         gradient: LinearGradient(
-                    //           begin: Alignment.topCenter,
-                    //           end: Alignment.bottomCenter,
-                    //           colors: [
-                    //             Color(0xffE1F5DC),
-                    //             Color(0xffD6EFB4),
-                    //           ],
-                    //         ),
-                    //         borderRadius: BorderRadius.circular(15),
-                    //         boxShadow: [
-                    //           BoxShadow(
-                    //             color: Color(0xffAED76E).withOpacity(0.1),
-                    //             blurRadius: 10,
-                    //             spreadRadius: 0,
-                    //             offset: Offset(0, 0), // Shadow position
-                    //           ),
-                    //         ],
-                    //       )
-                    //     :
-                    BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Color(0xffAED76E)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0xffAED76E).withOpacity(0.1),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                      offset: Offset(0, 0), // Shadow position
-                    ),
-                  ],
-                ),
+                decoration: (daydetail == true)
+                    ? BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xffE1F5DC),
+                            Color(0xffD6EFB4),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Color(0xffAED76E)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      ),
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(

@@ -5,21 +5,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 
 class indetail extends StatefulWidget {
   _indetailState createState() => _indetailState();
   final int jidx;
-  indetail({required this.jidx});
+  final String userName;
+  indetail({required this.jidx, required this.userName});
 }
 
 class _indetailState extends State<indetail> {
   var timein = TextEditingController();
   var timeout = TextEditingController();
-  var tech = TextEditingController();
-  var head = TextEditingController();
-  var secur = TextEditingController();
-  var normal = TextEditingController();
+  // var tech = TextEditingController();
+  // var head = TextEditingController();
+  // var secur = TextEditingController();
+  // var normal = TextEditingController();
   String? select;
+  int? detailId;
 
   List<TextEditingController> _controllers = [];
   List<TextField> _fields = [];
@@ -27,25 +30,75 @@ class _indetailState extends State<indetail> {
   List<TextField> _fieldsname = [];
 
   addDaily(jidx, work) async {
+    var body = jsonEncode(<dynamic, dynamic>{
+      "jidx": jidx,
+      "startTime": '12:00',
+      "endTime": '18:00',
+      "weather": select,
+      "userName": widget.userName,
+      "workers": work
+    });
+    try {
+      var response =
+          await http.post(Uri.parse('$api/api/mobile/addDailyDetailInstall'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+              },
+              body: body);
+      // print('add code : ${body}');
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        print('add : ${jsonResponse}');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  updateDaily(jidx, work) async {
+    var body = jsonEncode(<dynamic, dynamic>{
+      "jDetailInstallId": jidx,
+      "startTime": '12:00',
+      "endTime": '18:00',
+      "weather": select,
+      "userName": widget.userName,
+      "workers": work
+    });
+    try {
+      var response =
+          await http.post(Uri.parse('$api/api/mobile/updateDailyDetailInstall'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+                'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+              },
+              body: body);
+      print('update code : ${body}');
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        print('update : ${jsonResponse}');
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  getdetail(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse('$api/api/mobile/addDailyDetailInstall'),
+        Uri.parse('$api/api/mobile/getDailyDetailInstall'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
         },
-        body: jsonEncode(<dynamic, dynamic>{
-          "jidx": jidx,
-          "startTime": '',
-          "endTime": '',
-          "weather": '',
-          "userName": '',
-          "workers": work
-        }),
+        body: jsonEncode(<dynamic, dynamic>{"jidx": jidx}),
       );
-
+      print(jidx);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
+        print(jsonResponse);
+        return jsonResponse;
       }
     } catch (error) {
       print(error);
@@ -56,7 +109,60 @@ class _indetailState extends State<indetail> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    addOther('', '');
+    getdetail(widget.jidx).then((val) {
+      if (val.isEmpty) {
+        print('emp');
+        // person('วิศวกรคุมงาน', tech),
+        // person('หัวหน้าคนงาน', head),
+        // person('เจ้าหน้าที่ความปลอดภัย', secur),
+        // person('คนงาน', normal),
+        addMaster('วิศวกรคุมงาน', '');
+        addMaster('หัวหน้าคนงาน', '');
+        addMaster('เจ้าหน้าที่ความปลอดภัย', '');
+        addMaster('คนงาน', '');
+        addOther('', '');
+      } else {
+        print('have');
+        setState(() {
+          detailId = val[0]['j_detail_install_id'];
+          select = val[0]['weather'];
+          timein.text = val[0]['j_detail_install_start_time'];
+          timeout.text = val[0]['j_detail_install_end_time'];
+          List all = val[0]['workers'];
+          for (var i = 0; i < all.length; i++) {
+            print(all[i]['worker_name']);
+            if (all[i]['other'] == false) {
+              addMaster(
+                  all[i]['worker_name'], all[i]['worker_amount'].toString());
+            } else {
+              addOther(
+                  all[i]['worker_name'], all[i]['worker_amount'].toString());
+            }
+          }
+          addOther('', '');
+        });
+      }
+    });
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 
   @override
@@ -93,23 +199,41 @@ class _indetailState extends State<indetail> {
                     onPressed: () {
                       // Navigator.pop(context);
 
+                      loading();
                       List workers = [];
-                      workers.add({
-                        "workerName": 'วิศวกรคุมงาน',
-                        "workerAmount": tech.text
-                      });
-                      workers.add({
-                        "workerName": 'หัวหน้าคนงาน',
-                        "workerAmount": head.text
-                      });
-                      workers.add({
-                        "workerName": 'เจ้าหน้าที่ความปลอดภัย',
-                        "workerAmount": secur.text
-                      });
-                      workers.add(
-                          {"workerName": 'คนงาน', "workerAmount": normal.text});
+
+                      for (var data in masterCon) {
+                        workers.add({
+                          "workerName": data['workerName'],
+                          "workerAmount": data['workerAmount'].text,
+                          "other": false
+                        });
+                      }
+
+                      for (var i = 0; i < _controllers.length; i++) {
+                        if (_controllersname[i].text.isNotEmpty) {
+                          workers.add({
+                            "workerName": _controllersname[i].text,
+                            "workerAmount": _controllers[i].text,
+                            "other": true
+                          });
+                        }
+                      }
                       print(workers);
-                      addDaily(widget.jidx, workers);
+                      if (detailId == null) {
+                        print('add');
+
+                        addDaily(widget.jidx, workers).then((val) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        });
+                      } else {
+                        print('update');
+                        updateDaily(detailId, workers).then((val) {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        });
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
@@ -282,10 +406,17 @@ class _indetailState extends State<indetail> {
                   fontSize: 15,
                   fontWeight: FontWeight.w500),
             ),
-            person('วิศวกรคุมงาน', tech),
-            person('หัวหน้าคนงาน', head),
-            person('เจ้าหน้าที่ความปลอดภัย', secur),
-            person('คนงาน', normal),
+            // person('วิศวกรคุมงาน', tech),
+            // person('หัวหน้าคนงาน', head),
+            // person('เจ้าหน้าที่ความปลอดภัย', secur),
+            // person('คนงาน', normal),
+            ListView.builder(
+                primary: false,
+                shrinkWrap: true,
+                itemCount: master.length,
+                itemBuilder: (context, index) {
+                  return master[index];
+                }),
             ListView.builder(
               primary: false,
               shrinkWrap: true,
@@ -472,6 +603,17 @@ class _indetailState extends State<indetail> {
         ],
       ),
     );
+  }
+
+  List master = [];
+  List masterCon = [];
+  addMaster(titleMas, val) {
+    final controller = TextEditingController();
+    setState(() {
+      controller.text = val;
+      master.add(person(titleMas, controller));
+      masterCon.add({"workerName": titleMas, "workerAmount": controller});
+    });
   }
 
   addOther(title, number) {
