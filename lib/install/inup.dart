@@ -49,7 +49,7 @@ class _inupState extends State<inup> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text('ถ่ายรูป หลังล้างแผง',
+                      Text('ดำเนินงาน',
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,

@@ -1693,8 +1693,13 @@ class _installState extends State<install> {
                   return GestureDetector(
                     onTap: () {
                       if (groupPic[index].sub_type == true) {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: ((context) => insub())));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => insub(
+                                      jidx: widget.jid,
+                                      title: groupPic[index].name ?? '',
+                                    ))));
                       } else {
                         Navigator.push(context,
                             MaterialPageRoute(builder: ((context) => inup())));
