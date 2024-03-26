@@ -97,17 +97,27 @@ class _installState extends State<install> {
   int? iduser;
   var contact = <Album>[];
   bool contactloading = true;
+  String signOGname_1 = '';
+  String pathOGsign1 = '';
+  String signOGname_2 = '';
+  String pathOGsign2 = '';
   String sign_name_1 = '';
   String path_sign1 = '';
   String sign_name_2 = '';
   String path_sign2 = '';
+  String sign_name_3 = '';
+  String path_sign3 = '';
 
   bool isLoading = true;
-  int before_taken = 0;
-  int after_taken = 0;
-  int total_taken = 0;
   int workstatus = 0;
   bool daydetail = false;
+  bool next = false;
+  bool isfinished = true;
+  bool loadgroup = false;
+
+  String date = '';
+  String dateshow = '';
+  List alldate = [];
 
   var remarkEnd = TextEditingController();
 
@@ -140,34 +150,62 @@ class _installState extends State<install> {
         remarkEnd.text = widget.j_remark_complete;
         // contactloading = false;
       });
-      API.getGroupLs(idd).then((value) {
+      API.getGroupLs(idd, date).then((value) {
         setState(() {
           var data = json.decode(value.body);
           print(data['detail']);
           daydetail = data['detail'];
+          next = data['status_next'];
+          problem.text = data['j_detail_problem'] ?? '';
+          fix.text = data['j_detail_solution'] ?? '';
           List list1 = json.decode(value.body)['type'];
 
           groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
-          // ispass = 0;
-          // for (var i = 0; i < groupPic.length; i++) {
-          //   if (groupPic[i].amount_sub_type_true ==
-          //       groupPic[i].amount_sub_type_all) {
-          //     ispass = ispass + 1;
-          //   }
-          // }
-          // if (ispass == groupPic.length) {
-          //   totalpass = true;
-          // } else {
-          //   totalpass = false;
-          // }
 
+          isfinished = true;
+
+          for (var i = 0; i < groupPic.length; i++) {
+            if (groupPic[i].percent < 100) {
+              isfinished = false;
+            }
+          }
           contactloading = false;
         });
       });
     });
   }
 
-  Future getsign1(jidx) async {
+  Future getDate(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse('$api/api/mobile/getTotalDaysWorked'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'jidx': jidx,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        print(jsonResponse['j_detail_install_date']);
+
+        setState(() {
+          date = jsonResponse['j_detail_install_date'][0];
+          dateshow = DateFormat.yMMMMEEEEd("th")
+              .format(DateTime.parse(date))
+              .toString();
+          alldate = jsonResponse['j_detail_install_date'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getOGsign1(jidx) async {
     try {
       var response = await http.post(
         Uri.parse('$api/api/mobile/getJobGroupDetail'),
@@ -187,8 +225,62 @@ class _installState extends State<install> {
         var jsonResponse = json.decode(response.body);
 
         setState(() {
+          signOGname_1 = jsonResponse[0]['sign_name'];
+          pathOGsign1 = jsonResponse[0]['j_img_name'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getOGsign2(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse('$api/api/mobile/getJobGroupDetail'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{
+          'jidx': jidx,
+          "groupNo": 1,
+          'typeId': null,
+          'imgType': 2
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        print('sign2 : $jsonResponse');
+
+        setState(() {
+          signOGname_2 = jsonResponse[0]['sign_name'];
+          pathOGsign2 = jsonResponse[0]['j_img_name'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getsign1(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse('$api/api/mobile/getJobInstallSignImage'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 3}),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+
+        setState(() {
           sign_name_1 = jsonResponse[0]['sign_name'];
-          path_sign1 = jsonResponse[0]['j_img_name'];
+          path_sign1 = jsonResponse[0]['j_img_install_name'];
         });
       }
     } catch (error) {
@@ -239,17 +331,12 @@ class _installState extends State<install> {
   Future getsign2(jidx) async {
     try {
       var response = await http.post(
-        Uri.parse('$api/api/mobile/getJobGroupDetail'),
+        Uri.parse('$api/api/mobile/getJobInstallSignImage'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
         },
-        body: jsonEncode(<dynamic, dynamic>{
-          'jidx': jidx,
-          "groupNo": 1,
-          'typeId': null,
-          'imgType': 2
-        }),
+        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 2}),
       );
 
       if (response.statusCode == 200) {
@@ -258,7 +345,32 @@ class _installState extends State<install> {
 
         setState(() {
           sign_name_2 = jsonResponse[0]['sign_name'];
-          path_sign2 = jsonResponse[0]['j_img_name'];
+          path_sign2 = jsonResponse[0]['j_img_install_name'];
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future getsign3(jidx) async {
+    try {
+      var response = await http.post(
+        Uri.parse('$api/api/mobile/getJobInstallSignImage'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+        },
+        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 4}),
+      );
+
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        print('sign2 : $jsonResponse');
+
+        setState(() {
+          sign_name_3 = jsonResponse[0]['sign_name'];
+          path_sign3 = jsonResponse[0]['j_img_install_name'];
         });
       }
     } catch (error) {
@@ -322,6 +434,28 @@ class _installState extends State<install> {
     }
   }
 
+  addproblem() async {
+    var response = await http.post(
+      Uri.parse('$api/api/mobile/updateProblem'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': widget.jid,
+        'problem': problem.text,
+        'solution': fix.text,
+        'userName': userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print('ปัญหา : ${jsonResponse}');
+
+      return jsonResponse;
+    }
+  }
+
   void loading() {
     showDialog(
         barrierDismissible: true,
@@ -374,9 +508,19 @@ class _installState extends State<install> {
       workstatus = widget.j_status;
     });
     getUser();
-    _getAPI(widget.jid);
+    if (widget.j_status == 3) {
+      getDate(widget.jid).then((va) {
+        _getAPI(widget.jid);
+      });
+    } else {
+      _getAPI(widget.jid);
+    }
+
     getsign1(widget.jid);
     getsign2(widget.jid);
+    getsign3(widget.jid);
+    getOGsign1(widget.jid);
+    getOGsign2(widget.jid);
 
     print(widget.sitepic);
   }
@@ -387,6 +531,93 @@ class _installState extends State<install> {
       path: phoneNumber,
     );
     await launchUrl(launchUri);
+  }
+
+  void confirmpopday() {
+    showDialog<void>(
+      context: context,
+      // barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          contentPadding:
+              EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 15),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  'ยืนยันการส่งข้อมูล',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xffAED76E)),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'ยืนยันการส่งข้อมูล ${DateFormat.yMMMMEEEEd("th").format(DateTime.now()).toString()}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      height: 2,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff464646)),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          'ยกเลิก',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff464646)),
+                        )),
+                    SizedBox(
+                      height: 40,
+                      width: 130,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => homePage()),
+                              (route) => false);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          shadowColor: Colors.white,
+                          backgroundColor: Color(0xffAED76E),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32.0),
+                          ),
+                        ),
+                        child: Text(
+                          'ยืนยันส่งงาน',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xff2A302C)),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void confirmpop() {
@@ -479,6 +710,170 @@ class _installState extends State<install> {
       },
     );
   }
+
+  var problem = TextEditingController();
+  var fix = TextEditingController();
+
+  // problempop() {
+  //   showDialog(
+  //     context: context,
+  //     // barrierDismissible: false, // user must tap button!
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         contentPadding:
+  //             EdgeInsets.only(left: 20, right: 20, top: 25, bottom: 15),
+  //         shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.all(Radius.circular(20))),
+  //         content: Container(
+  //           width: 1000,
+  //           child: SingleChildScrollView(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   'ปัญหาและการแก้ไข',
+  //                   style: TextStyle(
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: Color(0xffAED76E)),
+  //                 ),
+  //                 Text(
+  //                   '(กรณีไม่เขียนระบุ แสดงว่าไม่พบปัญหา)',
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       height: 2,
+  //                       fontSize: 13,
+  //                       fontWeight: FontWeight.w500,
+  //                       color: Color(0xff464646)),
+  //                 ),
+  //                 SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 Text('ปัญหา',
+  //                     style: TextStyle(
+  //                         fontWeight: FontWeight.w500,
+  //                         fontSize: 14,
+  //                         color: Color(0xff2A302C))),
+  //                 SizedBox(
+  //                   height: 5,
+  //                 ),
+  //                 Container(
+  //                   // height: 100,
+  //                   width: double.infinity,
+  //                   decoration: BoxDecoration(
+  //                     color: Color(0xffffffff),
+  //                     borderRadius: BorderRadius.circular(15),
+  //                     border: Border.all(color: Color(0xffD6EFB4)),
+  //                   ),
+  //                   child: TextField(
+  //                     onTapOutside: (b) {
+  //                       FocusManager.instance.primaryFocus?.unfocus();
+  //                     },
+  //                     // textInputAction: TextInputAction.done,
+  //                     controller: problem,
+  //                     keyboardType: TextInputType.multiline,
+  //                     minLines: 2,
+  //                     maxLines: 5,
+  //                     decoration: InputDecoration(
+  //                       hintStyle:
+  //                           TextStyle(fontSize: 14, color: Colors.grey[300]),
+  //                       border: InputBorder.none,
+  //                       contentPadding: EdgeInsets.all(10),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   height: 10,
+  //                 ),
+  //                 Text('วิธีแก้ไข',
+  //                     style: TextStyle(
+  //                         fontWeight: FontWeight.w500,
+  //                         fontSize: 14,
+  //                         color: Color(0xff2A302C))),
+  //                 SizedBox(
+  //                   height: 5,
+  //                 ),
+  //                 Container(
+  //                   // height: 100,
+  //                   width: double.infinity,
+  //                   decoration: BoxDecoration(
+  //                     color: Color(0xffffffff),
+  //                     borderRadius: BorderRadius.circular(15),
+  //                     border: Border.all(color: Color(0xffD6EFB4)),
+  //                   ),
+  //                   child: TextField(
+  //                     onTapOutside: (b) {
+  //                       FocusManager.instance.primaryFocus?.unfocus();
+  //                     },
+  //                     // textInputAction: TextInputAction.done,
+  //                     controller: fix,
+  //                     keyboardType: TextInputType.multiline,
+  //                     minLines: 2,
+  //                     maxLines: 5,
+  //                     decoration: InputDecoration(
+  //                       hintStyle:
+  //                           TextStyle(fontSize: 14, color: Colors.grey[300]),
+  //                       border: InputBorder.none,
+  //                       contentPadding: EdgeInsets.all(10),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   height: 20,
+  //                 ),
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     SizedBox(
+  //                       height: 40,
+  //                       width: 130,
+  //                       child: ElevatedButton(
+  //                         onPressed: () {
+  //                           Navigator.pop(context);
+  //                           loading();
+  //                           addproblem().then((po) {
+  //                             API.getGroupLs(widget.jid).then((value) {
+  //                               setState(() {
+  //                                 var data = json.decode(value.body);
+  //                                 print(data['detail']);
+  //                                 daydetail = data['detail'];
+  //                                 next = data['status_next'];
+  //                                 problem.text = data['j_detail_problem'] ?? '';
+  //                                 fix.text = data['j_detail_solution'] ?? '';
+
+  //                                 Navigator.pop(context, true);
+  //                               });
+  //                             });
+  //                           });
+  //                         },
+  //                         style: ElevatedButton.styleFrom(
+  //                           foregroundColor: Colors.white,
+  //                           shadowColor: Colors.white,
+  //                           backgroundColor: Color(0xff9DC75B),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(15.0),
+  //                           ),
+  //                         ),
+  //                         child: Text(
+  //                           'ยืนยันส่งงาน',
+  //                           style: TextStyle(
+  //                               fontSize: 12,
+  //                               fontWeight: FontWeight.w600,
+  //                               color: Color(0xff2A302C)),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  //   return false;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -1579,12 +1974,228 @@ class _installState extends State<install> {
                         height: 50,
                         // width: 160,
                         child: ElevatedButton(
-                          onPressed: (before_taken == total_taken &&
-                                  after_taken == total_taken)
+                          onPressed: (next == true && daydetail == true)
                               ? () {
-                                  controller.nextPage(
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.ease);
+                                  showDialog(
+                                    context: context,
+                                    // barrierDismissible: false, // user must tap button!
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        contentPadding: EdgeInsets.only(
+                                            left: 20,
+                                            right: 20,
+                                            top: 25,
+                                            bottom: 15),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20))),
+                                        content: Container(
+                                          width: 1000,
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'ปัญหาและการแก้ไข',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xffAED76E)),
+                                                ),
+                                                Text(
+                                                  '(กรณีไม่เขียนระบุ แสดงว่าไม่พบปัญหา)',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      height: 2,
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Color(0xff464646)),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text('ปัญหา',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff2A302C))),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Container(
+                                                  // height: 100,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffffffff),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    border: Border.all(
+                                                        color:
+                                                            Color(0xffD6EFB4)),
+                                                  ),
+                                                  child: TextField(
+                                                    onTapOutside: (b) {
+                                                      FocusManager
+                                                          .instance.primaryFocus
+                                                          ?.unfocus();
+                                                    },
+                                                    // textInputAction: TextInputAction.done,
+                                                    controller: problem,
+                                                    keyboardType:
+                                                        TextInputType.multiline,
+                                                    minLines: 2,
+                                                    maxLines: 5,
+                                                    decoration: InputDecoration(
+                                                      hintStyle: TextStyle(
+                                                          fontSize: 14,
+                                                          color:
+                                                              Colors.grey[300]),
+                                                      border: InputBorder.none,
+                                                      contentPadding:
+                                                          EdgeInsets.all(10),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text('วิธีแก้ไข',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 14,
+                                                        color:
+                                                            Color(0xff2A302C))),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Container(
+                                                  // height: 100,
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: Color(0xffffffff),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    border: Border.all(
+                                                        color:
+                                                            Color(0xffD6EFB4)),
+                                                  ),
+                                                  child: TextField(
+                                                    onTapOutside: (b) {
+                                                      FocusManager
+                                                          .instance.primaryFocus
+                                                          ?.unfocus();
+                                                    },
+                                                    // textInputAction: TextInputAction.done,
+                                                    controller: fix,
+                                                    keyboardType:
+                                                        TextInputType.multiline,
+                                                    minLines: 2,
+                                                    maxLines: 5,
+                                                    decoration: InputDecoration(
+                                                      hintStyle: TextStyle(
+                                                          fontSize: 14,
+                                                          color:
+                                                              Colors.grey[300]),
+                                                      border: InputBorder.none,
+                                                      contentPadding:
+                                                          EdgeInsets.all(10),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 20,
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 40,
+                                                      width: 130,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context, true);
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          shadowColor:
+                                                              Colors.white,
+                                                          backgroundColor:
+                                                              Color(0xff9DC75B),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15.0),
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          'ยืนยันส่งงาน',
+                                                          style: TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: Color(
+                                                                  0xff2A302C)),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ).then((vapop) {
+                                    print(vapop);
+                                    if (vapop != null && vapop == true) {
+                                      loading();
+                                      addproblem().then((po) async {
+                                        if (po['status'] == true) {
+                                          API
+                                              .getGroupLs(widget.jid, date)
+                                              .then((value) {
+                                            setState(() {
+                                              var data =
+                                                  json.decode(value.body);
+                                              print(data['detail']);
+                                              daydetail = data['detail'];
+                                              next = data['status_next'];
+                                              problem.text =
+                                                  data['j_detail_problem'] ??
+                                                      '';
+                                              fix.text =
+                                                  data['j_detail_solution'] ??
+                                                      '';
+                                            });
+                                            Navigator.pop(context);
+                                            controller.nextPage(
+                                                duration:
+                                                    Duration(milliseconds: 300),
+                                                curve: Curves.ease);
+                                          });
+                                        }
+                                      });
+                                    }
+                                  });
+                                  // controller.nextPage(
+                                  //     duration: Duration(milliseconds: 300),
+                                  //     curve: Curves.ease);
                                 }
                               : null,
                           style: ElevatedButton.styleFrom(
@@ -1625,7 +2236,32 @@ class _installState extends State<install> {
                         builder: (context) => indetail(
                               jidx: widget.jid,
                               userName: userName,
-                            )));
+                              status: widget.j_status,
+                              date: date,
+                            ))).then((ba) {
+                  API.getGroupLs(widget.jid, date).then((value) {
+                    setState(() {
+                      var data = json.decode(value.body);
+                      print(data['detail']);
+                      daydetail = data['detail'];
+                      next = data['status_next'];
+                      problem.text = data['j_detail_problem'] ?? '';
+                      fix.text = data['j_detail_solution'] ?? '';
+                      List list1 = json.decode(value.body)['type'];
+
+                      groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+
+                      isfinished = true;
+
+                      for (var i = 0; i < groupPic.length; i++) {
+                        if (groupPic[i].percent < 100) {
+                          isfinished = false;
+                        }
+                      }
+                      contactloading = false;
+                    });
+                  });
+                });
               },
               child: Container(
                 height: 65,
@@ -1699,10 +2335,72 @@ class _installState extends State<install> {
                                 builder: ((context) => insub(
                                       jidx: widget.jid,
                                       title: groupPic[index].name ?? '',
-                                    ))));
+                                      status: widget.j_status,
+                                      userName: userName,
+                                      date: date,
+                                    )))).then((ba) {
+                          API.getGroupLs(widget.jid, date).then((value) {
+                            setState(() {
+                              var data = json.decode(value.body);
+                              print(data['detail']);
+                              daydetail = data['detail'];
+                              next = data['status_next'];
+                              problem.text = data['j_detail_problem'] ?? '';
+                              fix.text = data['j_detail_solution'] ?? '';
+                              List list1 = json.decode(value.body)['type'];
+
+                              groupPic = list1
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              isfinished = true;
+
+                              for (var i = 0; i < groupPic.length; i++) {
+                                if (groupPic[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+                              contactloading = false;
+                            });
+                          });
+                        });
                       } else {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: ((context) => inup())));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => inup(
+                                      title: groupPic[index].name ?? '',
+                                      status: widget.j_status,
+                                      userName: userName,
+                                      jidx: widget.jid,
+                                      jTaskId: groupPic[index].j_task_id ?? 0,
+                                      date: date,
+                                    )))).then((ba) {
+                          API.getGroupLs(widget.jid, date).then((value) {
+                            setState(() {
+                              var data = json.decode(value.body);
+                              print(data['detail']);
+                              daydetail = data['detail'];
+                              next = data['status_next'];
+                              problem.text = data['j_detail_problem'] ?? '';
+                              fix.text = data['j_detail_solution'] ?? '';
+                              List list1 = json.decode(value.body)['type'];
+
+                              groupPic = list1
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              isfinished = true;
+
+                              for (var i = 0; i < groupPic.length; i++) {
+                                if (groupPic[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+                              contactloading = false;
+                            });
+                          });
+                        });
                       }
                     },
                     child: Container(
@@ -1819,31 +2517,59 @@ class _installState extends State<install> {
                 child: SizedBox(
                   height: 50,
                   // width: 160,
-                  child: ElevatedButton(
-                    onPressed:
-                        (sign_name_1.isNotEmpty && sign_name_2.isNotEmpty)
-                            ? () {
-                                controller.nextPage(
-                                    duration: Duration(milliseconds: 300),
-                                    curve: Curves.ease);
-                              }
-                            : null,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.white,
-                      backgroundColor: Color(0xffAED76E),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'ถัดไป',
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xff2A302C)),
-                    ),
-                  ),
+                  child: (isfinished == true)
+                      ? ElevatedButton(
+                          onPressed: (sign_name_1.isNotEmpty &&
+                                  sign_name_2.isNotEmpty &&
+                                  sign_name_3.isNotEmpty &&
+                                  signOGname_1.isNotEmpty &&
+                                  signOGname_2.isNotEmpty)
+                              ? () {
+                                  controller.nextPage(
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.ease);
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.white,
+                            backgroundColor: Color(0xffAED76E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'ถัดไป',
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff2A302C)),
+                          ),
+                        )
+                      : ElevatedButton(
+                          onPressed: (sign_name_1.isNotEmpty &&
+                                  sign_name_2.isNotEmpty &&
+                                  sign_name_3.isNotEmpty)
+                              ? () {
+                                  confirmpopday();
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.white,
+                            backgroundColor: Color(0xffAED76E),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'บันทึก',
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff2A302C)),
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -1854,6 +2580,9 @@ class _installState extends State<install> {
         onRefresh: () async {
           await getsign1(widget.jid);
           await getsign2(widget.jid);
+          await getsign3(widget.jid);
+          await getOGsign1(widget.jid);
+          await getOGsign2(widget.jid);
         },
         child: ListView(
           children: [
@@ -1866,11 +2595,15 @@ class _installState extends State<install> {
                         loading();
                         await getsign1(widget.jid);
                         await getsign2(widget.jid);
+                        await getsign3(widget.jid);
+                        await getOGsign1(widget.jid);
+                        await getOGsign2(widget.jid);
+
                         Navigator.pop(context);
 
                         (sign_name_1.isNotEmpty)
                             ? popsign(path_sign1)
-                            : sheet('ผู้ติดต่อหน้างาน', 3);
+                            : sheet('ผู้ควบคุมงาน', 3, false);
                       },
                       child: Container(
                         height: 70,
@@ -1912,7 +2645,7 @@ class _installState extends State<install> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'ผู้ติดต่อหน้างาน',
+                                    'ผู้ควบคุมงาน',
                                     style: TextStyle(
                                         color: (sign_name_1.isNotEmpty)
                                             ? Colors.white
@@ -1947,11 +2680,15 @@ class _installState extends State<install> {
                         loading();
                         await getsign1(widget.jid);
                         await getsign2(widget.jid);
+                        await getsign3(widget.jid);
+                        await getOGsign1(widget.jid);
+                        await getOGsign2(widget.jid);
+
                         Navigator.pop(context);
 
                         (sign_name_2.isNotEmpty)
                             ? popsign(path_sign2)
-                            : sheet('ช่าง', 2);
+                            : sheet('หัวหน้าช่าง', 2, false);
                       },
                       child: Container(
                         height: 70,
@@ -1993,7 +2730,7 @@ class _installState extends State<install> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'ช่าง',
+                                    'หัวหน้าช่าง',
                                     style: TextStyle(
                                         color: (sign_name_2.isNotEmpty)
                                             ? Colors.white
@@ -2021,6 +2758,297 @@ class _installState extends State<install> {
                         ),
                       )),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+                  child: GestureDetector(
+                      onTap: () async {
+                        loading();
+                        await getsign1(widget.jid);
+                        await getsign2(widget.jid);
+                        await getsign3(widget.jid);
+                        await getOGsign1(widget.jid);
+                        await getOGsign2(widget.jid);
+
+                        Navigator.pop(context);
+
+                        (sign_name_3.isNotEmpty)
+                            ? popsign(path_sign3)
+                            : sheet('ผู้ประสานงาน', 4, false);
+                      },
+                      child: Container(
+                        height: 70,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: (sign_name_3.isNotEmpty)
+                              ? Color(0xff9DC75B)
+                              : Color(0xffEEF5E2),
+                          borderRadius: BorderRadius.circular(15),
+                          // border: Border.all(color: Color(0xffE0ECDE)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: (sign_name_3.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xff9CC75B),
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: Center(
+                                  child: Icon(EvaIcons.peopleOutline,
+                                      size: 20,
+                                      color: (sign_name_3.isNotEmpty)
+                                          ? Color(0xff9CC75B)
+                                          : Colors.white),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'ผู้ประสานงาน',
+                                    style: TextStyle(
+                                        color: (sign_name_3.isNotEmpty)
+                                            ? Colors.white
+                                            : Color(0xffAED76E),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14),
+                                  ),
+                                  (sign_name_3.isNotEmpty)
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Text(
+                                            sign_name_3,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12),
+                                          ),
+                                        )
+                                      : Container()
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+                (isfinished == false)
+                    ? Container()
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 25,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Text('เซ็นต์ส่งงาน',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Color(0xff2A302C),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10, left: 30, right: 30),
+                            child: GestureDetector(
+                                onTap: () async {
+                                  loading();
+                                  await getsign1(widget.jid);
+                                  await getsign2(widget.jid);
+                                  await getsign3(widget.jid);
+                                  await getOGsign1(widget.jid);
+                                  await getOGsign2(widget.jid);
+                                  Navigator.pop(context);
+
+                                  (signOGname_1.isNotEmpty)
+                                      ? popsign(pathOGsign1)
+                                      : sheet('ผู้ติดต่อหน้างาน', 3, true);
+                                },
+                                child: Container(
+                                  height: 70,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: (signOGname_1.isNotEmpty)
+                                        ? Color(0xff9DC75B)
+                                        : Color(0xffEEF5E2),
+                                    borderRadius: BorderRadius.circular(15),
+                                    // border: Border.all(color: Color(0xffE0ECDE)),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20),
+                                        child: Container(
+                                          height: 35,
+                                          width: 35,
+                                          decoration: BoxDecoration(
+                                            color: (signOGname_1.isNotEmpty)
+                                                ? Colors.white
+                                                : Color(0xff9CC75B),
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                          ),
+                                          child: Center(
+                                            child: Icon(EvaIcons.peopleOutline,
+                                                size: 20,
+                                                color: (signOGname_1.isNotEmpty)
+                                                    ? Color(0xff9CC75B)
+                                                    : Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'ผู้ติดต่อหน้างาน',
+                                              style: TextStyle(
+                                                  color:
+                                                      (signOGname_1.isNotEmpty)
+                                                          ? Colors.white
+                                                          : Color(0xffAED76E),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14),
+                                            ),
+                                            (signOGname_1.isNotEmpty)
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 5),
+                                                    child: Text(
+                                                      signOGname_1,
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 12),
+                                                    ),
+                                                  )
+                                                : Container()
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 20, left: 30, right: 30),
+                            child: GestureDetector(
+                                onTap: () async {
+                                  loading();
+                                  await getsign1(widget.jid);
+                                  await getsign2(widget.jid);
+                                  await getsign3(widget.jid);
+                                  await getOGsign1(widget.jid);
+                                  await getOGsign2(widget.jid);
+                                  Navigator.pop(context);
+
+                                  (signOGname_2.isNotEmpty)
+                                      ? popsign(pathOGsign2)
+                                      : sheet('ช่าง', 2, true);
+                                },
+                                child: Container(
+                                  height: 70,
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: (signOGname_2.isNotEmpty)
+                                        ? Color(0xff9DC75B)
+                                        : Color(0xffEEF5E2),
+                                    borderRadius: BorderRadius.circular(15),
+                                    // border: Border.all(color: Color(0xffE0ECDE)),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20),
+                                        child: Container(
+                                          height: 35,
+                                          width: 35,
+                                          decoration: BoxDecoration(
+                                            color: (signOGname_2.isNotEmpty)
+                                                ? Colors.white
+                                                : Color(0xff9CC75B),
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                          ),
+                                          child: Center(
+                                            child: Icon(EvaIcons.peopleOutline,
+                                                size: 20,
+                                                color: (signOGname_2.isNotEmpty)
+                                                    ? Color(0xff9CC75B)
+                                                    : Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'ช่าง',
+                                              style: TextStyle(
+                                                  color:
+                                                      (signOGname_2.isNotEmpty)
+                                                          ? Colors.white
+                                                          : Color(0xffAED76E),
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 14),
+                                            ),
+                                            (signOGname_2.isNotEmpty)
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 5),
+                                                    child: Text(
+                                                      signOGname_2,
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize: 12),
+                                                    ),
+                                                  )
+                                                : Container()
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        ],
+                      )
               ],
             ),
           ],
@@ -2205,57 +3233,289 @@ class _installState extends State<install> {
             SizedBox(
               height: 10,
             ),
+            (widget.j_status == 3)
+                ? Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        int _selectdate = 0;
+                        showModalBottomSheet(
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (context) => Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xff000000)
+                                                .withOpacity(0.1),
+                                            spreadRadius: 0,
+                                            blurRadius: 7,
+                                            offset: Offset(0,
+                                                3), // changes position of shadow
+                                          ),
+                                        ],
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15))),
+                                    child: SingleChildScrollView(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'แสดงข้อมูลรายวัน',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color(0xffAED76E),
+                                                  fontSize: 17),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: SizedBox(
+                                                    // width: 200,
+                                                    height: 200,
+                                                    child: CupertinoPicker(
+                                                      itemExtent: 32,
+                                                      // looping: true,
+                                                      scrollController:
+                                                          FixedExtentScrollController(
+                                                              initialItem: 0),
+                                                      onSelectedItemChanged:
+                                                          (value) {
+                                                        _selectdate = value;
+                                                      },
+                                                      children: List.generate(
+                                                          alldate.length,
+                                                          (index) => Center(
+                                                                child: Text(
+                                                                    "${DateFormat.yMMMMEEEEd("th").format(DateTime.parse(alldate[index])).toString()}"),
+                                                              )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Container(
+                                                height: 50,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(10)),
+                                                  color: Color(0xffAED76E),
+                                                ),
+                                                child: ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(
+                                                        context, _selectdate);
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    shadowColor:
+                                                        Colors.transparent,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    'ตกลง',
+                                                    style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            Color(0xff2A302C)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ) //whatever you're returning, does not have to be a Container
+                            ).then((pop) {
+                          print(pop);
+                          if (pop != null) {
+                            API
+                                .getGroupLs(widget.jid, alldate[pop])
+                                .then((value) {
+                              setState(() {
+                                loadgroup = true;
+                                groupPic.clear();
+                                var data = json.decode(value.body);
+                                daydetail = data['detail'];
+                                next = data['status_next'];
+                                problem.text = data['j_detail_problem'] ?? '';
+                                fix.text = data['j_detail_solution'] ?? '';
+                                List list1 = json.decode(value.body)['type'];
+                                Future.delayed(Duration(seconds: 1)).then((aa) {
+                                  // print('333');
+                                  setState(() {
+                                    groupPic = list1
+                                        .map((m) => GroupLs.fromJson(m))
+                                        .toList();
+                                    loadgroup = false;
+                                  });
+                                });
+                                // groupPic = list1
+                                //     .map((m) => GroupLs.fromJson(m))
+                                //     .toList();
+                                date = alldate[pop];
+                                dateshow = DateFormat.yMMMMEEEEd("th")
+                                    .format(DateTime.parse(date))
+                                    .toString();
+                              });
+                            });
+                          }
+                        });
+                      },
+                      child: Container(
+                        height: 65,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: Color(0xffAED76E)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffAED76E).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text('ข้อมูล${dateshow}',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                    color: Color(0xffAED76E),
+                                  )),
+                              RotatedBox(
+                                quarterTurns: -1,
+                                child: Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  size: 20,
+                                  color: Color(0xffAED76E),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => indetail(
+                              jidx: widget.jid,
+                              userName: userName,
+                              status: widget.j_status,
+                              date: date,
+                            )));
+              },
+              child: Container(
+                height: 65,
+                decoration: (daydetail == true)
+                    ? BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xffE1F5DC),
+                            Color(0xffD6EFB4),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Color(0xffAED76E)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Text('รายละเอียด ติดตั้งระบบโซล่าเซลล์',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Color(0xff2A302C),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
             GridView.count(
-                shrinkWrap: true,
-                childAspectRatio: 0.75,
-                primary: false,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 10,
-                crossAxisCount: 2,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => cleanphotopage(
-                                  type: 0,
-                                  limit: total_taken,
-                                  jidx: widget.jid,
-                                  status: widget.j_status,
-                                )),
-                      ).then((value) {
-                        // print('dasdasdas');
-                        setState(() {
-                          // getcountphoto(widget.jid);
-                        });
-                      });
-                      ;
-                    },
-                    child: Container(
-                      height: 80,
-                      width: double.infinity,
-                      decoration: (before_taken == total_taken)
-                          ? BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xffE1F5DC),
-                                  Color(0xffD6EFB4),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffAED76E).withOpacity(0.1),
-                                  blurRadius: 10,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 0), // Shadow position
-                                ),
-                              ],
-                            )
-                          : BoxDecoration(
+              shrinkWrap: true,
+              childAspectRatio: 0.8,
+              primary: false,
+              crossAxisSpacing: 30,
+              mainAxisSpacing: 20,
+              crossAxisCount: 2,
+              children: (loadgroup == true)
+                  ? List.generate(2, (index) {
+                      return Shimmer.fromColors(
+                          baseColor: Colors.grey[200]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
                               border: Border.all(color: Color(0xffAED76E)),
@@ -2268,210 +3528,132 @@ class _installState extends State<install> {
                                 ),
                               ],
                             ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                          ));
+                    })
+                  : List.generate(groupPic.length, (index) {
+                      return GestureDetector(
+                        onTap: () {
+                          if (groupPic[index].sub_type == true) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => insub(
+                                          jidx: widget.jid,
+                                          title: groupPic[index].name ?? '',
+                                          status: widget.j_status,
+                                          userName: userName,
+                                          date: date,
+                                        ))));
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => inup(
+                                          title: groupPic[index].name ?? '',
+                                          status: widget.j_status,
+                                          userName: userName,
+                                          jidx: widget.jid,
+                                          jTaskId:
+                                              groupPic[index].j_task_id ?? 0,
+                                          date: date,
+                                        ))));
+                          }
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          decoration: (groupPic[index].percent > 99)
+                              ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Color(0xffE1F5DC),
+                                      Color(0xffD6EFB4),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: SfCircularChart(
+                                      centerX: '30%',
+                                      series: <CircularSeries>[
+                                        RadialBarSeries<dynamic, dynamic>(
+                                            // dataSource: chartData,
+                                            radius: '95%',
+                                            innerRadius: '55%',
+                                            trackColor: Color(0xffE1F5DC),
+                                            maximumValue: 100,
+                                            dataSource: [0],
+                                            xValueMapper: (data, _) => '',
+                                            yValueMapper: (data, _) =>
+                                                (groupPic[index].percent == 0)
+                                                    ? 0
+                                                    : (groupPic[index].percent +
+                                                        1),
+                                            pointColorMapper: (data, _) =>
+                                                Color(0xff57A946),
+                                            cornerStyle: CornerStyle.bothCurve)
+                                      ]),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Image.asset(
-                                        'assets/clean.png',
-                                        width: 30,
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('ถ่ายรูป ก่อนล้างแผง',
+                                      Text('${groupPic[index].percent} %',
                                           style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: Color(0xff2A302C))),
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 20,
+                                            color: Color(0xff2A302C),
+                                          )),
+                                      Text(groupPic[index].name ?? '',
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 2,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            color: Color(0xff2A302C),
+                                          )),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 30,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          // border: Border.all(width: 3),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(13),
-                                          ),
-                                          color: Color(0xff2A302C),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                              '$before_taken/$total_taken',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14,
-                                                  color: Colors.white)),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('รูปถ่ายทั้งหมด',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                              color: Color(0xff2A302C))),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => cleanphotopage(
-                                  type: 1,
-                                  limit: total_taken,
-                                  jidx: widget.jid,
-                                  status: widget.j_status,
-                                )),
-                      ).then((value) {
-                        setState(() {
-                          // getcountphoto(widget.jid);
-                        });
-                      });
-                    },
-                    child: Container(
-                      height: 80,
-                      width: double.infinity,
-                      decoration: (after_taken == total_taken)
-                          ? BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xffE1F5DC),
-                                  Color(0xffD6EFB4),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffAED76E).withOpacity(0.1),
-                                  blurRadius: 10,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 0), // Shadow position
-                                ),
-                              ],
-                            )
-                          : BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Color(0xffAED76E)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffAED76E).withOpacity(0.1),
-                                  blurRadius: 10,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 0), // Shadow position
-                                ),
+                                )
                               ],
                             ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Image.asset(
-                                        'assets/clean.png',
-                                        width: 30,
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('ถ่ายรูป หลังล้างแผง',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: Color(0xff2A302C))),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 30,
-                                        width: 50,
-                                        decoration: BoxDecoration(
-                                          // border: Border.all(width: 3),
-                                          borderRadius: BorderRadius.all(
-                                            Radius.circular(13),
-                                          ),
-                                          color: Color(0xff2A302C),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                              '$after_taken/$total_taken',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 14,
-                                                  color: Colors.white)),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text('รูปถ่ายทั้งหมด',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                              color: Color(0xff2A302C))),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                ]),
+                      );
+                    }),
+            ),
             SizedBox(
               height: 10,
             ),
@@ -2485,9 +3667,7 @@ class _installState extends State<install> {
             ),
             GestureDetector(
                 onTap: () {
-                  (sign_name_1.isNotEmpty)
-                      ? popsign(path_sign1)
-                      : sheet('ผู้ติดต่อหน้างาน', 3);
+                  popsign(path_sign1);
                 },
                 child: Container(
                   height: 70,
@@ -2529,7 +3709,7 @@ class _installState extends State<install> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'ผู้ติดต่อหน้างาน',
+                              'ผู้ควบคุมงาน',
                               style: TextStyle(
                                   color: (sign_name_1.isNotEmpty)
                                       ? Colors.white
@@ -2560,9 +3740,7 @@ class _installState extends State<install> {
             ),
             GestureDetector(
                 onTap: () {
-                  (sign_name_2.isNotEmpty)
-                      ? popsign(path_sign2)
-                      : sheet('ช่าง', 2);
+                  popsign(path_sign2);
                 },
                 child: Container(
                   height: 70,
@@ -2604,7 +3782,7 @@ class _installState extends State<install> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'ช่าง',
+                              'หัวหน้าช่าง',
                               style: TextStyle(
                                   color: (sign_name_2.isNotEmpty)
                                       ? Colors.white
@@ -2617,6 +3795,225 @@ class _installState extends State<install> {
                                     padding: const EdgeInsets.only(top: 5),
                                     child: Text(
                                       sign_name_2,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12),
+                                    ),
+                                  )
+                                : Container()
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+                onTap: () {
+                  popsign(path_sign3);
+                },
+                child: Container(
+                  height: 70,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: (sign_name_3.isNotEmpty)
+                        ? Color(0xff9DC75B)
+                        : Color(0xffEEF5E2),
+                    borderRadius: BorderRadius.circular(15),
+                    // border: Border.all(color: Color(0xffE0ECDE)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            color: (sign_name_3.isNotEmpty)
+                                ? Colors.white
+                                : Color(0xff9CC75B),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Center(
+                            child: Icon(EvaIcons.peopleOutline,
+                                size: 20,
+                                color: (sign_name_3.isNotEmpty)
+                                    ? Color(0xff9CC75B)
+                                    : Colors.white),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'ผู้ประสานงาน',
+                              style: TextStyle(
+                                  color: (sign_name_3.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xffAED76E),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14),
+                            ),
+                            (sign_name_3.isNotEmpty)
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      sign_name_3,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12),
+                                    ),
+                                  )
+                                : Container()
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+                onTap: () {
+                  popsign(pathOGsign1);
+                },
+                child: Container(
+                  height: 70,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: (signOGname_1.isNotEmpty)
+                        ? Color(0xff9DC75B)
+                        : Color(0xffEEF5E2),
+                    borderRadius: BorderRadius.circular(15),
+                    // border: Border.all(color: Color(0xffE0ECDE)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            color: (signOGname_1.isNotEmpty)
+                                ? Colors.white
+                                : Color(0xff9CC75B),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Center(
+                            child: Icon(EvaIcons.peopleOutline,
+                                size: 20,
+                                color: (signOGname_1.isNotEmpty)
+                                    ? Color(0xff9CC75B)
+                                    : Colors.white),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'ผู้ติดต่อหน้างาน',
+                              style: TextStyle(
+                                  color: (signOGname_1.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xffAED76E),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14),
+                            ),
+                            (signOGname_1.isNotEmpty)
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      signOGname_1,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12),
+                                    ),
+                                  )
+                                : Container()
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+                onTap: () {
+                  popsign(pathOGsign2);
+                },
+                child: Container(
+                  height: 70,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: (signOGname_2.isNotEmpty)
+                        ? Color(0xff9DC75B)
+                        : Color(0xffEEF5E2),
+                    borderRadius: BorderRadius.circular(15),
+                    // border: Border.all(color: Color(0xffE0ECDE)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: BoxDecoration(
+                            color: (signOGname_2.isNotEmpty)
+                                ? Colors.white
+                                : Color(0xff9CC75B),
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: Center(
+                            child: Icon(EvaIcons.peopleOutline,
+                                size: 20,
+                                color: (signOGname_2.isNotEmpty)
+                                    ? Color(0xff9CC75B)
+                                    : Colors.white),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'ช่าง',
+                              style: TextStyle(
+                                  color: (signOGname_2.isNotEmpty)
+                                      ? Colors.white
+                                      : Color(0xffAED76E),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14),
+                            ),
+                            (signOGname_2.isNotEmpty)
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      signOGname_2,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,
@@ -2673,7 +4070,7 @@ class _installState extends State<install> {
     );
   }
 
-  void sheet(title, type) {
+  void sheet(title, type, og) {
     var putname = TextEditingController();
 
     showModalBottomSheet(
@@ -2755,7 +4152,8 @@ class _installState extends State<install> {
                                             imgType: type,
                                             signName: putname.text,
                                             user: userName,
-                                            type: widget.type,
+                                            type:
+                                                (og == true) ? 1 : widget.type,
                                           )),
                                 ).then((value) {
                                   SystemChrome.setPreferredOrientations([
@@ -2764,26 +4162,9 @@ class _installState extends State<install> {
                                   setState(() {
                                     getsign1(widget.jid);
                                     getsign2(widget.jid);
-                                  });
-                                });
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => signature(
-                                            jidx: widget.jid,
-                                            imgType: type,
-                                            signName: putname.text,
-                                            user: userName,
-                                            type: widget.type,
-                                          )),
-                                ).then((value) {
-                                  SystemChrome.setPreferredOrientations([
-                                    DeviceOrientation.portraitUp,
-                                  ]);
-                                  setState(() {
-                                    getsign1(widget.jid);
-                                    getsign2(widget.jid);
+                                    getsign3(widget.jid);
+                                    getOGsign1(widget.jid);
+                                    getOGsign2(widget.jid);
                                   });
                                 });
                               }
@@ -2832,16 +4213,14 @@ class API {
     return response;
   }
 
-  static Future getGroupLs(idd) async {
+  static Future getGroupLs(idd, sortDate) async {
     final response = await http.post(
       Uri.parse('$api/api/mobile/getJobHeaderImageForInstall'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
-      body: jsonEncode(<dynamic, dynamic>{
-        'jidx': idd,
-      }),
+      body: jsonEncode(<dynamic, dynamic>{'jidx': idd, 'sortDate': sortDate}),
     );
 
     return response;

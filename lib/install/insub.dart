@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:egp_app/config.dart';
+import 'package:egp_app/install/inup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -11,17 +13,33 @@ class insub extends StatefulWidget {
   _insubState createState() => _insubState();
   final int jidx;
   final String title;
-  insub({required this.title, required this.jidx});
+  final String userName;
+  final int status;
+  final String date;
+  insub(
+      {required this.title,
+      required this.jidx,
+      required this.status,
+      required this.userName,
+      required this.date});
 }
 
 class _insubState extends State<insub> {
   bool loading = true;
   List<SubType> sub = [];
+  String date = '';
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    API.getGroupLs(widget.jidx, widget.title).then((value) {
+    if (widget.date.isEmpty) {
+      date = DateFormat.MMMMEEEEd("th").format(DateTime.now()).toString();
+    } else {
+      date = DateFormat.MMMMEEEEd("th")
+          .format(DateTime.parse(widget.date))
+          .toString();
+    }
+    API.getGroupLs(widget.jidx, widget.title, widget.date).then((value) {
       setState(() {
         List list = json.decode(value.body);
         sub = list.map((m) => SubType.fromJson(m)).toList();
@@ -58,7 +76,7 @@ class _insubState extends State<insub> {
       appBar: AppBar(
         elevation: 0,
         toolbarHeight:
-            (defaultTargetPlatform == TargetPlatform.android) ? 120 : 100,
+            (defaultTargetPlatform == TargetPlatform.android) ? 140 : 120,
         backgroundColor: Color(0xffF8FFF6),
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
@@ -98,6 +116,39 @@ class _insubState extends State<insub> {
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                               color: Color(0xff2A302C))),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 20,
+                        decoration: BoxDecoration(
+                            color: Color(0xff57A946),
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Center(
+                          child: Icon(
+                            Icons.mode_edit_outlined,
+                            size: 15,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        date,
+                        style: TextStyle(
+                            color: Color(0xff57A946),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                 ),
@@ -169,37 +220,63 @@ class _insubState extends State<insub> {
               itemBuilder: ((context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: Container(
-                    height: 70,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border:
-                            Border.all(width: 0.5, color: Color(0xff9DC75B))),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                '${sub[index].sub_type_install_name}',
-                                overflow: TextOverflow.ellipsis,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: ((context) => inup(
+                                    title: sub[index].sub_type_install_name,
+                                    status: widget.status,
+                                    jTaskId: sub[index].j_task_id,
+                                    jidx: widget.jidx,
+                                    userName: widget.userName,
+                                    date: widget.date,
+                                  )))).then((va) {
+                        API
+                            .getGroupLs(widget.jidx, widget.title, widget.date)
+                            .then((value) {
+                          setState(() {
+                            List list = json.decode(value.body);
+                            sub = list.map((m) => SubType.fromJson(m)).toList();
+                            print(list);
+                            loading = false;
+                          });
+                        });
+                      });
+                    },
+                    child: Container(
+                      height: 70,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border:
+                              Border.all(width: 0.5, color: Color(0xff9DC75B))),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '${sub[index].sub_type_install_name}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: Color(0xff57A946),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Text(
+                                '${sub[index].percent} %',
                                 style: TextStyle(
                                     color: Color(0xff57A946),
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w500),
+                                    fontWeight: FontWeight.w800),
                               ),
-                            ),
-                            Text(
-                              '${sub[index].percent} %',
-                              style: TextStyle(
-                                  color: Color(0xff57A946),
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -212,15 +289,18 @@ class _insubState extends State<insub> {
 
 //api
 class API {
-  static Future getGroupLs(idd, typeInstallName) async {
+  static Future getGroupLs(idd, typeInstallName, date) async {
     final response = await http.post(
       Uri.parse('$api/api/mobile/getJobSubHeaderImageForInstall'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
       },
-      body: jsonEncode(
-          <dynamic, dynamic>{'jidx': idd, 'typeInstallName': typeInstallName}),
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': idd,
+        'typeInstallName': typeInstallName,
+        'sortDate': date
+      }),
     );
 
     return response;

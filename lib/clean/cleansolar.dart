@@ -2917,26 +2917,26 @@ class _cleansolarState extends State<cleansolar> {
                                     getsign2(widget.jid);
                                   });
                                 });
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => signature(
-                                            jidx: widget.jid,
-                                            imgType: type,
-                                            signName: putname.text,
-                                            user: userName,
-                                            type: widget.type,
-                                          )),
-                                ).then((value) {
-                                  SystemChrome.setPreferredOrientations([
-                                    DeviceOrientation.portraitUp,
-                                  ]);
-                                  setState(() {
-                                    getsign1(widget.jid);
-                                    getsign2(widget.jid);
-                                  });
-                                });
+                                // Navigator.pop(context);
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //       builder: (context) => signature(
+                                //             jidx: widget.jid,
+                                //             imgType: type,
+                                //             signName: putname.text,
+                                //             user: userName,
+                                //             type: widget.type,
+                                //           )),
+                                // ).then((value) {
+                                //   SystemChrome.setPreferredOrientations([
+                                //     DeviceOrientation.portraitUp,
+                                //   ]);
+                                //   setState(() {
+                                //     getsign1(widget.jid);
+                                //     getsign2(widget.jid);
+                                //   });
+                                // });
                               }
                             },
                             style: ElevatedButton.styleFrom(

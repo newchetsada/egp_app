@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -23,6 +24,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 );
 
 void main() async {
+  initializeDateFormatting("th");
   WidgetsFlutterBinding.ensureInitialized();
   //create noti chanel
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =

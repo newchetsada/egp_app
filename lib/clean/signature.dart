@@ -32,6 +32,7 @@ class _signatureState extends State<signature> {
   @override
   void initState() {
     super.initState();
+    print(widget.type);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
     ]);
@@ -62,15 +63,16 @@ class _signatureState extends State<signature> {
   uploadPic(image) async {
     var request = http.MultipartRequest(
         'POST',
-        Uri.parse((widget.type == 4)
-            ? '$api/api/mobile/uploadJobImageChecklist'
-            : '$api/api/mobile/uploadJobImage'));
+        Uri.parse((widget.type == 5)
+            ? '$api/api/mobile/uploadJobImageSignInstall'
+            : (widget.type == 4)
+                ? '$api/api/mobile/uploadJobImageChecklist'
+                : '$api/api/mobile/uploadJobImage'));
 
     request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
 
-    request.fields['jidx'] = widget.jidx.toString(); //widget.jidx.toString();
-    request.fields['imgType'] =
-        widget.imgType.toString(); //widget.type.toString();
+    request.fields['jidx'] = widget.jidx.toString();
+    request.fields['imgType'] = widget.imgType.toString();
     request.fields['typeId'] = '';
     request.fields['subTypeId'] = '';
     request.fields['imgDesId'] = '';
