@@ -1345,7 +1345,7 @@ class _repairState extends State<repair> {
                                                 ),
 
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel',
+                                                    title: Text('ยกเลิก',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -1822,7 +1822,7 @@ class _repairState extends State<repair> {
                           ),
 
                           cancelAction: CancelAction(
-                              title: Text('Cancel',
+                              title: Text('ยกเลิก',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,

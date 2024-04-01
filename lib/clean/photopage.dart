@@ -1027,20 +1027,20 @@ class _photopageState extends State<photopage> {
           // title: const Text('Title'),
           actions: <BottomSheetAction>[
             BottomSheetAction(
-              title: Text('Camera'),
+              title: Text('กล้อง'),
               onPressed: (context) {
                 openCamera();
                 Navigator.pop(context);
               },
             ),
             BottomSheetAction(
-                title: Text('Photos'),
+                title: Text('รูปภาพ'),
                 onPressed: (context) {
                   openImages();
                   Navigator.pop(context);
                 }),
           ],
-          cancelAction: CancelAction(title: Text('Cancel')),
+          cancelAction: CancelAction(title: Text('ยกเลิก')),
         );
       },
       child: Container(

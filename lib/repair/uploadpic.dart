@@ -1593,7 +1593,7 @@ class _uploadPicState extends State<uploadPic> {
                                                 // title: const Text('Title'),
                                                 actions: <BottomSheetAction>[
                                                   BottomSheetAction(
-                                                    title: Text('Camera'),
+                                                    title: Text('กล้อง'),
                                                     onPressed: (context) {
                                                       openCamera()
                                                           .then((value) {
@@ -1611,7 +1611,7 @@ class _uploadPicState extends State<uploadPic> {
                                                     },
                                                   ),
                                                   BottomSheetAction(
-                                                      title: Text('Photos'),
+                                                      title: Text('รูปภาพ'),
                                                       onPressed: (context) {
                                                         openPhoto()
                                                             .then((value) {
@@ -1632,7 +1632,7 @@ class _uploadPicState extends State<uploadPic> {
                                                       }),
                                                 ],
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel')),
+                                                    title: Text('ยกเลิก')),
                                               )
                                             : null;
                                       },
@@ -1960,7 +1960,7 @@ class _uploadPicState extends State<uploadPic> {
                                                     // title: const Text('Title'),
                                                     actions: <BottomSheetAction>[
                                                       BottomSheetAction(
-                                                        title: Text('Camera'),
+                                                        title: Text('กล้อง'),
                                                         onPressed: (context) {
                                                           openCamera()
                                                               .then((value) {
@@ -1980,7 +1980,7 @@ class _uploadPicState extends State<uploadPic> {
                                                         },
                                                       ),
                                                       BottomSheetAction(
-                                                          title: Text('Photos'),
+                                                          title: Text('รูปภาพ'),
                                                           onPressed: (context) {
                                                             openPhoto()
                                                                 .then((value) {
@@ -2003,7 +2003,7 @@ class _uploadPicState extends State<uploadPic> {
                                                           }),
                                                     ],
                                                     cancelAction: CancelAction(
-                                                        title: Text('Cancel')),
+                                                        title: Text('ยกเลิก')),
                                                   )
                                                 : null;
                                       },

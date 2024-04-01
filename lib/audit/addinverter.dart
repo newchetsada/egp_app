@@ -947,7 +947,7 @@ class _addinverterState extends State<addinverter> {
                                 // title: const Text('Title'),
                                 actions: <BottomSheetAction>[
                                   BottomSheetAction(
-                                    title: Text('Camera'),
+                                    title: Text('กล้อง'),
                                     onPressed: (context) {
                                       headopenCamera().then((value) {
                                         setState(() {});
@@ -956,7 +956,7 @@ class _addinverterState extends State<addinverter> {
                                     },
                                   ),
                                   BottomSheetAction(
-                                      title: Text('Photos'),
+                                      title: Text('รูปภาพ'),
                                       onPressed: (context) {
                                         headopenImages().then((value) {
                                           setState(() {});
@@ -965,7 +965,7 @@ class _addinverterState extends State<addinverter> {
                                       }),
                                 ],
                                 cancelAction:
-                                    CancelAction(title: Text('Cancel')),
+                                    CancelAction(title: Text('ยกเลิก')),
                               );
                             },
                             child: Container(
@@ -1591,7 +1591,7 @@ class _addinverterState extends State<addinverter> {
                                                   // title: const Text('Title'),
                                                   actions: <BottomSheetAction>[
                                                     BottomSheetAction(
-                                                      title: Text('Camera'),
+                                                      title: Text('กล้อง'),
                                                       onPressed: (context) {
                                                         openCamera()
                                                             .then((value) {
@@ -1602,7 +1602,7 @@ class _addinverterState extends State<addinverter> {
                                                       },
                                                     ),
                                                     BottomSheetAction(
-                                                        title: Text('Photos'),
+                                                        title: Text('รูปภาพ'),
                                                         onPressed: (context) {
                                                           openImages()
                                                               .then((value) {
@@ -1615,7 +1615,7 @@ class _addinverterState extends State<addinverter> {
                                                         }),
                                                   ],
                                                   cancelAction: CancelAction(
-                                                      title: Text('Cancel')),
+                                                      title: Text('ยกเลิก')),
                                                 );
                                               },
                                               child: Container(
@@ -1790,7 +1790,7 @@ class _addinverterState extends State<addinverter> {
                                                 // title: const Text('Title'),
                                                 actions: <BottomSheetAction>[
                                                   BottomSheetAction(
-                                                    title: Text('Camera'),
+                                                    title: Text('กล้อง'),
                                                     onPressed: (context) {
                                                       openCamera()
                                                           .then((value) {
@@ -1801,7 +1801,7 @@ class _addinverterState extends State<addinverter> {
                                                     },
                                                   ),
                                                   BottomSheetAction(
-                                                      title: Text('Photos'),
+                                                      title: Text('รูปภาพ'),
                                                       onPressed: (context) {
                                                         openImages()
                                                             .then((value) {
@@ -1812,7 +1812,7 @@ class _addinverterState extends State<addinverter> {
                                                       }),
                                                 ],
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel')),
+                                                    title: Text('ยกเลิก')),
                                               );
                                             },
                                             child: Container(

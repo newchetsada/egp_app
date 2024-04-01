@@ -16,12 +16,14 @@ class insub extends StatefulWidget {
   final String userName;
   final int status;
   final String date;
+  final int no;
   insub(
       {required this.title,
       required this.jidx,
       required this.status,
       required this.userName,
-      required this.date});
+      required this.date,
+      required this.no});
 }
 
 class _insubState extends State<insub> {
@@ -39,7 +41,9 @@ class _insubState extends State<insub> {
           .format(DateTime.parse(widget.date))
           .toString();
     }
-    API.getGroupLs(widget.jidx, widget.title, widget.date).then((value) {
+    API
+        .getGroupLs(widget.jidx, widget.title, widget.date, widget.no)
+        .then((value) {
       setState(() {
         List list = json.decode(value.body);
         sub = list.map((m) => SubType.fromJson(m)).toList();
@@ -232,9 +236,11 @@ class _insubState extends State<insub> {
                                     jidx: widget.jidx,
                                     userName: widget.userName,
                                     date: widget.date,
+                                    curValue: sub[index].percent,
                                   )))).then((va) {
                         API
-                            .getGroupLs(widget.jidx, widget.title, widget.date)
+                            .getGroupLs(widget.jidx, widget.title, widget.date,
+                                widget.no)
                             .then((value) {
                           setState(() {
                             List list = json.decode(value.body);
@@ -289,7 +295,7 @@ class _insubState extends State<insub> {
 
 //api
 class API {
-  static Future getGroupLs(idd, typeInstallName, date) async {
+  static Future getGroupLs(idd, typeInstallName, date, no) async {
     final response = await http.post(
       Uri.parse('$api/api/mobile/getJobSubHeaderImageForInstall'),
       headers: <String, String>{
@@ -299,7 +305,8 @@ class API {
       body: jsonEncode(<dynamic, dynamic>{
         'jidx': idd,
         'typeInstallName': typeInstallName,
-        'sortDate': date
+        'sortDate': date,
+        'no': no
       }),
     );
 

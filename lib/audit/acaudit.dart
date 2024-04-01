@@ -949,7 +949,7 @@ class _acauditState extends State<acaudit> {
                                                         actions: <BottomSheetAction>[
                                                           BottomSheetAction(
                                                             title:
-                                                                Text('Camera'),
+                                                                Text('กล้อง'),
                                                             onPressed:
                                                                 (context) {
                                                               openCamera().then(
@@ -981,7 +981,7 @@ class _acauditState extends State<acaudit> {
                                                         cancelAction:
                                                             CancelAction(
                                                                 title: Text(
-                                                                    'Cancel')),
+                                                                    'ยกเลิก')),
                                                       );
                                                     },
                                               child: Container(
@@ -1162,7 +1162,7 @@ class _acauditState extends State<acaudit> {
                                                       // title: const Text('Title'),
                                                       actions: <BottomSheetAction>[
                                                         BottomSheetAction(
-                                                          title: Text('Camera'),
+                                                          title: Text('กล้อง'),
                                                           onPressed: (context) {
                                                             openCamera()
                                                                 .then((value) {
@@ -1175,7 +1175,7 @@ class _acauditState extends State<acaudit> {
                                                         ),
                                                         BottomSheetAction(
                                                             title:
-                                                                Text('Photos'),
+                                                                Text('รูปภาพ'),
                                                             onPressed:
                                                                 (context) {
                                                               openImages().then(
@@ -1190,7 +1190,7 @@ class _acauditState extends State<acaudit> {
                                                       cancelAction:
                                                           CancelAction(
                                                               title: Text(
-                                                                  'Cancel')),
+                                                                  'ยกเลิก')),
                                                     );
                                                   },
                                             child: Container(

@@ -1351,7 +1351,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                           // title: const Text('Title'),
                                           actions: <BottomSheetAction>[
                                             BottomSheetAction(
-                                              title: Text('Camera'),
+                                              title: Text('กล้อง'),
                                               onPressed: (context) {
                                                 openCamera().then((value) {
                                                   if (value != null) {
@@ -1368,7 +1368,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                               },
                                             ),
                                             BottomSheetAction(
-                                                title: Text('Photos'),
+                                                title: Text('รูปภาพ'),
                                                 onPressed: (context) {
                                                   openPhoto().then((value) {
                                                     if (value != null) {
@@ -1386,7 +1386,7 @@ class _ReportuploadPicState extends State<ReportuploadPic> {
                                                 }),
                                           ],
                                           cancelAction: CancelAction(
-                                              title: Text('Cancel')),
+                                              title: Text('ยกเลิก')),
                                         )
                                       : null;
                                 },

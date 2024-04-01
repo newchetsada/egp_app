@@ -850,7 +850,7 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                             // title: const Text('Title'),
                                             actions: <BottomSheetAction>[
                                               BottomSheetAction(
-                                                title: Text('Camera'),
+                                                title: Text('กล้อง'),
                                                 onPressed: (context) {
                                                   openCamera().then((value) {
                                                     if (value != null) {
@@ -865,7 +865,7 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                                 },
                                               ),
                                               BottomSheetAction(
-                                                  title: Text('Photos'),
+                                                  title: Text('รูปภาพ'),
                                                   onPressed: (context) {
                                                     openPhoto().then((value) {
                                                       if (value != null) {
@@ -882,7 +882,7 @@ class _cleanphotopageState extends State<cleanphotopage> {
                                                   }),
                                             ],
                                             cancelAction: CancelAction(
-                                                title: Text('Cancel')),
+                                                title: Text('ยกเลิก')),
                                           )
                                         : (pic[index].onApi == 1)
                                             ? Navigator.push(
@@ -1176,20 +1176,20 @@ class _cleanphotopageState extends State<cleanphotopage> {
   //         // title: const Text('Title'),
   //         actions: <BottomSheetAction>[
   //           BottomSheetAction(
-  //             title: Text('Camera'),
+  //             title: Text('กล้อง'),
   //             onPressed: (context) {
   //               openCamera();
   //               Navigator.pop(context);
   //             },
   //           ),
   //           BottomSheetAction(
-  //               title: Text('Photos'),
+  //               title: Text('รูปภาพ'),
   //               onPressed: (context) {
   //                 openImages();
   //                 Navigator.pop(context);
   //               }),
   //         ],
-  //         cancelAction: CancelAction(title: Text('Cancel')),
+  //         cancelAction: CancelAction(title: Text('ยกเลิก')),
   //       );
   //     },
   //     child: Container(

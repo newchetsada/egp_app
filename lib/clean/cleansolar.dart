@@ -1030,7 +1030,7 @@ class _cleansolarState extends State<cleansolar> {
                                                 ),
 
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel',
+                                                    title: Text('ยกเลิก',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -1484,7 +1484,7 @@ class _cleansolarState extends State<cleansolar> {
                           ),
 
                           cancelAction: CancelAction(
-                              title: Text('Cancel',
+                              title: Text('ยกเลิก',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,

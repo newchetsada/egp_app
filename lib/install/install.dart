@@ -264,7 +264,7 @@ class _installState extends State<install> {
     }
   }
 
-  Future getsign1(jidx) async {
+  Future getsign1(jidx, da) async {
     try {
       var response = await http.post(
         Uri.parse('$api/api/mobile/getJobInstallSignImage'),
@@ -272,7 +272,8 @@ class _installState extends State<install> {
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
         },
-        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 3}),
+        body: jsonEncode(
+            <dynamic, dynamic>{'jidx': jidx, 'imgType': 3, 'sortDate': da}),
       );
 
       if (response.statusCode == 200) {
@@ -328,7 +329,7 @@ class _installState extends State<install> {
         });
   }
 
-  Future getsign2(jidx) async {
+  Future getsign2(jidx, da) async {
     try {
       var response = await http.post(
         Uri.parse('$api/api/mobile/getJobInstallSignImage'),
@@ -336,7 +337,8 @@ class _installState extends State<install> {
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
         },
-        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 2}),
+        body: jsonEncode(
+            <dynamic, dynamic>{'jidx': jidx, 'imgType': 2, 'sortDate': da}),
       );
 
       if (response.statusCode == 200) {
@@ -353,7 +355,7 @@ class _installState extends State<install> {
     }
   }
 
-  Future getsign3(jidx) async {
+  Future getsign3(jidx, da) async {
     try {
       var response = await http.post(
         Uri.parse('$api/api/mobile/getJobInstallSignImage'),
@@ -361,7 +363,8 @@ class _installState extends State<install> {
           'Content-Type': 'application/json; charset=UTF-8',
           'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
         },
-        body: jsonEncode(<dynamic, dynamic>{'jidx': jidx, 'imgType': 4}),
+        body: jsonEncode(
+            <dynamic, dynamic>{'jidx': jidx, 'imgType': 4, 'sortDate': da}),
       );
 
       if (response.statusCode == 200) {
@@ -511,14 +514,17 @@ class _installState extends State<install> {
     if (widget.j_status == 3) {
       getDate(widget.jid).then((va) {
         _getAPI(widget.jid);
+        getsign1(widget.jid, date);
+        getsign2(widget.jid, date);
+        getsign3(widget.jid, date);
       });
     } else {
       _getAPI(widget.jid);
     }
 
-    getsign1(widget.jid);
-    getsign2(widget.jid);
-    getsign3(widget.jid);
+    getsign1(widget.jid, date);
+    getsign2(widget.jid, date);
+    getsign3(widget.jid, date);
     getOGsign1(widget.jid);
     getOGsign2(widget.jid);
 
@@ -1426,7 +1432,7 @@ class _installState extends State<install> {
                                                 ),
 
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel',
+                                                    title: Text('ยกเลิก',
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -1880,7 +1886,7 @@ class _installState extends State<install> {
                           ),
 
                           cancelAction: CancelAction(
-                              title: Text('Cancel',
+                              title: Text('ยกเลิก',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 16,
@@ -2338,6 +2344,7 @@ class _installState extends State<install> {
                                       status: widget.j_status,
                                       userName: userName,
                                       date: date,
+                                      no: groupPic[index].no ?? 0,
                                     )))).then((ba) {
                           API.getGroupLs(widget.jid, date).then((value) {
                             setState(() {
@@ -2375,6 +2382,7 @@ class _installState extends State<install> {
                                       jidx: widget.jid,
                                       jTaskId: groupPic[index].j_task_id ?? 0,
                                       date: date,
+                                      curValue: groupPic[index].percent,
                                     )))).then((ba) {
                           API.getGroupLs(widget.jid, date).then((value) {
                             setState(() {
@@ -2578,9 +2586,9 @@ class _installState extends State<install> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await getsign1(widget.jid);
-          await getsign2(widget.jid);
-          await getsign3(widget.jid);
+          await getsign1(widget.jid, date);
+          await getsign2(widget.jid, date);
+          await getsign3(widget.jid, date);
           await getOGsign1(widget.jid);
           await getOGsign2(widget.jid);
         },
@@ -2593,9 +2601,9 @@ class _installState extends State<install> {
                   child: GestureDetector(
                       onTap: () async {
                         loading();
-                        await getsign1(widget.jid);
-                        await getsign2(widget.jid);
-                        await getsign3(widget.jid);
+                        await getsign1(widget.jid, date);
+                        await getsign2(widget.jid, date);
+                        await getsign3(widget.jid, date);
                         await getOGsign1(widget.jid);
                         await getOGsign2(widget.jid);
 
@@ -2678,9 +2686,9 @@ class _installState extends State<install> {
                   child: GestureDetector(
                       onTap: () async {
                         loading();
-                        await getsign1(widget.jid);
-                        await getsign2(widget.jid);
-                        await getsign3(widget.jid);
+                        await getsign1(widget.jid, date);
+                        await getsign2(widget.jid, date);
+                        await getsign3(widget.jid, date);
                         await getOGsign1(widget.jid);
                         await getOGsign2(widget.jid);
 
@@ -2763,9 +2771,9 @@ class _installState extends State<install> {
                   child: GestureDetector(
                       onTap: () async {
                         loading();
-                        await getsign1(widget.jid);
-                        await getsign2(widget.jid);
-                        await getsign3(widget.jid);
+                        await getsign1(widget.jid, date);
+                        await getsign2(widget.jid, date);
+                        await getsign3(widget.jid, date);
                         await getOGsign1(widget.jid);
                         await getOGsign2(widget.jid);
 
@@ -2867,9 +2875,9 @@ class _installState extends State<install> {
                             child: GestureDetector(
                                 onTap: () async {
                                   loading();
-                                  await getsign1(widget.jid);
-                                  await getsign2(widget.jid);
-                                  await getsign3(widget.jid);
+                                  await getsign1(widget.jid, date);
+                                  await getsign2(widget.jid, date);
+                                  await getsign3(widget.jid, date);
                                   await getOGsign1(widget.jid);
                                   await getOGsign2(widget.jid);
                                   Navigator.pop(context);
@@ -2960,9 +2968,9 @@ class _installState extends State<install> {
                             child: GestureDetector(
                                 onTap: () async {
                                   loading();
-                                  await getsign1(widget.jid);
-                                  await getsign2(widget.jid);
-                                  await getsign3(widget.jid);
+                                  await getsign1(widget.jid, date);
+                                  await getsign2(widget.jid, date);
+                                  await getsign3(widget.jid, date);
                                   await getOGsign1(widget.jid);
                                   await getOGsign2(widget.jid);
                                   Navigator.pop(context);
@@ -3362,6 +3370,9 @@ class _installState extends State<install> {
                                 .getGroupLs(widget.jid, alldate[pop])
                                 .then((value) {
                               setState(() {
+                                getsign1(widget.jid, alldate[pop]);
+                                getsign2(widget.jid, alldate[pop]);
+                                getsign3(widget.jid, alldate[pop]);
                                 loadgroup = true;
                                 groupPic.clear();
                                 var data = json.decode(value.body);
@@ -3543,6 +3554,7 @@ class _installState extends State<install> {
                                           status: widget.j_status,
                                           userName: userName,
                                           date: date,
+                                          no: groupPic[index].no ?? 0,
                                         ))));
                           } else {
                             Navigator.push(
@@ -3556,6 +3568,7 @@ class _installState extends State<install> {
                                           jTaskId:
                                               groupPic[index].j_task_id ?? 0,
                                           date: date,
+                                          curValue: groupPic[index].percent,
                                         ))));
                           }
                         },
@@ -4160,9 +4173,9 @@ class _installState extends State<install> {
                                     DeviceOrientation.portraitUp,
                                   ]);
                                   setState(() {
-                                    getsign1(widget.jid);
-                                    getsign2(widget.jid);
-                                    getsign3(widget.jid);
+                                    getsign1(widget.jid, date);
+                                    getsign2(widget.jid, date);
+                                    getsign3(widget.jid, date);
                                     getOGsign1(widget.jid);
                                     getOGsign2(widget.jid);
                                   });

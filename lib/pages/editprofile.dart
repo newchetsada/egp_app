@@ -345,7 +345,7 @@ class _editprofileState extends State<editprofile> {
                         ],
                         cancelAction: CancelAction(
                             title: Text(
-                          'Cancel',
+                          'ยกเลิก',
                           style: TextStyle(
                             fontSize: 15,
                             fontFamily: 'Noto Sans Thai',

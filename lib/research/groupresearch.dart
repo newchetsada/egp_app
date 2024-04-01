@@ -472,7 +472,7 @@ class _groupresearchState extends State<groupresearch> {
                                       // title: const Text('Title'),
                                       actions: <BottomSheetAction>[
                                         BottomSheetAction(
-                                          title: Text('Camera'),
+                                          title: Text('กล้อง'),
                                           onPressed: (context) {
                                             openCamera().then((value) {
                                               setState(() {});
@@ -481,7 +481,7 @@ class _groupresearchState extends State<groupresearch> {
                                           },
                                         ),
                                         BottomSheetAction(
-                                            title: Text('Photos'),
+                                            title: Text('รูปภาพ'),
                                             onPressed: (context) {
                                               openImages().then((value) {
                                                 setState(() {});
@@ -490,7 +490,7 @@ class _groupresearchState extends State<groupresearch> {
                                             }),
                                       ],
                                       cancelAction:
-                                          CancelAction(title: Text('Cancel')),
+                                          CancelAction(title: Text('ยกเลิก')),
                                     );
                                   },
                                   child: Container(
@@ -872,7 +872,7 @@ class _groupresearchState extends State<groupresearch> {
                                                   // title: const Text('Title'),
                                                   actions: <BottomSheetAction>[
                                                     BottomSheetAction(
-                                                      title: Text('Camera'),
+                                                      title: Text('กล้อง'),
                                                       onPressed: (context) {
                                                         openCamera()
                                                             .then((value) {
@@ -883,7 +883,7 @@ class _groupresearchState extends State<groupresearch> {
                                                       },
                                                     ),
                                                     BottomSheetAction(
-                                                        title: Text('Photos'),
+                                                        title: Text('รูปภาพ'),
                                                         onPressed: (context) {
                                                           openImages()
                                                               .then((value) {
@@ -896,7 +896,7 @@ class _groupresearchState extends State<groupresearch> {
                                                         }),
                                                   ],
                                                   cancelAction: CancelAction(
-                                                      title: Text('Cancel')),
+                                                      title: Text('ยกเลิก')),
                                                 );
                                               },
                                               child: Container(
@@ -1071,7 +1071,7 @@ class _groupresearchState extends State<groupresearch> {
                                                 // title: const Text('Title'),
                                                 actions: <BottomSheetAction>[
                                                   BottomSheetAction(
-                                                    title: Text('Camera'),
+                                                    title: Text('กล้อง'),
                                                     onPressed: (context) {
                                                       openCamera()
                                                           .then((value) {
@@ -1082,7 +1082,7 @@ class _groupresearchState extends State<groupresearch> {
                                                     },
                                                   ),
                                                   BottomSheetAction(
-                                                      title: Text('Photos'),
+                                                      title: Text('รูปภาพ'),
                                                       onPressed: (context) {
                                                         openImages()
                                                             .then((value) {
@@ -1093,7 +1093,7 @@ class _groupresearchState extends State<groupresearch> {
                                                       }),
                                                 ],
                                                 cancelAction: CancelAction(
-                                                    title: Text('Cancel')),
+                                                    title: Text('ยกเลิก')),
                                               );
                                             },
                                             child: Container(

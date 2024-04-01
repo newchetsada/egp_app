@@ -19,13 +19,15 @@ class inup extends StatefulWidget {
   final int status;
   final String userName;
   final String date;
+  final double curValue;
   inup(
       {required this.title,
       required this.status,
       required this.jTaskId,
       required this.jidx,
       required this.userName,
-      required this.date});
+      required this.date,
+      required this.curValue});
 }
 
 class _inupState extends State<inup> {
@@ -276,6 +278,9 @@ class _inupState extends State<inup> {
         });
       } else {
         print('null');
+        setState(() {
+          Value = widget.curValue ?? 0.0;
+        });
       }
     });
   }
@@ -588,7 +593,7 @@ class _inupState extends State<inup> {
                               // title: const Text('Title'),
                               actions: <BottomSheetAction>[
                                 BottomSheetAction(
-                                  title: Text('Camera'),
+                                  title: Text('กล้อง'),
                                   onPressed: (context) {
                                     openCamera().then((value) {
                                       setState(() {});
@@ -597,7 +602,7 @@ class _inupState extends State<inup> {
                                   },
                                 ),
                                 BottomSheetAction(
-                                    title: Text('Photos'),
+                                    title: Text('รูปภาพ'),
                                     onPressed: (context) {
                                       openImages().then((value) {
                                         setState(() {});
@@ -605,7 +610,7 @@ class _inupState extends State<inup> {
                                       Navigator.pop(context);
                                     }),
                               ],
-                              cancelAction: CancelAction(title: Text('Cancel')),
+                              cancelAction: CancelAction(title: Text('ยกเลิก')),
                             );
                           },
                           child: Container(
