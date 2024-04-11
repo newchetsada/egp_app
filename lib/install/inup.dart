@@ -261,9 +261,9 @@ class _inupState extends State<inup> {
     print("jidx: ${widget.jidx} ,jTaskId: ${widget.jTaskId}");
 
     if (widget.date.isEmpty) {
-      date = DateFormat.MMMMEEEEd("th").format(DateTime.now()).toString();
+      date = DateFormat.yMMMMEEEEd("th").format(DateTime.now()).toString();
     } else {
-      date = DateFormat.MMMMEEEEd("th")
+      date = DateFormat.yMMMMEEEEd("th")
           .format(DateTime.parse(widget.date))
           .toString();
     }
@@ -292,7 +292,7 @@ class _inupState extends State<inup> {
       appBar: AppBar(
         elevation: 0,
         toolbarHeight:
-            (defaultTargetPlatform == TargetPlatform.android) ? 140 : 120,
+            (defaultTargetPlatform == TargetPlatform.android) ? 120 : 100,
         backgroundColor: Color(0xffF8FFF6),
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
@@ -386,15 +386,7 @@ class _inupState extends State<inup> {
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${widget.title}',
-                                style: TextStyle(
-                                    color: Color(0xff9DC75B),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ],
+                            children: [],
                           ),
                         )),
                     Container(
@@ -411,6 +403,19 @@ class _inupState extends State<inup> {
         ),
       ),
       body: ListView(children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Text(
+            '${widget.title}',
+            style: TextStyle(
+                color: Color(0xff9DC75B),
+                fontSize: 15,
+                fontWeight: FontWeight.w500),
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 30),
           child: Row(
@@ -445,9 +450,15 @@ class _inupState extends State<inup> {
                   onChanged: (widget.status == 3)
                       ? null
                       : (double value) {
-                          setState(() {
-                            Value = value;
-                          });
+                          if (value < Value) {
+                            setState(() {
+                              Value = widget.curValue;
+                            });
+                          } else {
+                            setState(() {
+                              Value = value;
+                            });
+                          }
                         },
                   activeColor: Color(0xff57A946),
                   inactiveColor: Color(0xffD6EFB4)),

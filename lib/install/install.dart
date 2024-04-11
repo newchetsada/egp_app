@@ -9,6 +9,7 @@ import 'package:egp_app/clean/signature.dart';
 import 'package:egp_app/install/indetail.dart';
 import 'package:egp_app/install/insub.dart';
 import 'package:egp_app/install/inup.dart';
+import 'package:egp_app/install/loof.dart';
 import 'package:egp_app/pages/homepage.dart';
 import 'package:egp_app/repair/hero_dialog_route.dart';
 import 'package:egp_app/report/report.dart';
@@ -111,7 +112,7 @@ class _installState extends State<install> {
   bool isLoading = true;
   int workstatus = 0;
   bool daydetail = false;
-  bool next = false;
+  bool survey_roof = false;
   bool isfinished = true;
   bool loadgroup = false;
 
@@ -153,14 +154,17 @@ class _installState extends State<install> {
       API.getGroupLs(idd, date).then((value) {
         setState(() {
           var data = json.decode(value.body);
-          print(data['detail']);
-          daydetail = data['detail'];
-          next = data['status_next'];
+          // print(data['detail']);
+          daydetail = data['detail_daily'];
+          survey_roof = data['survey_roof'];
           problem.text = data['j_detail_problem'] ?? '';
           fix.text = data['j_detail_solution'] ?? '';
-          List list1 = json.decode(value.body)['type'];
+          List list1 = json.decode(value.body)['construction'];
 
           groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+
+          List list2 = json.decode(value.body)['electrical'];
+          groupPicElec = list2.map((m) => GroupLs.fromJson(m)).toList();
 
           isfinished = true;
 
@@ -1958,6 +1962,7 @@ class _installState extends State<install> {
   }
 
   var groupPic = <GroupLs>[];
+  var groupPicElec = <GroupLs>[];
 
   Widget photoPage() {
     return Scaffold(
@@ -1980,7 +1985,7 @@ class _installState extends State<install> {
                         height: 50,
                         // width: 160,
                         child: ElevatedButton(
-                          onPressed: (next == true && daydetail == true)
+                          onPressed: (survey_roof == true && daydetail == true)
                               ? () {
                                   showDialog(
                                     context: context,
@@ -2180,8 +2185,8 @@ class _installState extends State<install> {
                                               var data =
                                                   json.decode(value.body);
                                               print(data['detail']);
-                                              daydetail = data['detail'];
-                                              next = data['status_next'];
+                                              daydetail = data['detail_daily'];
+                                              survey_roof = data['survey_roof'];
                                               problem.text =
                                                   data['j_detail_problem'] ??
                                                       '';
@@ -2239,6 +2244,104 @@ class _installState extends State<install> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
+                        builder: ((context) => roof(
+                              status: widget.j_status,
+                              userName: userName,
+                              jidx: widget.jid,
+                            ))));
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => indetail(
+                //               jidx: widget.jid,
+                //               userName: userName,
+                //               status: widget.j_status,
+                //               date: date,
+                //             ))).then((ba) {
+                //   API.getGroupLs(widget.jid, date).then((value) {
+                //     setState(() {
+                //       var data = json.decode(value.body);
+                //       print(data['detail']);
+                //       daydetail = data['detail'];
+                //       next = data['status_next'];
+                //       problem.text = data['j_detail_problem'] ?? '';
+                //       fix.text = data['j_detail_solution'] ?? '';
+                //       List list1 = json.decode(value.body)['type'];
+
+                //       groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+
+                //       isfinished = true;
+
+                //       for (var i = 0; i < groupPic.length; i++) {
+                //         if (groupPic[i].percent < 100) {
+                //           isfinished = false;
+                //         }
+                //       }
+                //       contactloading = false;
+                //     });
+                //   });
+                // });
+              },
+              child: Container(
+                height: 65,
+                decoration: (survey_roof == true)
+                    ? BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xffE1F5DC),
+                            Color(0xffD6EFB4),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      )
+                    : BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(color: Color(0xffAED76E)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xffAED76E).withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 0,
+                            offset: Offset(0, 0), // Shadow position
+                          ),
+                        ],
+                      ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Text('สำรวจและส่งมอบหลังคา',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Color(0xff2A302C),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
                         builder: (context) => indetail(
                               jidx: widget.jid,
                               userName: userName,
@@ -2249,13 +2352,16 @@ class _installState extends State<install> {
                     setState(() {
                       var data = json.decode(value.body);
                       print(data['detail']);
-                      daydetail = data['detail'];
-                      next = data['status_next'];
+                      daydetail = data['detail_daily'];
+                      survey_roof = data['survey_roof'];
                       problem.text = data['j_detail_problem'] ?? '';
                       fix.text = data['j_detail_solution'] ?? '';
-                      List list1 = json.decode(value.body)['type'];
+                      List list1 = json.decode(value.body)['construction'];
 
                       groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+                      List list2 = json.decode(value.body)['electrical'];
+                      groupPicElec =
+                          list2.map((m) => GroupLs.fromJson(m)).toList();
 
                       isfinished = true;
 
@@ -2323,94 +2429,94 @@ class _installState extends State<install> {
             ),
           ),
           Padding(
-              padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 35),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 25,
+                ),
+                Text('งานก่อสร้าง',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: Color(0xff2A302C),
+                    )),
+                Divider(
+                  color: Color(0xffAED76E),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.only(top: 5, left: 30, right: 30),
               child: GridView.count(
                 shrinkWrap: true,
-                childAspectRatio: 0.8,
+                childAspectRatio: 1.6,
                 primary: false,
                 crossAxisSpacing: 30,
                 mainAxisSpacing: 20,
                 crossAxisCount: 2,
                 children: List.generate(groupPic.length, (index) {
                   return GestureDetector(
-                    onTap: () {
-                      if (groupPic[index].sub_type == true) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => insub(
-                                      jidx: widget.jid,
-                                      title: groupPic[index].name ?? '',
-                                      status: widget.j_status,
-                                      userName: userName,
-                                      date: date,
-                                      no: groupPic[index].no ?? 0,
-                                    )))).then((ba) {
-                          API.getGroupLs(widget.jid, date).then((value) {
-                            setState(() {
-                              var data = json.decode(value.body);
-                              print(data['detail']);
-                              daydetail = data['detail'];
-                              next = data['status_next'];
-                              problem.text = data['j_detail_problem'] ?? '';
-                              fix.text = data['j_detail_solution'] ?? '';
-                              List list1 = json.decode(value.body)['type'];
+                    onTap: (index != 0 && groupPic[index - 1].percent < 99)
+                        ? null
+                        : () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => inup(
+                                          title: groupPic[index].name ?? '',
+                                          status: widget.j_status,
+                                          userName: userName,
+                                          jidx: widget.jid,
+                                          jTaskId:
+                                              groupPic[index].j_task_id ?? 0,
+                                          date: date,
+                                          curValue: groupPic[index].percent,
+                                        )))).then((ba) {
+                              API.getGroupLs(widget.jid, date).then((value) {
+                                setState(() {
+                                  var data = json.decode(value.body);
+                                  print(data['detail']);
+                                  daydetail = data['detail_daily'];
+                                  survey_roof = data['survey_roof'];
+                                  problem.text = data['j_detail_problem'] ?? '';
+                                  fix.text = data['j_detail_solution'] ?? '';
+                                  List list1 =
+                                      json.decode(value.body)['construction'];
 
-                              groupPic = list1
-                                  .map((m) => GroupLs.fromJson(m))
-                                  .toList();
+                                  groupPic = list1
+                                      .map((m) => GroupLs.fromJson(m))
+                                      .toList();
 
-                              isfinished = true;
+                                  List list2 =
+                                      json.decode(value.body)['electrical'];
 
-                              for (var i = 0; i < groupPic.length; i++) {
-                                if (groupPic[i].percent < 100) {
-                                  isfinished = false;
-                                }
-                              }
-                              contactloading = false;
+                                  groupPicElec = list2
+                                      .map((m) => GroupLs.fromJson(m))
+                                      .toList();
+
+                                  isfinished = true;
+
+                                  for (var i = 0; i < groupPic.length; i++) {
+                                    if (groupPic[i].percent < 100) {
+                                      isfinished = false;
+                                    }
+                                  }
+
+                                  for (var i = 0;
+                                      i < groupPicElec.length;
+                                      i++) {
+                                    if (groupPicElec[i].percent < 100) {
+                                      isfinished = false;
+                                    }
+                                  }
+                                  contactloading = false;
+                                });
+                              });
                             });
-                          });
-                        });
-                      } else {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => inup(
-                                      title: groupPic[index].name ?? '',
-                                      status: widget.j_status,
-                                      userName: userName,
-                                      jidx: widget.jid,
-                                      jTaskId: groupPic[index].j_task_id ?? 0,
-                                      date: date,
-                                      curValue: groupPic[index].percent,
-                                    )))).then((ba) {
-                          API.getGroupLs(widget.jid, date).then((value) {
-                            setState(() {
-                              var data = json.decode(value.body);
-                              print(data['detail']);
-                              daydetail = data['detail'];
-                              next = data['status_next'];
-                              problem.text = data['j_detail_problem'] ?? '';
-                              fix.text = data['j_detail_solution'] ?? '';
-                              List list1 = json.decode(value.body)['type'];
-
-                              groupPic = list1
-                                  .map((m) => GroupLs.fromJson(m))
-                                  .toList();
-
-                              isfinished = true;
-
-                              for (var i = 0; i < groupPic.length; i++) {
-                                if (groupPic[i].percent < 100) {
-                                  isfinished = false;
-                                }
-                              }
-                              contactloading = false;
-                            });
-                          });
-                        });
-                      }
-                    },
+                          },
                     child: Container(
                       width: double.infinity,
                       decoration: (groupPic[index].percent > 99)
@@ -2433,10 +2539,176 @@ class _installState extends State<install> {
                                 ),
                               ],
                             )
-                          : BoxDecoration(
-                              color: Colors.white,
+                          : (index != 0 && groupPic[index - 1].percent < 99)
+                              ? BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                      color:
+                                          Color(0xff9D9D9D).withOpacity(0.5)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff9D9D9D).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${groupPic[index].percent.toInt()} %',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                  color: Color(0xff2A302C),
+                                )),
+                            Text(groupPic[index].name ?? '',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: Color(0xff2A302C),
+                                )),
+                            Text(
+                                '${DateFormat('dd/MM/yyyy').format(DateTime.now()).toString()}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                  color: Color(0xff9D9D9D),
+                                )),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              )),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 35),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 25,
+                ),
+                Text('งานไฟฟ้า',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 15,
+                      color: Color(0xff2A302C),
+                    )),
+                Divider(
+                  color: Color(0xffAED76E),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.only(
+                  top: 5, left: 30, right: 30, bottom: 20),
+              child: GridView.count(
+                shrinkWrap: true,
+                childAspectRatio: 1.6,
+                primary: false,
+                crossAxisSpacing: 30,
+                mainAxisSpacing: 20,
+                crossAxisCount: 2,
+                children: List.generate(groupPicElec.length, (index) {
+                  return GestureDetector(
+                    onTap: (index != 0 && groupPicElec[index - 1].percent < 99)
+                        ? null
+                        : () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: ((context) => inup(
+                                          title: groupPicElec[index].name ?? '',
+                                          status: widget.j_status,
+                                          userName: userName,
+                                          jidx: widget.jid,
+                                          jTaskId:
+                                              groupPicElec[index].j_task_id ??
+                                                  0,
+                                          date: date,
+                                          curValue: groupPicElec[index].percent,
+                                        )))).then((ba) {
+                              API.getGroupLs(widget.jid, date).then((value) {
+                                setState(() {
+                                  var data = json.decode(value.body);
+                                  print(data['detail']);
+                                  daydetail = data['detail_daily'];
+                                  survey_roof = data['survey_roof'];
+                                  problem.text = data['j_detail_problem'] ?? '';
+                                  fix.text = data['j_detail_solution'] ?? '';
+                                  List list1 =
+                                      json.decode(value.body)['construction'];
+
+                                  groupPic = list1
+                                      .map((m) => GroupLs.fromJson(m))
+                                      .toList();
+
+                                  List list2 =
+                                      json.decode(value.body)['electrical'];
+
+                                  groupPicElec = list2
+                                      .map((m) => GroupLs.fromJson(m))
+                                      .toList();
+
+                                  isfinished = true;
+
+                                  for (var i = 0; i < groupPic.length; i++) {
+                                    if (groupPic[i].percent < 100) {
+                                      isfinished = false;
+                                    }
+                                  }
+
+                                  for (var i = 0;
+                                      i < groupPicElec.length;
+                                      i++) {
+                                    if (groupPicElec[i].percent < 100) {
+                                      isfinished = false;
+                                    }
+                                  }
+                                  contactloading = false;
+                                });
+                              });
+                            });
+                          },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: (groupPicElec[index].percent > 99)
+                          ? BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xffE1F5DC),
+                                  Color(0xffD6EFB4),
+                                ],
+                              ),
                               borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Color(0xffAED76E)),
                               boxShadow: [
                                 BoxShadow(
                                   color: Color(0xffAED76E).withOpacity(0.1),
@@ -2445,7 +2717,36 @@ class _installState extends State<install> {
                                   offset: Offset(0, 0), // Shadow position
                                 ),
                               ],
-                            ),
+                            )
+                          : (index != 0 && groupPicElec[index - 1].percent < 99)
+                              ? BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(
+                                      color:
+                                          Color(0xff9D9D9D).withOpacity(0.5)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xff9D9D9D).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                )
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Color(0xffAED76E)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color(0xffAED76E).withOpacity(0.1),
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0), // Shadow position
+                                    ),
+                                  ],
+                                ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
@@ -2453,50 +2754,29 @@ class _installState extends State<install> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              flex: 3,
-                              child: SfCircularChart(
-                                  centerX: '30%',
-                                  series: <CircularSeries>[
-                                    RadialBarSeries<dynamic, dynamic>(
-                                        // dataSource: chartData,
-                                        radius: '95%',
-                                        innerRadius: '55%',
-                                        trackColor: Color(0xffE1F5DC),
-                                        maximumValue: 100,
-                                        dataSource: [0],
-                                        xValueMapper: (data, _) => '',
-                                        yValueMapper: (data, _) =>
-                                            (groupPic[index].percent == 0)
-                                                ? 0
-                                                : (groupPic[index].percent + 1),
-                                        pointColorMapper: (data, _) =>
-                                            Color(0xff57A946),
-                                        cornerStyle: CornerStyle.bothCurve)
-                                  ]),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('${groupPic[index].percent} %',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 20,
-                                        color: Color(0xff2A302C),
-                                      )),
-                                  Text(groupPic[index].name ?? '',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                        color: Color(0xff2A302C),
-                                      )),
-                                ],
-                              ),
-                            )
+                            Text('${groupPicElec[index].percent.toInt()} %',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
+                                  color: Color(0xff2A302C),
+                                )),
+                            Text(groupPicElec[index].name ?? '',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: Color(0xff2A302C),
+                                )),
+                            Text(
+                                '${DateFormat('dd/MM/yyyy').format(DateTime.now()).toString()}',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 11,
+                                  color: Color(0xff9D9D9D),
+                                )),
                           ],
                         ),
                       ),
@@ -3376,11 +3656,12 @@ class _installState extends State<install> {
                                 loadgroup = true;
                                 groupPic.clear();
                                 var data = json.decode(value.body);
-                                daydetail = data['detail'];
-                                next = data['status_next'];
+                                daydetail = data['detail_daily'];
+                                survey_roof = data['survey_roof'];
                                 problem.text = data['j_detail_problem'] ?? '';
                                 fix.text = data['j_detail_solution'] ?? '';
-                                List list1 = json.decode(value.body)['type'];
+                                List list1 =
+                                    json.decode(value.body)['construction'];
                                 Future.delayed(Duration(seconds: 1)).then((aa) {
                                   // print('333');
                                   setState(() {
@@ -4281,7 +4562,7 @@ class GroupLs {
       no: json['no'],
       name: json['type_install_name'],
       percent: json['percent'] ?? 0.0,
-      sub_type: json['sub_type'],
+      sub_type: false,
     );
   }
 }
