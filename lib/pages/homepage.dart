@@ -538,6 +538,7 @@ class _homePageState extends State<homePage> {
           int? sid;
           String site_layout = '';
           List sitepic = [];
+          DateTime dateStart = DateTime.now();
 
           //
           showDialog(
@@ -611,6 +612,7 @@ class _homePageState extends State<homePage> {
                 site_layout = jsonResponse[0]['site_layout'] ?? '';
                 sitepic = jsonResponse[0]['images'] ?? [];
                 belt_flag = jsonResponse[0]['belt_flag'] ?? 0;
+                dateStart = DateTime.parse(jsonResponse[0]['j_start_date']);
               });
             }
           }).then((value) {
@@ -748,6 +750,7 @@ class _homePageState extends State<homePage> {
                                               belt_flag: belt_flag,
                                               amount: amount,
                                               type: type,
+                                              dateStart: dateStart,
                                             )),
                                   ).then((value) => _ref())
                                 : null;

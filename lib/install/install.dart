@@ -60,6 +60,7 @@ class install extends StatefulWidget {
   final List sitepic;
   final int belt_flag;
   final int type;
+  final DateTime dateStart;
 
   //
 
@@ -88,7 +89,8 @@ class install extends StatefulWidget {
       required this.sitepic,
       required this.belt_flag,
       required this.amount,
-      required this.type});
+      required this.type,
+      required this.dateStart});
 }
 
 class _installState extends State<install> {
@@ -2248,39 +2250,33 @@ class _installState extends State<install> {
                               status: widget.j_status,
                               userName: userName,
                               jidx: widget.jid,
-                            ))));
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => indetail(
-                //               jidx: widget.jid,
-                //               userName: userName,
-                //               status: widget.j_status,
-                //               date: date,
-                //             ))).then((ba) {
-                //   API.getGroupLs(widget.jid, date).then((value) {
-                //     setState(() {
-                //       var data = json.decode(value.body);
-                //       print(data['detail']);
-                //       daydetail = data['detail'];
-                //       next = data['status_next'];
-                //       problem.text = data['j_detail_problem'] ?? '';
-                //       fix.text = data['j_detail_solution'] ?? '';
-                //       List list1 = json.decode(value.body)['type'];
+                            )))).then((value) {
+                  API.getGroupLs(widget.jid, date).then((value) {
+                    setState(() {
+                      var data = json.decode(value.body);
+                      print(data['detail']);
+                      daydetail = data['detail_daily'];
+                      survey_roof = data['survey_roof'];
+                      problem.text = data['j_detail_problem'] ?? '';
+                      fix.text = data['j_detail_solution'] ?? '';
+                      List list1 = json.decode(value.body)['construction'];
 
-                //       groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+                      groupPic = list1.map((m) => GroupLs.fromJson(m)).toList();
+                      List list2 = json.decode(value.body)['electrical'];
+                      groupPicElec =
+                          list2.map((m) => GroupLs.fromJson(m)).toList();
 
-                //       isfinished = true;
+                      isfinished = true;
 
-                //       for (var i = 0; i < groupPic.length; i++) {
-                //         if (groupPic[i].percent < 100) {
-                //           isfinished = false;
-                //         }
-                //       }
-                //       contactloading = false;
-                //     });
-                //   });
-                // });
+                      for (var i = 0; i < groupPic.length; i++) {
+                        if (groupPic[i].percent < 100) {
+                          isfinished = false;
+                        }
+                      }
+                      contactloading = false;
+                    });
+                  });
+                });
               },
               child: Container(
                 height: 65,
@@ -2452,7 +2448,7 @@ class _installState extends State<install> {
               padding: const EdgeInsets.only(top: 5, left: 30, right: 30),
               child: GridView.count(
                 shrinkWrap: true,
-                childAspectRatio: 1.6,
+                childAspectRatio: 1.4,
                 primary: false,
                 crossAxisSpacing: 30,
                 mainAxisSpacing: 20,
@@ -2539,35 +2535,64 @@ class _installState extends State<install> {
                                 ),
                               ],
                             )
-                          : (index != 0 && groupPic[index - 1].percent < 99)
+                          : (groupPic[index].percent < 100 &&
+                                  groupPic[index].type_install_day != null &&
+                                  DateTime.now().isAfter(widget.dateStart.add(
+                                      Duration(
+                                          days: groupPic[index]
+                                                  .type_install_day ??
+                                              0))))
                               ? BoxDecoration(
+                                  // widget.j_start_date
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(
                                       color:
-                                          Color(0xff9D9D9D).withOpacity(0.5)),
+                                          Color(0xffFF0000).withOpacity(0.5)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Color(0xff9D9D9D).withOpacity(0.1),
+                                      color: Color(0xffFF0000).withOpacity(0.1),
                                       blurRadius: 10,
                                       spreadRadius: 0,
                                       offset: Offset(0, 0), // Shadow position
                                     ),
                                   ],
                                 )
-                              : BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Color(0xffAED76E)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
+                              : (index != 0 && groupPic[index - 1].percent < 99)
+                                  ? BoxDecoration(
+                                      // widget.j_start_date
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(
+                                          color: Color(0xff9D9D9D)
+                                              .withOpacity(0.5)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff9D9D9D)
+                                              .withOpacity(0.1),
+                                          blurRadius: 10,
+                                          spreadRadius: 0,
+                                          offset:
+                                              Offset(0, 0), // Shadow position
+                                        ),
+                                      ],
+                                    )
+                                  : BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border:
+                                          Border.all(color: Color(0xffAED76E)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xffAED76E)
+                                              .withOpacity(0.1),
+                                          blurRadius: 10,
+                                          spreadRadius: 0,
+                                          offset:
+                                              Offset(0, 0), // Shadow position
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
@@ -2575,12 +2600,43 @@ class _installState extends State<install> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${groupPic[index].percent.toInt()} %',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 20,
-                                  color: Color(0xff2A302C),
-                                )),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('${groupPic[index].percent.toInt()} %',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 20,
+                                      color: Color(0xff2A302C),
+                                    )),
+                                (groupPic[index].percent < 100 &&
+                                        groupPic[index].type_install_day !=
+                                            null &&
+                                        DateTime.now().isAfter(widget.dateStart
+                                            .add(Duration(
+                                                days: groupPic[index]
+                                                        .type_install_day ??
+                                                    0))))
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Color(0xffFF0000)
+                                                .withOpacity(0.27)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15, vertical: 5),
+                                          child: Text('ล่าช้า',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: Color(0xff2A302C),
+                                              )),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
                             Text(groupPic[index].name ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
@@ -2589,15 +2645,22 @@ class _installState extends State<install> {
                                   fontSize: 12,
                                   color: Color(0xff2A302C),
                                 )),
-                            Text(
-                                '${DateFormat('dd/MM/yyyy').format(DateTime.now()).toString()}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                  color: Color(0xff9D9D9D),
-                                )),
+                            (groupPic[index].type_install_day == null)
+                                ? Text('',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                      color: Color(0xff9D9D9D),
+                                    ))
+                                : Text(
+                                    '${DateFormat('dd/MM/yyyy').format(widget.dateStart.add(Duration(days: groupPic[index].type_install_day ?? 0))).toString()}',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                      color: Color(0xff9D9D9D),
+                                    )),
                           ],
                         ),
                       ),
@@ -2630,7 +2693,7 @@ class _installState extends State<install> {
                   top: 5, left: 30, right: 30, bottom: 20),
               child: GridView.count(
                 shrinkWrap: true,
-                childAspectRatio: 1.6,
+                childAspectRatio: 1.4,
                 primary: false,
                 crossAxisSpacing: 30,
                 mainAxisSpacing: 20,
@@ -2718,35 +2781,65 @@ class _installState extends State<install> {
                                 ),
                               ],
                             )
-                          : (index != 0 && groupPicElec[index - 1].percent < 99)
+                          : (groupPicElec[index].percent < 100 &&
+                                  groupPicElec[index].type_install_day !=
+                                      null &&
+                                  DateTime.now().isAfter(widget.dateStart.add(
+                                      Duration(
+                                          days: groupPicElec[index]
+                                                  .type_install_day ??
+                                              0))))
                               ? BoxDecoration(
+                                  // widget.j_start_date
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(15),
                                   border: Border.all(
                                       color:
-                                          Color(0xff9D9D9D).withOpacity(0.5)),
+                                          Color(0xffFF0000).withOpacity(0.5)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Color(0xff9D9D9D).withOpacity(0.1),
+                                      color: Color(0xffFF0000).withOpacity(0.1),
                                       blurRadius: 10,
                                       spreadRadius: 0,
                                       offset: Offset(0, 0), // Shadow position
                                     ),
                                   ],
                                 )
-                              : BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Color(0xffAED76E)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
+                              : (index != 0 &&
+                                      groupPicElec[index - 1].percent < 99)
+                                  ? BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(
+                                          color: Color(0xff9D9D9D)
+                                              .withOpacity(0.5)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xff9D9D9D)
+                                              .withOpacity(0.1),
+                                          blurRadius: 10,
+                                          spreadRadius: 0,
+                                          offset:
+                                              Offset(0, 0), // Shadow position
+                                        ),
+                                      ],
+                                    )
+                                  : BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15),
+                                      border:
+                                          Border.all(color: Color(0xffAED76E)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Color(0xffAED76E)
+                                              .withOpacity(0.1),
+                                          blurRadius: 10,
+                                          spreadRadius: 0,
+                                          offset:
+                                              Offset(0, 0), // Shadow position
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 10),
@@ -2754,12 +2847,43 @@ class _installState extends State<install> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${groupPicElec[index].percent.toInt()} %',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 20,
-                                  color: Color(0xff2A302C),
-                                )),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('${groupPicElec[index].percent.toInt()} %',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 20,
+                                      color: Color(0xff2A302C),
+                                    )),
+                                (groupPicElec[index].percent < 100 &&
+                                        groupPicElec[index].type_install_day !=
+                                            null &&
+                                        DateTime.now().isAfter(widget.dateStart
+                                            .add(Duration(
+                                                days: groupPicElec[index]
+                                                        .type_install_day ??
+                                                    0))))
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Color(0xffFF0000)
+                                                .withOpacity(0.27)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15, vertical: 5),
+                                          child: Text('ล่าช้า',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: Color(0xff2A302C),
+                                              )),
+                                        ),
+                                      )
+                                    : Container()
+                              ],
+                            ),
                             Text(groupPicElec[index].name ?? '',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
@@ -2768,15 +2892,22 @@ class _installState extends State<install> {
                                   fontSize: 12,
                                   color: Color(0xff2A302C),
                                 )),
-                            Text(
-                                '${DateFormat('dd/MM/yyyy').format(DateTime.now()).toString()}',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                  color: Color(0xff9D9D9D),
-                                )),
+                            (groupPicElec[index].type_install_day == null)
+                                ? Text('',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                      color: Color(0xff9D9D9D),
+                                    ))
+                                : Text(
+                                    '${DateFormat('dd/MM/yyyy').format(widget.dateStart.add(Duration(days: groupPicElec[index].type_install_day ?? 0))).toString()}',
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                      color: Color(0xff9D9D9D),
+                                    )),
                           ],
                         ),
                       ),
@@ -2807,9 +2938,7 @@ class _installState extends State<install> {
                   // width: 160,
                   child: (isfinished == true)
                       ? ElevatedButton(
-                          onPressed: (sign_name_1.isNotEmpty &&
-                                  sign_name_2.isNotEmpty &&
-                                  sign_name_3.isNotEmpty &&
+                          onPressed: (sign_name_2.isNotEmpty &&
                                   signOGname_1.isNotEmpty &&
                                   signOGname_2.isNotEmpty)
                               ? () {
@@ -2835,9 +2964,7 @@ class _installState extends State<install> {
                           ),
                         )
                       : ElevatedButton(
-                          onPressed: (sign_name_1.isNotEmpty &&
-                                  sign_name_2.isNotEmpty &&
-                                  sign_name_3.isNotEmpty)
+                          onPressed: (sign_name_2.isNotEmpty)
                               ? () {
                                   confirmpopday();
                                 }
@@ -3644,8 +3771,9 @@ class _installState extends State<install> {
                                   ),
                                 ) //whatever you're returning, does not have to be a Container
                             ).then((pop) {
-                          print(pop);
                           if (pop != null) {
+                            print(alldate[pop]);
+
                             API
                                 .getGroupLs(widget.jid, alldate[pop])
                                 .then((value) {
@@ -3660,20 +3788,40 @@ class _installState extends State<install> {
                                 survey_roof = data['survey_roof'];
                                 problem.text = data['j_detail_problem'] ?? '';
                                 fix.text = data['j_detail_solution'] ?? '';
+                                // List list1 =
+                                //     json.decode(value.body)['construction'];
+                                // Future.delayed(Duration(seconds: 1)).then((aa) {
+                                //   // print('333');
+                                //   setState(() {
+                                //     groupPic = list1
+                                //         .map((m) => GroupLs.fromJson(m))
+                                //         .toList();
+                                //     loadgroup = false;
+                                //   });
+                                // });
+                                // // groupPic = list1
+                                // //     .map((m) => GroupLs.fromJson(m))
+                                // //     .toList();
                                 List list1 =
                                     json.decode(value.body)['construction'];
-                                Future.delayed(Duration(seconds: 1)).then((aa) {
-                                  // print('333');
-                                  setState(() {
-                                    groupPic = list1
-                                        .map((m) => GroupLs.fromJson(m))
-                                        .toList();
-                                    loadgroup = false;
-                                  });
-                                });
-                                // groupPic = list1
-                                //     .map((m) => GroupLs.fromJson(m))
-                                //     .toList();
+
+                                groupPic = list1
+                                    .map((m) => GroupLs.fromJson(m))
+                                    .toList();
+                                List list2 =
+                                    json.decode(value.body)['electrical'];
+                                groupPicElec = list2
+                                    .map((m) => GroupLs.fromJson(m))
+                                    .toList();
+
+                                isfinished = true;
+
+                                for (var i = 0; i < groupPic.length; i++) {
+                                  if (groupPic[i].percent < 100) {
+                                    isfinished = false;
+                                  }
+                                }
+                                contactloading = false;
                                 date = alldate[pop];
                                 dateshow = DateFormat.yMMMMEEEEd("th")
                                     .format(DateTime.parse(date))
@@ -3727,227 +3875,559 @@ class _installState extends State<install> {
                     ),
                   )
                 : Container(),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => indetail(
-                              jidx: widget.jid,
-                              userName: userName,
-                              status: widget.j_status,
-                              date: date,
-                            )));
-              },
-              child: Container(
-                height: 65,
-                decoration: (daydetail == true)
-                    ? BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0xffE1F5DC),
-                            Color(0xffD6EFB4),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => roof(
+                                status: widget.j_status,
+                                userName: userName,
+                                jidx: widget.jid,
+                              )))).then((value) {
+                    API.getGroupLs(widget.jid, date).then((value) {
+                      setState(() {
+                        var data = json.decode(value.body);
+                        print(data['detail']);
+                        daydetail = data['detail_daily'];
+                        survey_roof = data['survey_roof'];
+                        problem.text = data['j_detail_problem'] ?? '';
+                        fix.text = data['j_detail_solution'] ?? '';
+                        List list1 = json.decode(value.body)['construction'];
+
+                        groupPic =
+                            list1.map((m) => GroupLs.fromJson(m)).toList();
+                        List list2 = json.decode(value.body)['electrical'];
+                        groupPicElec =
+                            list2.map((m) => GroupLs.fromJson(m)).toList();
+
+                        isfinished = true;
+
+                        for (var i = 0; i < groupPic.length; i++) {
+                          if (groupPic[i].percent < 100) {
+                            isfinished = false;
+                          }
+                        }
+                        contactloading = false;
+                      });
+                    });
+                  });
+                },
+                child: Container(
+                  height: 65,
+                  decoration: (survey_roof == true)
+                      ? BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xffE1F5DC),
+                              Color(0xffD6EFB4),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffAED76E).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        )
+                      : BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: Color(0xffAED76E)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffAED76E).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffAED76E).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      )
-                    : BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(color: Color(0xffAED76E)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xffAED76E).withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 0,
-                            offset: Offset(0, 0), // Shadow position
-                          ),
-                        ],
-                      ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Text('รายละเอียด ติดตั้งระบบโซล่าเซลล์',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                            color: Color(0xff2A302C),
-                          )),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Text('สำรวจและส่งมอบหลังคา',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: Color(0xff2A302C),
+                            )),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            GridView.count(
-              shrinkWrap: true,
-              childAspectRatio: 0.8,
-              primary: false,
-              crossAxisSpacing: 30,
-              mainAxisSpacing: 20,
-              crossAxisCount: 2,
-              children: (loadgroup == true)
-                  ? List.generate(2, (index) {
-                      return Shimmer.fromColors(
-                          baseColor: Colors.grey[200]!,
-                          highlightColor: Colors.grey[100]!,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(color: Color(0xffAED76E)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color(0xffAED76E).withOpacity(0.1),
-                                  blurRadius: 10,
-                                  spreadRadius: 0,
-                                  offset: Offset(0, 0), // Shadow position
-                                ),
-                              ],
-                            ),
-                          ));
-                    })
-                  : List.generate(groupPic.length, (index) {
-                      return GestureDetector(
-                        onTap: () {
-                          if (groupPic[index].sub_type == true) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: ((context) => insub(
-                                          jidx: widget.jid,
-                                          title: groupPic[index].name ?? '',
-                                          status: widget.j_status,
-                                          userName: userName,
-                                          date: date,
-                                          no: groupPic[index].no ?? 0,
-                                        ))));
-                          } else {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: ((context) => inup(
-                                          title: groupPic[index].name ?? '',
-                                          status: widget.j_status,
-                                          userName: userName,
-                                          jidx: widget.jid,
-                                          jTaskId:
-                                              groupPic[index].j_task_id ?? 0,
-                                          date: date,
-                                          curValue: groupPic[index].percent,
-                                        ))));
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => indetail(
+                                jidx: widget.jid,
+                                userName: userName,
+                                status: widget.j_status,
+                                date: date,
+                              ))).then((ba) {
+                    API.getGroupLs(widget.jid, date).then((value) {
+                      setState(() {
+                        var data = json.decode(value.body);
+                        print(data['detail']);
+                        daydetail = data['detail_daily'];
+                        survey_roof = data['survey_roof'];
+                        problem.text = data['j_detail_problem'] ?? '';
+                        fix.text = data['j_detail_solution'] ?? '';
+                        List list1 = json.decode(value.body)['construction'];
+
+                        groupPic =
+                            list1.map((m) => GroupLs.fromJson(m)).toList();
+                        List list2 = json.decode(value.body)['electrical'];
+                        groupPicElec =
+                            list2.map((m) => GroupLs.fromJson(m)).toList();
+
+                        isfinished = true;
+
+                        for (var i = 0; i < groupPic.length; i++) {
+                          if (groupPic[i].percent < 100) {
+                            isfinished = false;
                           }
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          decoration: (groupPic[index].percent > 99)
-                              ? BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Color(0xffE1F5DC),
-                                      Color(0xffD6EFB4),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(15),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                )
-                              : BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Color(0xffAED76E)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Color(0xffAED76E).withOpacity(0.1),
-                                      blurRadius: 10,
-                                      spreadRadius: 0,
-                                      offset: Offset(0, 0), // Shadow position
-                                    ),
-                                  ],
-                                ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: SfCircularChart(
-                                      centerX: '30%',
-                                      series: <CircularSeries>[
-                                        RadialBarSeries<dynamic, dynamic>(
-                                            // dataSource: chartData,
-                                            radius: '95%',
-                                            innerRadius: '55%',
-                                            trackColor: Color(0xffE1F5DC),
-                                            maximumValue: 100,
-                                            dataSource: [0],
-                                            xValueMapper: (data, _) => '',
-                                            yValueMapper: (data, _) =>
-                                                (groupPic[index].percent == 0)
-                                                    ? 0
-                                                    : (groupPic[index].percent +
-                                                        1),
-                                            pointColorMapper: (data, _) =>
-                                                Color(0xff57A946),
-                                            cornerStyle: CornerStyle.bothCurve)
-                                      ]),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('${groupPic[index].percent} %',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w800,
-                                            fontSize: 20,
-                                            color: Color(0xff2A302C),
-                                          )),
-                                      Text(groupPic[index].name ?? '',
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 2,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 13,
-                                            color: Color(0xff2A302C),
-                                          )),
-                                    ],
-                                  ),
-                                )
-                              ],
+                        }
+                        contactloading = false;
+                      });
+                    });
+                  });
+                },
+                child: Container(
+                  height: 65,
+                  decoration: (daydetail == true)
+                      ? BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xffE1F5DC),
+                              Color(0xffD6EFB4),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffAED76E).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
                             ),
+                          ],
+                        )
+                      : BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: Color(0xffAED76E)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xffAED76E).withOpacity(0.1),
+                              blurRadius: 10,
+                              spreadRadius: 0,
+                              offset: Offset(0, 0), // Shadow position
+                            ),
+                          ],
+                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Text('รายละเอียด ติดตั้งระบบโซล่าเซลล์',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              color: Color(0xff2A302C),
+                            )),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Text('งานก่อสร้าง',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: Color(0xff2A302C),
+                      )),
+                  Divider(
+                    color: Color(0xffAED76E),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: GridView.count(
+                  shrinkWrap: true,
+                  childAspectRatio: 1.4,
+                  primary: false,
+                  crossAxisSpacing: 30,
+                  mainAxisSpacing: 20,
+                  crossAxisCount: 2,
+                  children: List.generate(groupPic.length, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => inup(
+                                      title: groupPic[index].name ?? '',
+                                      status: widget.j_status,
+                                      userName: userName,
+                                      jidx: widget.jid,
+                                      jTaskId: groupPic[index].j_task_id ?? 0,
+                                      date: date,
+                                      curValue: groupPic[index].percent,
+                                    )))).then((ba) {
+                          API.getGroupLs(widget.jid, date).then((value) {
+                            setState(() {
+                              var data = json.decode(value.body);
+                              print(data['detail']);
+                              daydetail = data['detail_daily'];
+                              survey_roof = data['survey_roof'];
+                              problem.text = data['j_detail_problem'] ?? '';
+                              fix.text = data['j_detail_solution'] ?? '';
+                              List list1 =
+                                  json.decode(value.body)['construction'];
+
+                              groupPic = list1
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              List list2 =
+                                  json.decode(value.body)['electrical'];
+
+                              groupPicElec = list2
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              isfinished = true;
+
+                              for (var i = 0; i < groupPic.length; i++) {
+                                if (groupPic[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+
+                              for (var i = 0; i < groupPicElec.length; i++) {
+                                if (groupPicElec[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+                              contactloading = false;
+                            });
+                          });
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: (groupPic[index].percent > 99)
+                            ? BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xffE1F5DC),
+                                    Color(0xffD6EFB4),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xffAED76E).withOpacity(0.1),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: Offset(0, 0), // Shadow position
+                                  ),
+                                ],
+                              )
+                            : (index != 0 && groupPic[index - 1].percent < 99)
+                                ? BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color:
+                                            Color(0xff9D9D9D).withOpacity(0.5)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xff9D9D9D).withOpacity(0.1),
+                                        blurRadius: 10,
+                                        spreadRadius: 0,
+                                        offset: Offset(0, 0), // Shadow position
+                                      ),
+                                    ],
+                                  )
+                                : BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border:
+                                        Border.all(color: Color(0xffAED76E)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xffAED76E).withOpacity(0.1),
+                                        blurRadius: 10,
+                                        spreadRadius: 0,
+                                        offset: Offset(0, 0), // Shadow position
+                                      ),
+                                    ],
+                                  ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${groupPic[index].percent.toInt()} %',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20,
+                                    color: Color(0xff2A302C),
+                                  )),
+                              Text(groupPic[index].name ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    color: Color(0xff2A302C),
+                                  )),
+                              (groupPic[index].type_install_day == null)
+                                  ? Text('',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11,
+                                        color: Color(0xff9D9D9D),
+                                      ))
+                                  : Text(
+                                      '${DateFormat('dd/MM/yyyy').format(widget.dateStart.add(Duration(days: groupPic[index].type_install_day ?? 0))).toString()}',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11,
+                                        color: Color(0xff9D9D9D),
+                                      )),
+                            ],
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    );
+                  }),
+                )),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 25,
+                  ),
+                  Text('งานไฟฟ้า',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        color: Color(0xff2A302C),
+                      )),
+                  Divider(
+                    color: Color(0xffAED76E),
+                  ),
+                ],
+              ),
             ),
+            Padding(
+                padding: const EdgeInsets.only(top: 5, bottom: 20),
+                child: GridView.count(
+                  shrinkWrap: true,
+                  childAspectRatio: 1.4,
+                  primary: false,
+                  crossAxisSpacing: 30,
+                  mainAxisSpacing: 20,
+                  crossAxisCount: 2,
+                  children: List.generate(groupPicElec.length, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => inup(
+                                      title: groupPicElec[index].name ?? '',
+                                      status: widget.j_status,
+                                      userName: userName,
+                                      jidx: widget.jid,
+                                      jTaskId:
+                                          groupPicElec[index].j_task_id ?? 0,
+                                      date: date,
+                                      curValue: groupPicElec[index].percent,
+                                    )))).then((ba) {
+                          API.getGroupLs(widget.jid, date).then((value) {
+                            setState(() {
+                              var data = json.decode(value.body);
+                              print(data['detail']);
+                              daydetail = data['detail_daily'];
+                              survey_roof = data['survey_roof'];
+                              problem.text = data['j_detail_problem'] ?? '';
+                              fix.text = data['j_detail_solution'] ?? '';
+                              List list1 =
+                                  json.decode(value.body)['construction'];
+
+                              groupPic = list1
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              List list2 =
+                                  json.decode(value.body)['electrical'];
+
+                              groupPicElec = list2
+                                  .map((m) => GroupLs.fromJson(m))
+                                  .toList();
+
+                              isfinished = true;
+
+                              for (var i = 0; i < groupPic.length; i++) {
+                                if (groupPic[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+
+                              for (var i = 0; i < groupPicElec.length; i++) {
+                                if (groupPicElec[i].percent < 100) {
+                                  isfinished = false;
+                                }
+                              }
+                              contactloading = false;
+                            });
+                          });
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        decoration: (groupPicElec[index].percent > 99)
+                            ? BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Color(0xffE1F5DC),
+                                    Color(0xffD6EFB4),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xffAED76E).withOpacity(0.1),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: Offset(0, 0), // Shadow position
+                                  ),
+                                ],
+                              )
+                            : (index != 0 &&
+                                    groupPicElec[index - 1].percent < 99)
+                                ? BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color:
+                                            Color(0xff9D9D9D).withOpacity(0.5)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xff9D9D9D).withOpacity(0.1),
+                                        blurRadius: 10,
+                                        spreadRadius: 0,
+                                        offset: Offset(0, 0), // Shadow position
+                                      ),
+                                    ],
+                                  )
+                                : BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border:
+                                        Border.all(color: Color(0xffAED76E)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            Color(0xffAED76E).withOpacity(0.1),
+                                        blurRadius: 10,
+                                        spreadRadius: 0,
+                                        offset: Offset(0, 0), // Shadow position
+                                      ),
+                                    ],
+                                  ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${groupPicElec[index].percent.toInt()} %',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20,
+                                    color: Color(0xff2A302C),
+                                  )),
+                              Text(groupPicElec[index].name ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                    color: Color(0xff2A302C),
+                                  )),
+                              (groupPicElec[index].type_install_day == null)
+                                  ? Text('',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11,
+                                        color: Color(0xff9D9D9D),
+                                      ))
+                                  : Text(
+                                      '${DateFormat('dd/MM/yyyy').format(widget.dateStart.add(Duration(days: groupPicElec[index].type_install_day ?? 0))).toString()}',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11,
+                                        color: Color(0xff9D9D9D),
+                                      )),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                )),
             SizedBox(
               height: 10,
             ),
@@ -3960,9 +4440,11 @@ class _installState extends State<install> {
               height: 10,
             ),
             GestureDetector(
-                onTap: () {
-                  popsign(path_sign1);
-                },
+                onTap: (path_sign1.isEmpty)
+                    ? null
+                    : () {
+                        popsign(path_sign1);
+                      },
                 child: Container(
                   height: 70,
                   width: double.infinity,
@@ -4033,9 +4515,11 @@ class _installState extends State<install> {
               height: 10,
             ),
             GestureDetector(
-                onTap: () {
-                  popsign(path_sign2);
-                },
+                onTap: (path_sign2.isEmpty)
+                    ? null
+                    : () {
+                        popsign(path_sign2);
+                      },
                 child: Container(
                   height: 70,
                   width: double.infinity,
@@ -4106,9 +4590,11 @@ class _installState extends State<install> {
               height: 10,
             ),
             GestureDetector(
-                onTap: () {
-                  popsign(path_sign3);
-                },
+                onTap: (path_sign3.isEmpty)
+                    ? null
+                    : () {
+                        popsign(path_sign3);
+                      },
                 child: Container(
                   height: 70,
                   width: double.infinity,
@@ -4548,21 +5034,23 @@ class GroupLs {
   final String? name;
   final double percent;
   final bool sub_type;
+  final int? type_install_day;
 
   const GroupLs(
       {required this.j_task_id,
       required this.no,
       required this.name,
       required this.percent,
-      required this.sub_type});
+      required this.sub_type,
+      required this.type_install_day});
 
   factory GroupLs.fromJson(Map<String, dynamic> json) {
     return GroupLs(
-      j_task_id: json['j_task_id'],
-      no: json['no'],
-      name: json['type_install_name'],
-      percent: json['percent'] ?? 0.0,
-      sub_type: false,
-    );
+        j_task_id: json['j_task_id'],
+        no: json['no'],
+        name: json['type_install_name'],
+        percent: json['percent'] ?? 0.0,
+        sub_type: false,
+        type_install_day: json['type_install_day']);
   }
 }

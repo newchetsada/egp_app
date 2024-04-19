@@ -1,17 +1,27 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:egp_app/config.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:http/http.dart' as http;
 
 class roofup extends StatefulWidget {
   @override
   _roofupState createState() => _roofupState();
   final int status;
-  roofup({required this.status});
+  final int jidx;
+  final String? problemId;
+  final String userName;
+  roofup(
+      {required this.status,
+      required this.problemId,
+      required this.jidx,
+      required this.userName});
 }
 
 class _roofupState extends State<roofup> {
@@ -24,13 +34,165 @@ class _roofupState extends State<roofup> {
   var picafter = <Album>[];
   List deleteLs = [];
 
+  getRoofDetailById(id, pro, j_img_type) async {
+    var response = await http.post(
+      Uri.parse('$api/api/mobile/getRoofDetailById'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'jidx': id,
+        'problem': pro,
+        'j_img_type': j_img_type
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
+  loopdelete() async {
+    for (var i = 0; i < deleteLs.length; i++) {
+      print(deleteLs[i]);
+      await deletePic(deleteLs[i]);
+      // await Future.delayed(const Duration(seconds: 3));
+    }
+    return deleteLs.length;
+  }
+
+  deletePic(id) async {
+    var response = await http.post(
+      Uri.parse('$api/api/mobile/deleteImageProblem'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        'roofInstallId': id,
+        'userName': widget.userName,
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
+  loopuploadBefore() async {
+    for (var i = 0; i < picbefore.length; i++) {
+      if (picbefore[i].onApi == 0) {
+        print(picbefore[i].j_img_roof_install_image);
+        await uploadPic(File(picbefore[i].j_img_roof_install_image), 0,
+            remarkproblem.text, remarkfix.text);
+        // await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+  }
+
+  loopuploadAfter() async {
+    for (var i = 0; i < picafter.length; i++) {
+      if (picafter[i].onApi == 0) {
+        print(picafter[i].j_img_roof_install_image);
+        await uploadPic(File(picafter[i].j_img_roof_install_image), 1,
+            remarkproblem.text, remarkfix.text);
+        // await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+  }
+
+  updateRemark(id, proold, pronew, fix) async {
+    var response = await http.post(
+      Uri.parse('$api/api/mobile/updateJobImageProblem'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-API-Key': 'evdplusm8DdW+Wd3UCweHj',
+      },
+      body: jsonEncode(<dynamic, dynamic>{
+        "jidx": id,
+        "problemOld": proold,
+        "problem": pronew,
+        "solution": fix,
+        "userName": widget.userName
+      }),
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+      return jsonResponse;
+    }
+  }
+
+  uploadPic(File? image, imgType, problem, solution) async {
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('$api/api/mobile/uploadJobImageProblem'));
+
+    request.headers["X-API-Key"] = 'evdplusm8DdW+Wd3UCweHj';
+
+    request.fields['jidx'] = widget.jidx.toString();
+    // request.fields['typeId'] = widget.typeId.toString();
+    // request.fields['subTypeId'] = sub;
+    // request.fields['groupNo'] = widget.group.toString();
+    // request.fields['remark'] = '';
+    request.fields['problem'] = problem;
+    request.fields['solution'] = solution;
+    request.fields['imgType'] = imgType.toString();
+    // request.fields['sinsId'] = widget.sin.toString();
+
+    request.fields['userName'] = widget.userName;
+    request.fields['filesName'] =
+        (image == null) ? "" : image.path.split('/').last;
+
+    (image == null)
+        ? null
+        : request.files.add(http.MultipartFile.fromBytes(
+            'files', image.readAsBytesSync(),
+            filename: image.path.split('/').last));
+
+    var response = await request.send();
+
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+    // print(response.body);
+    // return response.body;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      isLoading = false;
-    });
+    if (widget.problemId == null) {
+      setState(() {
+        isLoading = false;
+        // remarkproblem.text = widget.problemId ?? '';
+      });
+    } else {
+      getRoofDetailById(widget.jidx, widget.problemId, null).then((before) {
+        setState(() {
+          isLoading = false;
+          remarkproblem.text = widget.problemId ?? '';
+          remarkfix.text = before[0]['j_img_roof_install_solution'] ?? '';
+          List list = before; //json.decode(response.body);
+          // var picdetail =
+          //     list.map((m) => Album.fromJson(m)).toList();
+          picbefore = list
+              .map((m) => Album.fromJson(m))
+              .toList()
+              .where((element) => element.j_img_type == 0)
+              .toList();
+
+          picafter = list
+              .map((m) => Album.fromJson(m))
+              .toList()
+              .where((element) => element.j_img_type == 1)
+              .toList();
+        });
+      });
+    }
   }
 
   openImages(after) async {
@@ -43,17 +205,17 @@ class _roofupState extends State<roofup> {
         for (var i = 0; i < pickedfiles.length; i++) {
           (after == true)
               ? picafter.add(Album(
-                  j_img_install_id: 0,
-                  j_img_install_name: pickedfiles[i].path,
+                  j_img_roof_install_id: 0,
+                  j_img_roof_install_image: pickedfiles[i].path,
                   onApi: 0,
                   j_img_install_remark: '',
-                  imgType: 1))
+                  j_img_type: 1))
               : picbefore.add(Album(
-                  j_img_install_id: 0,
-                  j_img_install_name: pickedfiles[i].path,
+                  j_img_roof_install_id: 0,
+                  j_img_roof_install_image: pickedfiles[i].path,
                   onApi: 0,
                   j_img_install_remark: '',
-                  imgType: 0));
+                  j_img_type: 0));
         }
         // setState(() {});
       } else {
@@ -76,17 +238,17 @@ class _roofupState extends State<roofup> {
         // return pickedfile;
         (after == true)
             ? picafter.add(Album(
-                j_img_install_id: 0,
-                j_img_install_name: pickedfile.path,
+                j_img_roof_install_id: 0,
+                j_img_roof_install_image: pickedfile.path,
                 onApi: 0,
                 j_img_install_remark: '',
-                imgType: 1))
+                j_img_type: 1))
             : picbefore.add(Album(
-                j_img_install_id: 0,
-                j_img_install_name: pickedfile.path,
+                j_img_roof_install_id: 0,
+                j_img_roof_install_image: pickedfile.path,
                 onApi: 0,
                 j_img_install_remark: '',
-                imgType: 0));
+                j_img_type: 0));
 
         // setState(() {});
 
@@ -97,6 +259,26 @@ class _roofupState extends State<roofup> {
     } catch (e) {
       print("error while picking file.");
     }
+  }
+
+  void loading() {
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (_) {
+          return Center(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: 100,
+              width: 100,
+              child: Center(
+                  child: Lottie.asset('assets/logoloading.json', height: 80)),
+            ),
+          );
+        });
   }
 
   @override
@@ -126,7 +308,29 @@ class _roofupState extends State<roofup> {
                               height: 50,
                               // width: 160,
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (remarkproblem.text.isEmpty ||
+                                      picbefore.isEmpty) {
+                                    pop('กรุณากรอกปัญหาและอัพโหลดรูปอย่างน้อย 1 รูป');
+                                  } else {
+                                    loading();
+                                    loopdelete().then((del) {
+                                      loopuploadBefore().then((be) {
+                                        loopuploadAfter().then((af) {
+                                          updateRemark(
+                                                  widget.jidx,
+                                                  widget.problemId,
+                                                  remarkproblem.text,
+                                                  remarkfix.text)
+                                              .then((up) {
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          });
+                                        });
+                                      });
+                                    });
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
                                   shadowColor: Colors.white,
@@ -357,14 +561,14 @@ class _roofupState extends State<roofup> {
                             return GestureDetector(
                               onTap: () {
                                 // (picbefore[index].onApi == 1)
-                                //     ? popPicbeforeApi(picbefore[index].j_img_install_name)
-                                //     : popPicbeforePre(picbefore[index].j_img_install_name);
+                                //     ? popPicbeforeApi(picbefore[index].j_img_roof_install_image)
+                                //     : popPicbeforePre(picbefore[index].j_img_roof_install_image);
                               },
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(13),
                                 child: (picbefore[index].onApi == 1)
                                     ? Image.network(
-                                        '$api/${picbefore[index].j_img_install_name}', // this image doesn't exist
+                                        '$api/${picbefore[index].j_img_roof_install_image}', // this image doesn't exist
                                         fit: BoxFit.cover,
                                         height: double.infinity,
                                         width: double.infinity,
@@ -403,7 +607,7 @@ class _roofupState extends State<roofup> {
                                       )
                                     : Image.file(
                                         File(picbefore[index]
-                                            .j_img_install_name),
+                                            .j_img_roof_install_image),
                                         fit: BoxFit.cover,
                                         height: double.infinity,
                                         width: double.infinity,
@@ -463,8 +667,8 @@ class _roofupState extends State<roofup> {
                               return GestureDetector(
                                 onTap: () {
                                   // (pic[index].onApi == 1)
-                                  //     ? popPicApi(pic[index].j_img_install_name)
-                                  //     : popPicPre(pic[index].j_img_install_name);
+                                  //     ? popPicApi(pic[index].j_img_roof_install_image)
+                                  //     : popPicPre(pic[index].j_img_roof_install_image);
                                 },
                                 child: Stack(
                                   children: [
@@ -472,7 +676,7 @@ class _roofupState extends State<roofup> {
                                       borderRadius: BorderRadius.circular(13),
                                       child: (picbefore[index].onApi == 1)
                                           ? Image.network(
-                                              '$api/${picbefore[index].j_img_install_name}', // this image doesn't exist
+                                              '$api/${picbefore[index].j_img_roof_install_image}', // this image doesn't exist
                                               fit: BoxFit.cover,
                                               height: double.infinity,
                                               width: double.infinity,
@@ -514,7 +718,7 @@ class _roofupState extends State<roofup> {
                                             )
                                           : Image.file(
                                               File(picbefore[index]
-                                                  .j_img_install_name),
+                                                  .j_img_roof_install_image),
                                               fit: BoxFit.cover,
                                               height: double.infinity,
                                               width: double.infinity,
@@ -531,9 +735,9 @@ class _roofupState extends State<roofup> {
                                                 setState(() {
                                                   if (picbefore[index].onApi ==
                                                       1) {
-                                                    deleteLs.add(
-                                                        picbefore[index]
-                                                            .j_img_install_id);
+                                                    deleteLs.add(picbefore[
+                                                            index]
+                                                        .j_img_roof_install_id);
                                                     picbefore.removeAt(index);
                                                   } else {
                                                     picbefore.removeAt(index);
@@ -606,14 +810,14 @@ class _roofupState extends State<roofup> {
                             return GestureDetector(
                               onTap: () {
                                 // (picafter[index].onApi == 1)
-                                //     ? popPicafterApi(picafter[index].j_img_install_name)
-                                //     : popPicafterPre(picafter[index].j_img_install_name);
+                                //     ? popPicafterApi(picafter[index].j_img_roof_install_image)
+                                //     : popPicafterPre(picafter[index].j_img_roof_install_image);
                               },
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(13),
                                 child: (picafter[index].onApi == 1)
                                     ? Image.network(
-                                        '$api/${picafter[index].j_img_install_name}', // this image doesn't exist
+                                        '$api/${picafter[index].j_img_roof_install_image}', // this image doesn't exist
                                         fit: BoxFit.cover,
                                         height: double.infinity,
                                         width: double.infinity,
@@ -651,8 +855,8 @@ class _roofupState extends State<roofup> {
                                         },
                                       )
                                     : Image.file(
-                                        File(
-                                            picafter[index].j_img_install_name),
+                                        File(picafter[index]
+                                            .j_img_roof_install_image),
                                         fit: BoxFit.cover,
                                         height: double.infinity,
                                         width: double.infinity,
@@ -712,8 +916,8 @@ class _roofupState extends State<roofup> {
                               return GestureDetector(
                                 onTap: () {
                                   // (pic[index].onApi == 1)
-                                  //     ? popPicApi(pic[index].j_img_install_name)
-                                  //     : popPicPre(pic[index].j_img_install_name);
+                                  //     ? popPicApi(pic[index].j_img_roof_install_image)
+                                  //     : popPicPre(pic[index].j_img_roof_install_image);
                                 },
                                 child: Stack(
                                   children: [
@@ -721,7 +925,7 @@ class _roofupState extends State<roofup> {
                                       borderRadius: BorderRadius.circular(13),
                                       child: (picafter[index].onApi == 1)
                                           ? Image.network(
-                                              '$api/${picafter[index].j_img_install_name}', // this image doesn't exist
+                                              '$api/${picafter[index].j_img_roof_install_image}', // this image doesn't exist
                                               fit: BoxFit.cover,
                                               height: double.infinity,
                                               width: double.infinity,
@@ -763,7 +967,7 @@ class _roofupState extends State<roofup> {
                                             )
                                           : Image.file(
                                               File(picafter[index]
-                                                  .j_img_install_name),
+                                                  .j_img_roof_install_image),
                                               fit: BoxFit.cover,
                                               height: double.infinity,
                                               width: double.infinity,
@@ -781,7 +985,7 @@ class _roofupState extends State<roofup> {
                                                   if (picafter[index].onApi ==
                                                       1) {
                                                     deleteLs.add(picafter[index]
-                                                        .j_img_install_id);
+                                                        .j_img_roof_install_id);
                                                     picafter.removeAt(index);
                                                   } else {
                                                     picafter.removeAt(index);
@@ -826,33 +1030,71 @@ class _roofupState extends State<roofup> {
             ),
           );
   }
+
+  pop(title) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return (defaultTargetPlatform == TargetPlatform.android)
+              ? AlertDialog(
+                  actionsPadding: EdgeInsets.all(5),
+                  // title: Text(
+                  //     'ต้องการลบข้อมูลหรือไม่'),
+                  contentPadding: EdgeInsets.only(top: 30, bottom: 20),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(title),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                )
+              : CupertinoAlertDialog(
+                  content: Text(title),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); //close Dialog
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+        });
+  }
 }
 
 class Album {
-  final int j_img_install_id;
-  final String j_img_install_name;
+  final int j_img_roof_install_id;
+  final String j_img_roof_install_image;
   final int onApi;
   final String j_img_install_remark;
-  final int imgType;
+  final int j_img_type;
 
   const Album(
-      {required this.j_img_install_id,
-      required this.j_img_install_name,
+      {required this.j_img_roof_install_id,
+      required this.j_img_roof_install_image,
       required this.onApi,
       required this.j_img_install_remark,
-      required this.imgType});
+      required this.j_img_type});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-        j_img_install_id: json['j_img_install_id'],
-        j_img_install_name: (json['j_img_install_name'].toString() == 'null')
-            ? ""
-            : json['j_img_install_name'],
-        onApi: 1,
-        j_img_install_remark:
-            (json['j_img_install_remark'].toString() == 'null')
+        j_img_roof_install_id: json['j_img_roof_install_id'],
+        j_img_roof_install_image:
+            (json['j_img_roof_install_image'].toString() == 'null')
                 ? ""
-                : json['j_img_install_remark'],
-        imgType: json['imgType']);
+                : json['j_img_roof_install_image'],
+        onApi: 1,
+        j_img_install_remark: "",
+        j_img_type: json['j_img_type']);
   }
 }
